@@ -1,0 +1,3245 @@
+const { useEffect, useMemo, useRef, useState, useCallback } = React;
+
+const images = {
+  city: "url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?auto=format&fit=crop&w=1600&q=80')",
+  parliament: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1600&q=85",
+  business: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=85",
+  tech: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=85",
+  sport: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=85",
+  culture: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1600&q=85",
+  analysis: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=85",
+  world: "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80",
+  newsroom: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80",
+  power: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=900&q=80",
+  tourism: "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?auto=format&fit=crop&w=900&q=80",
+  cityPeople: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
+  road: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80",
+  debate: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=900&q=80",
+  diplomacy: "https://images.unsplash.com/photo-1541872705-1f73c6400ec9?auto=format&fit=crop&w=900&q=80",
+  map: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=900&q=80",
+  studio: "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=900&q=80",
+  photo1: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=900&q=80",
+  photo2: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80",
+  photo3:"☁️",
+  photo4: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=900&q=80",
+  photo5: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80",
+  photo6: "https://images.unsplash.com/photo-1526495124232-a04e1849168c?auto=format&fit=crop&w=900&q=80",
+};
+
+const copy = {
+  uz: {
+    live: "Jonli lenta",
+    date: new Date().toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" }),
+    search: "Qidirish...",
+    portal: "Yangiliklar portali",
+    read: "O'qish",
+    popular: "Ko'p o'qilganlar",
+    newsletterTitle: "Kunlik dayjest",
+    newsletterText: "Muhim xabarlar, tahlillar va maxsus maqolalarni pochtangizga oling.",
+    email: "Email manzilingiz",
+    subscribe: "Obuna bo'lish",
+    latest: "So'nggi yangiliklar",
+    latestNote: "Tahririyat tanlagan dolzarb xabarlar, qisqa sharhlar va mavzuga oid ma'lumotlar.",
+    all: "Barchasi",
+    special: "Maxsus loyiha",
+    specialTitle: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
+    specialText:
+      "Vatan.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+    pages: ["Bosh sahifa", "Siyosat", "Iqtisodiyot", "Tarix", "Falsafa", "Adabiyot"],
+    pageNotes: {
+      "Bosh sahifa": "Asosiy xabarlar, trendlar va kunning eng muhim mavzulari.",
+      Siyosat: "Davlat boshqaruvi, parlament, mahalliy kengashlar va jamoatchilik muhokamalari.",
+      Iqtisodiyot: "Bozorlar, biznes, moliya, bandlik va tadbirkorlik muhiti.",
+      Tarix: "O'tmish sahifalari, tarixiy voqealar va shaxslar.",
+      Falsafa: "Falsafiy qarashlar, mutafakkirlar va dunyoqarash.",
+      Adabiyot: "She'riyat, nasr, kitobxonlik va adabiy tanqid.",
+      Videolar: "Kunning eng muhim videolari, suhbatlar va tahlillar.",
+      Aloqa: "Tahririyat bilan bog'lanish, reklama va hamkorlik uchun ma'lumotlar.",
+    },
+    contact: [
+      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: news@yangikun.uz"],
+      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@yangikun.uz"],
+      ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
+    ],
+    close: "Yopish",
+  },
+  ru: {
+    live: "Лента",
+    date: new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }),
+    search: "Поиск...",
+    portal: "Новостной портал",
+    read: "Читать",
+    popular: "Популярное",
+    newsletterTitle: "Ежедневный дайджест",
+    newsletterText: "Получайте главные новости, аналитику и специальные материалы на почту.",
+    email: "Ваш email",
+    subscribe: "Подписаться",
+    latest: "Последние новости",
+    latestNote: "Актуальные сообщения, короткие разборы и контекст от редакции.",
+    all: "Все",
+    special: "Спецпроект",
+    specialTitle: "Журналистика на основе данных: отделяем события от шума",
+    specialText:
+      "Редакция Vatan.uz понятным языком объясняет важные процессы в политике, экономике, технологиях, спорте и культуре.",
+    pages: ["Главная", "Политика", "Экономика", "История", "Философия", "Литература"],
+    pageNotes: {
+      "Главная": "Главные материалы, тренды и ключевые темы дня.",
+      "Политика": "Госуправление, парламент, местные советы и общественные обсуждения.",
+      "Экономика": "Рынки, бизнес, финансы, занятость и предпринимательская среда.",
+      "Технологии": "Стартапы, искусственный интеллект, цифровые сервисы и кибербезопасность.",
+      "Спорт": "Футбол, олимпийские виды, турниры и истории спортсменов.",
+      "Культура": "Кино, театр, книги, музыка и культурные события городской жизни.",
+      "Контакты": "Связь с редакцией, реклама и партнёрские проекты.",
+    },
+    contact: [
+      ["Редакция", "Новости, пресс-релизы и фотоматериалы: news@yangikun.uz"],
+      ["Реклама", "Бренд-проекты, баннеры и специальные страницы: ads@yangikun.uz"],
+      ["Адрес", "Ташкент, медиацентр, 4 этаж. Понедельник-пятница 09:00-18:00."],
+    ],
+    close: "Закрыть",
+  },
+};
+
+copy["uzk"] = {
+  live: "\u0416\u043e\u043d\u043b\u0438 \u043b\u0435\u043d\u0442\u0430",
+  date: new Date().toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" }),
+  search: "\u049a\u0438\u0434\u0438\u0440\u0438\u0448...",
+  portal: "\u042f\u043d\u0433\u0438\u043b\u0438\u043a\u043b\u0430\u0440 \u043f\u043e\u0440\u0442\u0430\u043b\u0438",
+  read: "\u040e\u049b\u0438\u0448",
+  popular: "\u041a\u045e\u043f \u045e\u049b\u0438\u043b\u0433\u0430\u043d\u043b\u0430\u0440",
+  newsletterTitle: "\u041a\u0443\u043d\u043b\u0438\u043a \u0434\u0430\u0439\u0436\u0435\u0441\u0442",
+  newsletterText: "\u041c\u0443\u04b3\u0438\u043c \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u0442\u0430\u04b3\u043b\u0438\u043b\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u043c\u0430\u049b\u043e\u043b\u0430\u043b\u0430\u0440\u043d\u0438 \u043f\u043e\u0448\u0442\u0430\u043d\u0433\u0438\u0437\u0433\u0430 \u043e\u043b\u0438\u043d\u0433.",
+  email: "Email \u043c\u0430\u043d\u0437\u0438\u043b\u0438\u043d\u0433\u0438\u0437",
+  subscribe: "\u041e\u0431\u0443\u043d\u0430 \u0431\u045e\u043b\u0438\u0448",
+  latest: "\u0421\u045e\u043d\u0433\u0433\u0438 \u044f\u043d\u0433\u0438\u043b\u0438\u043a\u043b\u0430\u0440",
+  latestNote: "\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442 \u0442\u0430\u043d\u043b\u0430\u0433\u0430\u043d \u0434\u043e\u043b\u0437\u0430\u0440\u0431 \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u049b\u0438\u0441\u049b\u0430 \u0448\u0430\u0440\u04b3\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0432\u0437\u0443\u0433\u0430 \u043e\u0438\u0434 \u043c\u0430\u044a\u043b\u0443\u043c\u043e\u0442\u043b\u0430\u0440.",
+  all: "\u0411\u0430\u0440\u0447\u0430\u0441\u0438",
+  special: "\u041c\u0430\u0445\u0441\u0443\u0441 \u043b\u043e\u0439\u0438\u04b3\u0430",
+  specialTitle: "\u041c\u0430\u044a\u043b\u0443\u043c\u043e\u0442\u0433\u0430 \u0442\u0430\u044f\u043d\u0433\u0430\u043d \u0436\u0443\u0440\u043d\u0430\u043b\u0438\u0441\u0442\u0438\u043a\u0430",
+  specialText: "\u042f\u043d\u0433\u0438 \u041a\u0443\u043d \u0442\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442\u0438 \u0441\u0438\u0451\u0441\u0430\u0442, \u0438\u049b\u0442\u0438\u0441\u043e\u0434, \u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u044f, \u0441\u043f\u043e\u0440\u0442 \u0432\u0430 \u043c\u0430\u0434\u0430\u043d\u0438\u044f\u0442\u0434\u0430\u0433\u0438 \u043c\u0443\u04b3\u0438\u043c \u0436\u0430\u0440\u0430\u0451\u043d\u043b\u0430\u0440\u043d\u0438 \u0440\u0430\u0432\u043e\u043d \u0442\u0438\u043b\u0434\u0430 \u0442\u0443\u0448\u0443\u043d\u0442\u0438\u0440\u0430\u0434\u0438.",
+  pages: ["Бош саҳифа", "Сиёсат", "Иқтисодиёт", "Тарих", "Фалсафа", "Адабиёт"],
+  pageNotes: {
+    "\u0411\u043e\u0448 \u0441\u0430\u04b3\u0438\u0444\u0430": "\u0410\u0441\u043e\u0441\u0438\u0439 \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u0442\u0440\u0435\u043d\u0434\u043b\u0430\u0440 \u0432\u0430 \u043a\u0443\u043d\u043d\u0438\u043d\u0433 \u044d\u043d\u0433 \u043c\u0443\u04b3\u0438\u043c \u043c\u0430\u0432\u0437\u0443\u043b\u0430\u0440\u0438.",
+    "\u0421\u0438\u0451\u0441\u0430\u0442": "\u0414\u0430\u0432\u043b\u0430\u0442 \u0431\u043e\u0448\u049b\u0430\u0440\u0443\u0432\u0438, \u043f\u0430\u0440\u043b\u0430\u043c\u0435\u043d\u0442, \u043c\u0430\u04b3\u0430\u043b\u043b\u0438\u0439 \u043a\u0435\u043d\u0433\u0430\u0448\u043b\u0430\u0440 \u0432\u0430 \u0436\u0430\u043c\u043e\u0430\u0442\u0447\u0438\u043b\u0438\u043a \u043c\u0443\u04b3\u043e\u043a\u0430\u043c\u0430\u043b\u0430\u0440\u0438.",
+    "Тарих": "Ўтмиш саҳифалари, тарихий воқеалар ва шахслар.",
+    "Фалсафа": "Фалсафий қарашлар, мутафаккирлар ва дунёқараш.",
+    "Адабиёт": "Шеърият, наср, китобхонлик ва адабий танқид.",
+  },
+  contact: [
+    ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: news@yangikun.uz"],
+    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@yangikun.uz"],
+    ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
+  ],
+  close: "\u0401\u043f\u0438\u0448",
+};
+
+const categoryMap = {
+  uz: {
+    "Bosh sahifa": null,
+    "Siyosat": "Siyosat",
+    "Iqtisodiyot": "Iqtisodiyot",
+    "Tarix": "Tarix",
+    "Falsafa": "Falsafa",
+    "Adabiyot": "Adabiyot",
+    "Aloqa": "Aloqa"
+  },
+  ru: {
+    "Главная": null,
+    "Политика": "Siyosat",
+    "Экономика": "Iqtisodiyot",
+    "История": "Tarix",
+    "Философия": "Falsafa",
+    "Литература": "Adabiyot",
+    "Контакты": "Aloqa"
+  }
+};
+categoryMap["uzk"] = {
+  "Бош саҳифа": null,
+  "Сиёсат": "Siyosat",
+  "Иқтисодиёт": "Iqtisodiyot",
+  "Тарих": "Tarix",
+  "Фалсафа": "Falsafa",
+  "Адабиёт": "Adabiyot",
+  "Алоқа": "Aloqa"
+};
+
+const storyData = {
+  uz: [
+    {
+      category: "Siyosat",
+      title: "Hududlarda ochiq budjet muhokamalari yangi tartibda o'tkaziladi",
+      summary: "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi.",
+      image: images.newsroom,
+      author: "Ali Valiyev",
+      time: "Bugun, 10:30",
+      read: "3 daqiqa",
+      body: "Maqola matni...",
+      status: "published",
+      tags: "byudjet, islohot",
+      views: 120,
+    },
+    {
+      category: "Iqtisodiyot",
+      title: "Kichik biznes uchun eksport maslahat markazlari ishga tushmoqda",
+      summary: "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi.",
+      image: images.newsroom,
+      author: "Nodir Rahimov",
+      time: "Kecha, 15:45",
+      read: "5 daqiqa",
+      body: "Iqtisodiy tahlil...",
+      status: "published",
+      tags: "biznes, eksport",
+      views: 340,
+    }
+  ],
+  ru: [
+    {
+      category: "Политика",
+      title: "Новый порядок обсуждения открытого бюджета в регионах",
+      summary: "Местные советы опубликуют цифровой график рассмотрения предложений граждан.",
+      image: images.newsroom,
+      author: "Али Валиев",
+      time: "Сегодня, 10:30",
+      read: "3 минуты",
+      body: "Текст статьи...",
+      status: "published",
+      tags: "бюджет, реформа",
+      views: 120,
+    }
+  ]
+};
+
+const mediaItems = {
+  "uzk": [
+    {
+      "type": "video",
+      "title": "Дунёда нечта АЭС бор ва уларнинг биринчиси қаерда қурилган?",
+      "meta": "Дунё | 09:38",
+      "url": "https://picsum.photos/800/450?v1"
+    },
+    {
+      "type": "video",
+      "title": "Марғилонда янги туризм мажмуаси ва ўртача иш ҳақи",
+      "meta": "Ўзбекистон | 19:50",
+      "url": "https://picsum.photos/800/450?v2"
+    },
+    {
+      "type": "video",
+      "title": "Акциядорлардан қарздорлик ва компенсация",
+      "meta": "Ўзбекистон | 19:00",
+      "url": "https://picsum.photos/800/450?v3"
+    },
+    {
+      "type": "video",
+      "title": "LIVE: Вашингтондаги отишма ва Москвага борган Ароқчи",
+      "meta": "Дунё | 15:07",
+      "url": "https://picsum.photos/800/450?v4"
+    },
+    {
+      "type": "video",
+      "title": "Путин-Ароқчи учрашуви, Эрон таклифи ва кун дайжести",
+      "meta": "Дунё | 14:48",
+      "url": "https://picsum.photos/800/450?v5"
+    },
+    {
+      "type": "video",
+      "title": "Қора денгиздаги янги келишув: экспорт йўллари ўзгарадими?",
+      "meta": "Дунё | 12:15",
+      "url": "https://picsum.photos/800/450?v6"
+    },
+    {
+      "type": "photo",
+      "title": "Инспектор формасидан фойдаланиб одамларни алдади",
+      "meta": "Ўзбекистон | 17:00",
+      "url": "https://picsum.photos/800/450?p1"
+    },
+    {
+      "type": "photo",
+      "title": "Империялар қабристони: нега Афғонистон бўйсундирилмади?",
+      "meta": "Дунё | 11:34",
+      "url": "https://picsum.photos/800/450?p2"
+    },
+    {
+      "type": "photo",
+      "title": "Самарқандда халқаро маданият фестивали",
+      "meta": "Маданият | 13:20",
+      "url": "https://picsum.photos/800/450?p3"
+    },
+    {
+      "type": "photo",
+      "title": "Тошкентнинг янги кўриниши: фоторепортаж",
+      "meta": "Ўзбекистон | 10:45",
+      "url": "https://picsum.photos/800/450?p4"
+    },
+    {
+      "type": "photo",
+      "title": "Тоғ ва табиат: Ўзбекистон манзаралари",
+      "meta": "Табиат | 08:30",
+      "url": "https://picsum.photos/800/450?p5"
+    },
+    {
+      "type": "photo",
+      "title": "Ёшлар форуми: иштирокчилар ва ғоялар",
+      "meta": "Жамият | 16:00",
+      "url": "https://picsum.photos/800/450?p6"
+    },
+    {
+      "type": "photo",
+      "title": "Хайрия акцияси: оилаларга ёрдам кўрсатилди",
+      "meta": "Жамият | 11:00",
+      "url": "https://picsum.photos/800/450?p7"
+    },
+    {
+      "type": "photo",
+      "title": "Миллий кийим куни: либослар намойиши",
+      "meta": "Маданият | 09:15",
+      "url": "https://picsum.photos/800/450?p8"
+    },
+    {
+      "type": "photo",
+      "title": "Қадимий Бухоро кўчалари: тарихий фоторепортаж",
+      "meta": "Ўзбекистон | 15:40",
+      "url": "https://picsum.photos/800/450?p9"
+    },
+    {
+      "type": "photo",
+      "title": "Ўзбек миллий таомлари фестивали",
+      "meta": "Маданият | 12:00",
+      "url": "https://picsum.photos/800/450?p10"
+    },
+    {
+      "type": "photo",
+      "title": "Янги Тошкент лойиҳаси тақдимоти",
+      "meta": "Ўзбекистон | 09:30",
+      "url": "https://picsum.photos/800/450?p11"
+    }
+  ],
+  "uz": [
+    {
+      "type": "video",
+      "title": "Dunyoda nechta AES bor va ularning birinchisi qayerda qurilgan?",
+      "meta": "Dunyo | 09:38",
+      "url": "https://picsum.photos/800/450?v1"
+    },
+    {
+      "type": "video",
+      "title": "Marg'ilonda yangi turizm majmuasi va o'rtacha ish haqi",
+      "meta": "O'zbekiston | 19:50",
+      "url": "https://picsum.photos/800/450?v2"
+    },
+    {
+      "type": "video",
+      "title": "Aksiyadorlardan qarzdorlik va kompensatsiya",
+      "meta": "O'zbekiston | 19:00",
+      "url": "https://picsum.photos/800/450?v3"
+    },
+    {
+      "type": "video",
+      "title": "LIVE: Vashingtondagi otishma va Moskvaga borgan Aroqchi",
+      "meta": "Dunyo | 15:07",
+      "url": "https://picsum.photos/800/450?v4"
+    },
+    {
+      "type": "video",
+      "title": "Putin-Aroqchi uchrashuvi, Eron taklifi va kun dayjesti",
+      "meta": "Dunyo | 14:48",
+      "url": "https://picsum.photos/800/450?v5"
+    },
+    {
+      "type": "video",
+      "title": "Qora dengizdagi yangi kelishuv: eksport yo'llari o'zgaradimi?",
+      "meta": "Dunyo | 12:15",
+      "url": "https://picsum.photos/800/450?v6"
+    },
+    {
+      "type": "photo",
+      "title": "Inspektor formasidan foydalanib odamlarni aldadi",
+      "meta": "O'zbekiston | 17:00",
+      "url": "https://picsum.photos/800/450?p1"
+    },
+    {
+      "type": "photo",
+      "title": "Imperiyalar qabristoni: nega Afg'oniston bo'ysundirilmadi?",
+      "meta": "Dunyo | 11:34",
+      "url": "https://picsum.photos/800/450?p2"
+    },
+    {
+      "type": "photo",
+      "title": "Samarqandda xalqaro madaniyat festivali",
+      "meta": "Madaniyat | 13:20",
+      "url": "https://picsum.photos/800/450?p3"
+    },
+    {
+      "type": "photo",
+      "title": "Toshkentning yangi ko'rinishi: fotoreportaj",
+      "meta": "O'zbekiston | 10:45",
+      "url": "https://picsum.photos/800/450?p4"
+    },
+    {
+      "type": "photo",
+      "title": "Tog' va tabiat: O'zbekiston manzaralari",
+      "meta": "Tabiat | 08:30",
+      "url": "https://picsum.photos/800/450?p5"
+    },
+    {
+      "type": "photo",
+      "title": "Yoshlar forumi: ishtirokchilar va g'oyalar",
+      "meta": "Jamiyat | 16:00",
+      "url": "https://picsum.photos/800/450?p6"
+    },
+    {
+      "type": "photo",
+      "title": "Xayriya aksiyasi: oilalarga yordam ko'rsatildi",
+      "meta": "Jamiyat | 11:00",
+      "url": "https://picsum.photos/800/450?p7"
+    },
+    {
+      "type": "photo",
+      "title": "Milliy kiyim kuni: liboslar namoyishi",
+      "meta": "Madaniyat | 09:15",
+      "url": "https://picsum.photos/800/450?p8"
+    }
+  ],
+  "ru": [
+    {
+      "type": "video",
+      "title": "Сколько АЭС в мире и где была построена первая?",
+      "meta": "Мир | 09:38",
+      "url": "https://picsum.photos/800/450?v1"
+    },
+    {
+      "type": "video",
+      "title": "Новый туристический комплекс в Маргилане и средняя зарплата",
+      "meta": "Узбекистан | 19:50",
+      "url": "https://picsum.photos/800/450?v2"
+    },
+    {
+      "type": "video",
+      "title": "Задолженность и компенсации акционерам",
+      "meta": "Узбекистан | 19:00",
+      "url": "https://picsum.photos/800/450?v3"
+    },
+    {
+      "type": "video",
+      "title": "LIVE: Стрельба в Вашингтоне и визит Аракчи в Москву",
+      "meta": "Мир | 15:07",
+      "url": "https://picsum.photos/800/450?v4"
+    },
+    {
+      "type": "video",
+      "title": "Встреча Путина и Аракчи, предложение Ирана и дайджест дня",
+      "meta": "Мир | 14:48",
+      "url": "https://picsum.photos/800/450?v5"
+    },
+    {
+      "type": "video",
+      "title": "Новое соглашение в Чёрном море: изменятся ли пути экспорта?",
+      "meta": "Мир | 12:15",
+      "url": "https://picsum.photos/800/450?v6"
+    },
+    {
+      "type": "photo",
+      "title": "Обманывал людей, используя форму инспектора",
+      "meta": "Узбекистан | 17:00",
+      "url": "https://picsum.photos/800/450?p1"
+    },
+    {
+      "type": "photo",
+      "title": "Кладбище империй: почему Афганистан не был покорен?",
+      "meta": "Мир | 11:34",
+      "url": "https://picsum.photos/800/450?p2"
+    },
+    {
+      "type": "photo",
+      "title": "Международный фестиваль культуры в Самарканде",
+      "meta": "Культура | 13:20",
+      "url": "https://picsum.photos/800/450?p3"
+    },
+    {
+      "type": "photo",
+      "title": "Новый облик Ташкента: фоторепортаж",
+      "meta": "Узбекистан | 10:45",
+      "url": "https://picsum.photos/800/450?p4"
+    },
+    {
+      "type": "photo",
+      "title": "Горы и природа: пейзажи Узбекистана",
+      "meta": "Природа | 08:30",
+      "url": "https://picsum.photos/800/450?p5"
+    },
+    {
+      "type": "photo",
+      "title": "Молодежный форум: участники и идеи",
+      "meta": "Общество | 16:00",
+      "url": "https://picsum.photos/800/450?p6"
+    },
+    {
+      "type": "photo",
+      "title": "Благотворительная акция: помощь семьям",
+      "meta": "Общество | 11:00",
+      "url": "https://picsum.photos/800/450?p7"
+    },
+    {
+      "type": "photo",
+      "title": "День национальной одежды: показ мод",
+      "meta": "Культура | 09:15",
+      "url": "https://picsum.photos/800/450?p8"
+    }
+  ]
+};
+
+
+const DEFAULT_PASSWORD = "admin2026";
+const emptyStory = {
+  category: "Siyosat",
+  title: "",
+  summary: "",
+  image: images.newsroom,
+  author: "",
+  time: "Hozir",
+  read: "3 daqiqa",
+  body: "",
+  status: "published",
+  tags: "",
+  metaTitle: "",
+  metaDesc: "",
+  views: 0,
+  isHero: false,
+  isEditorPick: false,
+  isBreaking: false,
+  countViews: true,
+  publishAt: "", // Rejalashtirish sanasi (YYYY-MM-DDTHH:mm)
+};
+
+const DEFAULT_SITE_CONFIG = {
+  siteName: "Vatan.uz",
+  logoUrl: "",
+  email: "news@yangikun.uz",
+  telegram: "https://t.me/yangikun",
+  bannerText: "",
+  bannerActive: false,
+  specialUz: {
+    kicker: "Maxsus loyiha",
+    title: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
+    text: "Vatan.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+    badge: "Jonli tahririyat",
+    image: "",
+    features: "Tezkor yangiliklar, Mustaqil tahlil, Ikki tilda, Ishonchli manba",
+    stat1: "24/7", stat1label: "Monitoring",
+    stat2: "7",    stat2label: "Bo'lim",
+    stat3: "2",    stat3label: "Til",
+    stat4: "100+", stat4label: "Maqola",
+  },
+  specialRu: {
+    kicker: "Спецпроект",
+    title: "Журналистика на основе данных: отделяем события от шума",
+    text: "Редакция Vatan.uz понятным языком объясняет важные процессы в политике, экономике, технологиях, спорте и культуре.",
+    badge: "Живая редакция",
+    image: "",
+    features: "Быстрые новости, Независимый анализ, На двух языках, Надёжный источник",
+    stat1: "24/7", stat1label: "Мониторинг",
+    stat2: "7",    stat2label: "Разделов",
+    stat3: "2",    stat3label: "Языка",
+    stat4: "100+", stat4label: "Статей",
+  },
+  ads: [],
+};
+const fallbackStory = {
+  ...emptyStory,
+  id: "fallback-story",
+  title: "Yangi maqola qo'shing",
+  summary: "Admin panel orqali birinchi yangilikni joylashtiring.",
+  author: "Vatan.uz",
+  body: "Bu vaqtinchalik matn. Admin paneldan maqola qo'shilganda sayt lentasi yangilanadi.",
+};
+
+function makeId() {
+  return `story-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function RichEditor({ value, onChange }) {
+  const editorRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const isComposing = useRef(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const el = editorRef.current;
+    if (!el) return;
+    if (el.innerHTML !== value) {
+      el.innerHTML = value || "";
+    }
+  }, []);
+
+  function exec(cmd, val = null) {
+    editorRef.current.focus();
+    document.execCommand(cmd, false, val);
+    syncContent();
+  }
+
+  function syncContent() {
+    if (editorRef.current) onChange(editorRef.current.innerHTML);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      exec("insertHTML", "&nbsp;&nbsp;&nbsp;&nbsp;");
+    }
+  }
+
+  async function uploadAndInsert(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const res = await fetch("/api/admin/upload", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl: reader.result }),
+          });
+          const data = await res.json();
+          if (data.url) {
+            editorRef.current.focus();
+            document.execCommand("insertImage", false, data.url);
+            syncContent();
+          }
+        } catch {}
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch { setUploading(false); }
+  }
+
+  function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        uploadAndInsert(item.getAsFile());
+        return;
+      }
+    }
+  }
+
+  function handleDrop(e) {
+    const file = e.dataTransfer?.files?.[0];
+    if (file?.type.startsWith("image/")) {
+      e.preventDefault();
+      uploadAndInsert(file);
+    }
+  }
+
+  const AlignLeftIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/>
+    </svg>
+  );
+  const AlignCenterIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+  );
+  const AlignRightIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/>
+    </svg>
+  );
+  const AlignJustifyIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  );
+
+  function insertLink() {
+    const url = prompt("Havola URL:", "https://");
+    if (url) exec("createLink", url);
+  }
+
+  function insertImage() {
+    const url = prompt("Rasm URL:", "https://");
+    if (url) exec("insertImage", url);
+  }
+
+  function clearFormat() {
+    exec("removeFormat");
+    exec("formatBlock", "p");
+  }
+
+  const Divider = () => <span className="rich-divider" />;
+
+  return (
+    <div className="rich-editor">
+      <div className="rich-toolbar">
+        <div className="rich-toolbar-row">
+          {/* Matn formatlash */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Qalin (Ctrl+B)" className="rich-tool-btn" style={{fontWeight:900}} onMouseDown={e=>{e.preventDefault();exec("bold");}}>B</button>
+            <button type="button" title="Kursiv (Ctrl+I)" className="rich-tool-btn" style={{fontStyle:"italic"}} onMouseDown={e=>{e.preventDefault();exec("italic");}}>I</button>
+            <button type="button" title="Chizilgan (Ctrl+U)" className="rich-tool-btn" style={{textDecoration:"underline"}} onMouseDown={e=>{e.preventDefault();exec("underline");}}>U</button>
+            <button type="button" title="O'tkazib chizilgan" className="rich-tool-btn" style={{textDecoration:"line-through"}} onMouseDown={e=>{e.preventDefault();exec("strikeThrough");}}>S</button>
+          </div>
+
+          <Divider />
+
+          {/* Sarlavhalar */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Katta sarlavha" className="rich-tool-btn rich-tool-h1" onMouseDown={e=>{e.preventDefault();exec("formatBlock","h2");}}>H1</button>
+            <button type="button" title="Kichik sarlavha" className="rich-tool-btn rich-tool-h2" onMouseDown={e=>{e.preventDefault();exec("formatBlock","h3");}}>H2</button>
+            <button type="button" title="Paragraf" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("formatBlock","p");}}>¶</button>
+          </div>
+
+          <Divider />
+
+          {/* Hizalanish */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Chapga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyLeft");}}><AlignLeftIcon /></button>
+            <button type="button" title="Markazga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyCenter");}}><AlignCenterIcon /></button>
+            <button type="button" title="O'ngga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyRight");}}><AlignRightIcon /></button>
+            <button type="button" title="Ikki tomonga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyFull");}}><AlignJustifyIcon /></button>
+          </div>
+
+          <Divider />
+
+          {/* Ro'yxatlar */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Raqamli ro'yxat" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertOrderedList");}}>1.</button>
+            <button type="button" title="Nuqtali ro'yxat" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertUnorderedList");}}>•</button>
+            <button type="button" title="Ajratgich chiziq" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertHorizontalRule");}}>—</button>
+          </div>
+
+          <Divider />
+
+          {/* Qo'shish */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Havola qo'shish" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();insertLink();}}>🔗</button>
+            <button
+              type="button"
+              title="Rasm yuklash (kompyuterdan)"
+              className={`rich-tool-btn rich-tool-img ${uploading ? "uploading" : ""}`}
+              onMouseDown={e=>{ e.preventDefault(); fileInputRef.current?.click(); }}
+            >{uploading ? "⏳" : "🖼"}</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{display:"none"}}
+              onChange={e => { uploadAndInsert(e.target.files?.[0]); e.target.value=""; }}
+            />
+          </div>
+
+          <Divider />
+
+          {/* Undo/Redo + Tozalash */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Bekor qilish (Ctrl+Z)" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("undo");}}>↺</button>
+            <button type="button" title="Qayta qilish (Ctrl+Y)" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("redo");}}>↻</button>
+            <button type="button" title="Formatlashni tozalash" className="rich-tool-btn rich-tool-clear" onMouseDown={e=>{e.preventDefault();clearFormat();}}>✕</button>
+          </div>
+        </div>
+      </div>
+      {uploading && (
+        <div className="rich-upload-bar">
+          <span className="rich-upload-spinner" /> Rasm yuklanmoqda...
+        </div>
+      )}
+      <div
+        ref={editorRef}
+        className="rich-content"
+        contentEditable
+        suppressContentEditableWarning
+        onInput={syncContent}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onDrop={handleDrop}
+        onDragOver={e => e.preventDefault()}
+        onCompositionStart={() => { isComposing.current = true; }}
+        onCompositionEnd={() => { isComposing.current = false; syncContent(); }}
+        data-placeholder="To'liq maqola matni. Paragraflarni Enter bilan ajrating..."
+      />
+    </div>
+  );
+}
+
+function withIds(stories) {
+  return {
+    uz: stories.uz.map((story, index) => ({ id: story.id || `uz-seed-${index}`, status: story.status || "published", ...story })),
+    ru: stories.ru.map((story, index) => ({ id: story.id || `ru-seed-${index}`, status: story.status || "published", ...story })),
+    uzk: stories.uz.map((story, index) => ({ id: story.id || `uzk-seed-${index}`, status: story.status || "published", ...story })),
+  };
+}
+
+// Лотин <-> Кирилл о'гириш
+const latToCyr = {
+  'a':'а','b':'б','d':'д','e':'е','f':'ф','g':'г','h':'ҳ','i':'и','j':'ж','k':'к','l':'л','m':'м','n':'н',
+  'o':'о','p':'п','q':'қ','r':'р','s':'с','t':'т','u':'у','v':'в','x':'х','y':'й','z':'з',
+  // о'збек апостроф турлари
+  "o'":'ў',"oʻ":'ў',"o`":'ў',"oʻ":'ў',"oʼ":'ў',
+  "g'":'ғ',"gʻ":'ғ',"g`":'ғ',"gʻ":'ғ',"gʼ":'ғ',
+  // икки ҳарфли комбинациялар
+  'sh':'ш','ch':'ч','yo':'ё','yu':'ю','ya':'я','ye':'е','yo\'':'йў',
+  '"':'ъ',
+  'A':'А','B':'Б','D':'Д','E':'Е','F':'Ф','G':'Г','H':'Ҳ','I':'И','J':'Ж','K':'К','L':'Л','M':'М','N':'Н',
+  'O':'О','P':'П','Q':'Қ','R':'Р','S':'С','T':'Т','U':'У','V':'В','X':'Х','Y':'Й','Z':'З',
+  "O'":'Ў',"Oʻ":'Ў',"O`":'Ў',"Oʻ":'Ў',"Oʼ":'Ў',
+  "G'":'Ғ',"Gʻ":'Ғ',"G`":'Ғ',"Gʻ":'Ғ',"Gʼ":'Ғ',
+  'Sh':'Ш','Ch':'Ч','Yo':'Ё','Yu':'Ю','Ya':'Я','Ye':'Е'
+};
+
+// 2-harfli tezkor qidiruv uchun kesh
+const lat2Char = {};
+const cyr2Char = {};
+for (let k in latToCyr) { if (k.length === 2) lat2Char[k.toLowerCase()] = latToCyr[k]; }
+for (let k in cyrToLat) { if (k.length === 2) cyr2Char[k.toLowerCase()] = cyrToLat[k]; }
+
+const cyrToLat = {
+  'а':'a','б':'b','в':'v','д':'d','е':'e','э':'e','ф':'f','г':'g','ҳ':'h','и':'i','ж':'j','к':'k','л':'l','м':'m','н':'n',
+  'о':'o','п':'p','қ':'q','р':'r','с':'s','т':'t','у':'u','ў':'oʻ','ғ':'gʻ',
+  'ш':'sh','ч':'ch','ё':'yo','ю':'yu','я':'ya','ъ':'"','ь':'',
+  'А':'A','Б':'B','В':'V','Д':'D','Е':'E','Э':'E','Ф':'F','Г':'G','Ҳ':'H','И':'I','Ж':'J','К':'K','Л':'L','М':'M','Н':'N',
+  'О':'O','П':'P','Қ':'Q','Р':'R','С':'S','Т':'T','У':'U','Ў':'Oʻ','Ғ':'Gʻ',
+  'Ш':'Sh','Ч':'Ch','Ё':'Yo','Ю':'Yu','Я':'Ya'
+};
+
+const uiRu = {
+  "Bosh sahifa": "Главная",
+  "Maqolalar": "Статьи",
+  "Siz uchun tavsiyalar": "Рекомендации для вас",
+  "Ko'p o'qiysiz: ": "Читаете чаще: ",
+  "Ko'proq yangiliklar": "Больше новостей",
+  "Video": "Видео",
+  "Foto": "Фото",
+  "Tomosha qilish →": "Смотреть →",
+  "Ko'rish →": "Смотреть →",
+  "Kunning eng muhim videolari": "Главные видео дня",
+  "Fotoreportajlar va vizual materiallar": "Фоторепортажи и визуальные материалы",
+  "Tezkor yangiliklar": "Быстрые новости",
+  "Mustaqil tahlil": "Независимый анализ",
+  "Ikki tilda": "На двух языках",
+  "Ishonchli manba": "Надёжный источник",
+  "Monitoring": "Мониторинг",
+  "Bo'lim": "Разделы",
+  "Til": "Языки",
+  "Maqola": "Статьи",
+  "Bu bo'limda hozircha maqola yo'q.": "В этом разделе пока нет статей.",
+  "Saqlash": "Сохранить",
+  "Saqlangandan olib tashlash": "Убрать из сохраненных",
+  "★ Saqlangan": "★ Сохранено",
+  "☆ Saqlash": "☆ Сохранить",
+  "Izohlar": "Комментарии",
+  "Hozircha izoh yo'q. Birinchi bo'ling!": "Комментариев пока нет. Будьте первым!",
+  "Vatan.uz tahririyati": "Редакция Vatan.uz",
+  "Jonli tahririyat": "Живая редакция"
+};
+
+function T(str) {
+  if (!str) return str;
+  const lang = window.__currentLang || "uz";
+  if (lang === "ru") return uiRu[str] || str;
+  if (lang === "uzk") return convertText(str, true);
+  return str;
+}
+
+function convertText(text, toCyrillic) {
+  if (!text) return text;
+  if (toCyrillic) {
+    text = text
+      .replace(/yo'/g, 'йў').replace(/Yo'/g, 'Йў')
+      .replace(/yoʻ/g, 'йў').replace(/Yoʻ/g, 'Йў')
+      .replace(/yoʼ/g, 'йў').replace(/Yoʼ/g, 'Йў')
+      .replace(/yo`/g, 'йў').replace(/Yo`/g, 'Йў');
+  }
+  const map = toCyrillic ? latToCyr : cyrToLat;
+  const twoCharMap = toCyrillic ? lat2Char : cyr2Char;
+  let result = '';
+  let i = 0;
+  const len = text.length;
+  while (i < len) {
+    if (i < len - 1) {
+      const two = text[i] + text[i+1];
+      const twoLower = two.toLowerCase();
+      let mapped = map[two];
+      if (mapped === undefined && twoCharMap[twoLower] !== undefined) {
+        mapped = twoCharMap[twoLower];
+        if (two[0] === two[0].toUpperCase()) {
+          mapped = mapped.toUpperCase();
+        }
+      }
+      if (mapped !== undefined) {
+        result += mapped;
+        i += 2;
+        continue;
+      }
+    }
+    const ch = text[i];
+    if (toCyrillic && (ch === "'" || ch === "ʼ" || ch === "ʻ" || ch === "`")) {
+      const prev = i > 0 ? text[i-1] : '';
+      const next = i < len - 1 ? text[i+1] : '';
+      if (/[a-zA-Z]/.test(prev) && /[a-zA-Z]/.test(next)) {
+        result += 'ъ';
+      } else {
+        result += ch;
+      }
+    } else {
+      result += map[ch] || ch;
+    }
+    i++;
+  }
+  return result;
+}
+
+
+function VideosPage({ lang, t, mediaItems, onOpen, setPage }) {
+  const isUz = lang !== "ru";
+  const videos = mediaItems.filter(item => item.type === "video");
+  const title = lang === "uz" ? "Videolar" : (lang === "uzk" ? "Видеолар" : "Видео");
+  const note = lang === "uz" ? "Kunning eng muhim videolari" : (lang === "uzk" ? "Куннинг энг муҳим видеолари" : "Главные видео дня");
+
+  return (
+    <main className="section animate-fade-in">
+      <div className="section-inner">
+        <button 
+          className="article-back-btn" 
+          onClick={() => { setPage(lang === "uz" ? "Bosh sahifa" : (lang === "uzk" ? "Бош саҳифа" : "Главная")); window.scrollTo({ top: 0, behavior: "instant" }); }} 
+          style={{marginBottom: 24}}
+        >
+          <span>&#8592;</span> {isUz ? (lang === "uzk" ? "Орқага" : "Orqaga") : "Назад"}
+        </button>
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">📺 {title}</h2>
+            <p className="section-note">{note}</p>
+          </div>
+        </div>
+        
+        <div className="videos-grid-page" style={{display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", marginTop: "24px"}}>
+          {videos.map((item, idx) => {
+            const { title: itemTitle, meta, url: image } = item;
+            return (
+              <button 
+                key={idx}
+                className="video-card-page"
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  padding: 0,
+                  borderBottom: "3px solid var(--brand)",
+                  transition: "transform 0.2s"
+                }}
+                onClick={() => {
+                  onOpen({
+                    id: `media-${Date.now()}-${Math.random()}`,
+                    title: itemTitle,
+                    category: meta ? meta.split(' | ')[0] : "video",
+                    time: meta ? meta.split(' | ')[1] : "",
+                    image: null,
+                    body: `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 24px;">
+                             <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                           </div>
+                           <p>${itemTitle} haqida batafsil ma'lumot...</p>`
+                  });
+                }}
+              >
+                <div style={{position: "relative", width: "100%", paddingTop: "56.25%", background: "#000"}}>
+                  <img src={image} style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover"}} alt="" />
+                  <span className="media-list-icon video" style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "44px", height: "44px", background: "rgba(195, 25, 50, 0.85)", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px"}}>▶</span>
+                </div>
+                <div style={{padding: "16px", display: "flex", flexDirection: "column", gap: "8px"}}>
+                  <span style={{fontSize: "12px", color: "var(--muted)", fontWeight: "600"}}>{meta}</span>
+                  <strong style={{fontSize: "15px", fontWeight: "700", color: "var(--ink)", lineHeight: "1.4"}}>{itemTitle}</strong>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function PhotosPage({ lang, t, mediaItems, onOpen, setPage }) {
+  const isUz = lang !== "ru";
+  const photos = mediaItems.filter(item => item.type === "photo");
+  const title = lang === "uz" ? "Fotolar" : (lang === "uzk" ? "Фотолар" : "Фото");
+  const note = lang === "uz" ? "Fotoreportajlar va vizual materiallar" : (lang === "uzk" ? "Фоторепортажлар ва визуал материаллар" : "Фоторепортажи и визуальные материалы");
+
+  return (
+    <main className="section animate-fade-in">
+      <div className="section-inner">
+        <button 
+          className="article-back-btn" 
+          onClick={() => { setPage(lang === "uz" ? "Bosh sahifa" : (lang === "uzk" ? "Бош саҳифа" : "Главная")); window.scrollTo({ top: 0, behavior: "instant" }); }} 
+          style={{marginBottom: 24}}
+        >
+          <span>&#8592;</span> {isUz ? (lang === "uzk" ? "Орқага" : "Orqaga") : "Назад"}
+        </button>
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">📷 {title}</h2>
+            <p className="section-note">{note}</p>
+          </div>
+        </div>
+        <div className="media-photo-grid" style={{marginTop: 24}}>
+          {photos.map((item, idx) => {
+            const { title: itemTitle, meta, url: image } = item;
+            return (
+              <article className="media-photo-card" key={idx}>
+                <button onClick={() => {
+                  onOpen({
+                    id: `media-${Date.now()}-${Math.random()}`,
+                    title: itemTitle,
+                    category: meta ? meta.split(' | ')[0] : "photo",
+                    time: meta ? meta.split(' | ')[1] : "",
+                    image: image,
+                    body: `<p style="text-align:center; padding: 40px; background: #eee; border-radius: 12px; font-weight: bold; margin-bottom: 20px;">[ Fotogalereya Placeholder ]</p><p>${itemTitle} haqida batafsil ma'lumot...</p>`
+                  });
+                }}>
+                  <div className="media-photo-thumb">
+                    <img src={image} alt="" />
+                    <div className="media-photo-overlay" />
+                    <span className="media-photo-icon">◉</span>
+                    <span className="media-photo-meta">{meta}</span>
+                  </div>
+                  <div className="media-photo-body">
+                    <strong>{itemTitle}</strong>
+                  </div>
+                </button>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function App() {
+  const [lang, setLang] = useState("uz");
+  const [uiStrings, setUiStrings] = useState({});
+
+  useEffect(() => {
+    fetch('/api/translations')
+      .then(res => res.json())
+      .then(data => {
+        if (data.translations) {
+          setUiStrings(data.translations);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  window.__currentLang = lang;
+  const [menuOpen, setMenuOpen] = useState(false);
+  
+  const [page, setPage] = useState(
+    window.location.hash === "#admin" ? "admin" : copy.uz.pages[0]
+  );
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [activeStory, setActiveStory] = useState(null);
+  const [allStories, setAllStories] = useState(withIds(storyData));
+  const [serverMessage, setServerMessage] = useState("");
+  const [siteConfig, setSiteConfig] = useState(DEFAULT_SITE_CONFIG);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("yk-dark") === "1");
+  const [savedIds, setSavedIds] = useState(() => JSON.parse(localStorage.getItem("yk-saved") || "[]"));
+  const [scrollVisible, setScrollVisible] = useState(false);
+  const [pinnedHeroId, setPinnedHeroId] = useState(() => localStorage.getItem("yk-hero") || "");
+  const [pinnedSideIds, setPinnedSideIds] = useState(() => JSON.parse(localStorage.getItem("yk-sides") || "[]"));
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [activeAuthor, setActiveAuthor] = useState(null);
+  const [activeTag, setActiveTag] = useState(null);
+  const [reactions, setReactions] = useState(() => JSON.parse(localStorage.getItem("yk-reactions") || "{}"));
+  const [ads, setAds] = useState(() => {
+    localStorage.removeItem("yk-ads");
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("yk-ads", JSON.stringify(ads));
+  }, [ads]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-reactions", JSON.stringify(reactions));
+  }, [reactions]);
+
+  function addReaction(storyId, emoji) {
+    setReactions(prev => {
+      const cur = prev[storyId] || {};
+      const myPrev = cur._mine;
+      if (myPrev === emoji) return prev;
+      const updated = { ...cur };
+      if (myPrev) updated[myPrev] = Math.max(0, (updated[myPrev] || 1) - 1);
+      updated[emoji] = (updated[emoji] || 0) + 1;
+      updated._mine = emoji;
+      return { ...prev, [storyId]: updated };
+    });
+  }
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("yk-dark", darkMode ? "1" : "0");
+  }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-saved", JSON.stringify(savedIds));
+  }, [savedIds]);
+
+  useEffect(() => {
+    if (pinnedHeroId) localStorage.setItem("yk-hero", pinnedHeroId);
+    else localStorage.removeItem("yk-hero");
+  }, [pinnedHeroId]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-sides", JSON.stringify(pinnedSideIds));
+  }, [pinnedSideIds]);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrollVisible(window.scrollY > 400);
+      // Glassmorphism header scrolled class
+      const header = document.querySelector(".header");
+      if (header) header.classList.toggle("scrolled", window.scrollY > 10);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll fade-in animation (IntersectionObserver)
+  useEffect(() => {
+    const els = document.querySelectorAll(".fade-in-up");
+    if (!els.length) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  });
+
+  // Keyboard shortcuts: / → search, ESC → close story
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "/" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        document.querySelector(".search")?.focus();
+      }
+      if (e.key === "Escape" && activeStory) {
+        setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"});
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeStory]);
+
+  function toggleSave(id) {
+    setSavedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  function handleView(storyId) {
+    setAllStories(prev => ({
+      ...prev,
+      uz: prev.uz.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
+      ru: prev.ru.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
+    }));
+  }
+
+  useEffect(() => {
+    function onHash() {
+      if (window.location.hash === "#admin") setPage("admin");
+    }
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const t = copy[lang] || copy.uz;
+  const dataLang = lang;
+  const now = new Date().toISOString();
+  const rawStories = (allStories[dataLang] || []).filter((story) => {
+    if (story.status !== "published") return false;
+    // Rejalashtirish sanasi o'tganmi yoki yo'qmi
+    if (story.publishAt && story.publishAt > now) return false;
+    return true;
+  });
+  // Крилл тилда кўрсатишда матнни автоматик ўгириш
+  const stories = rawStories.map(story => {
+    let catVal = story.category === "Iqtisod" ? "Iqtisodiyot" : story.category;
+    let displayCat = catVal;
+    if (lang === "ru") {
+       const map = categoryMap.ru || {};
+       const found = Object.keys(map).find(k => map[k] === catVal);
+       if (found) displayCat = found;
+    } else if (lang === "uzk") {
+       displayCat = convertText(catVal, true);
+    }
+    
+    if (lang === "ru") {
+       return {
+         ...story,
+         category: displayCat,
+         author: story.author === "Vatan.uz tahririyati" ? "Редакция Vatan.uz" : story.author,
+         read: story.read ? story.read.replace('daqiqa', 'минуты') : story.read
+       };
+    }
+    if (lang === "uzk") {
+       return {
+         ...story,
+         title: convertText(story.title, true),
+         summary: convertText(story.summary, true),
+         body: convertText(story.body, true),
+         author: convertText(story.author, true),
+         category: displayCat,
+         read: convertText(story.read, true),
+         time: convertText(story.time, true),
+         tags: convertText(story.tags, true)
+       };
+    }
+    return story;
+  });
+  const adminStories = allStories[dataLang] || [];
+  const pages = t.pages;
+  const selectedCategory = (categoryMap[lang] || categoryMap.uz)[page] ?? null;
+
+  function changeLang(nextLang) {
+    try {
+      const currentIndex = Math.max(0, pages.indexOf(page));
+      const nextCopy = copy[nextLang] || copy.uz;
+      const nextPages = nextCopy.pages || copy.uz.pages;
+      setLang(nextLang);
+      setPage(nextPages[currentIndex] || nextPages[0]);
+      setFilter("all");
+      setQuery("");
+      setActiveStory(null);
+    } catch(e) {
+      console.error("changeLang error:", e);
+    }
+  }
+
+  const categories = useMemo(() => [t.all, ...new Set(stories.map((story) => story.category))], [stories, t.all]);
+
+  const visibleStories = stories.filter((story) => {
+    const matchesPage = !selectedCategory || story.category === selectedCategory;
+    const matchesFilter = filter === "all" || story.category === filter || filter === t.all;
+    const text = `${story.title} ${story.summary} ${story.category}`.toLowerCase();
+    return matchesPage && matchesFilter && text.includes(query.toLowerCase());
+  });
+
+  const pinnedStory = pinnedHeroId ? stories.find(s => s.id === pinnedHeroId) : null;
+  const hero = pinnedStory || stories[2] || stories[0] || adminStories[0] || fallbackStory;
+  const pinnedSideStories = pinnedSideIds.map(id => stories.find(s => s.id === id)).filter(Boolean);
+  
+  // Exclude hero and pinned grid stories
+  const remainingStories = stories.filter(s => s.id !== hero.id && !pinnedSideIds.includes(s.id));
+  const allAvailable = [...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories];
+  
+  // gridStories takes pinned ones first, then fills up to 9
+  const gridStories = [...pinnedSideStories, ...allAvailable].slice(0, 9);
+  
+  // latestStories takes the next 9 items
+  const usedForGrid = gridStories.filter(s => !pinnedSideIds.includes(s.id)).length;
+  const latestStories = allAvailable.slice(usedForGrid, usedForGrid + 9);
+
+  useEffect(() => {
+    refreshPublicStories();
+  }, []);
+
+  async function refreshPublicStories() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/stories");
+      if (!response.ok) throw new Error("API javob bermadi");
+      const data = await response.json();
+      const uzStories = data.stories.uz.length ? data.stories.uz : withIds(storyData).uz;
+      const uzkStories = data.stories.uzk && data.stories.uzk.length ? data.stories.uzk : uzStories;
+      setAllStories(prev => ({
+        ...prev,
+        uz: uzStories,
+        ru: data.stories.ru.length ? data.stories.ru : withIds(storyData).ru,
+        uzk: uzkStories,
+      }));
+      setServerMessage("");
+    } catch (error) {
+      setServerMessage("Server API bilan aloqa bo'lmadi, demo maqolalar ko'rsatilmoqda.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="app">
+      <WeatherBar lang={lang} />
+      <header className="header">
+        <div className="nav-inner">
+          <button className="menu-toggle" onClick={() => setMenuOpen(true)} aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+          <button className="brand nav-link" onClick={() => { setPage(pages[0]); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} aria-label="VATAN" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            
+            {siteConfig.logoUrl ? (
+              <img src={siteConfig.logoUrl} alt="Logo" height="44" style={{ objectFit: "contain", borderRadius: "4px" }} />
+            ) : (
+              <svg width="150" height="44" viewBox="0 0 150 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(0, 4)">
+                  <path d="M18 0L33 8.66V26L18 34.64L3 26V8.66L18 0Z" fill="#D30018"/>
+                  <path d="M18 0L33 8.66V26L18 34.64V17.32H3L18 0Z" fill="#B30014"/>
+                  <path d="M10 10H16L21 21L26 10H32L21 30L10 10Z" fill="#FFFFFF"/>
+                </g>
+                <text x="45" y="32" fill="#D30018" fontFamily="Georgia, serif" fontSize="28" fontWeight="bold" letterSpacing="1">VATAN</text>
+              </svg>
+            )}
+          </button>
+          <nav className="nav-links" aria-label="Main navigation">
+            {pages.slice(1).map((item) => (
+              <button
+                key={item}
+                className={`nav-link ${page === item ? "active" : ""}`}
+                onClick={() => {
+                  setPage(item);
+                  setFilter("all");
+                  setActiveStory(null);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+          <div className="actions">
+            <input
+              className="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t.search}
+              aria-label={t.search}
+            />
+            <div className="lang-toggle" aria-label="Language">
+              <button className={lang === "uzk" ? "active" : ""} onClick={() => changeLang("uzk")}>{"\u040e\u0417"}</button>
+              <button className={lang === "uz" ? "active" : ""} onClick={() => changeLang("uz")}>UZ</button>
+              <button className={lang === "ru" ? "active" : ""} onClick={() => changeLang("ru")}>RU</button>
+            </div>
+            <button
+              className="dark-toggle"
+              title={darkMode ? "Kunduz rejimi" : "Qorong'u rejim"}
+              onClick={() => setDarkMode(d => !d)}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "40px", height: "40px", padding: 0, borderRadius: "50%", background: "var(--fill)", border: "1px solid var(--line)", color: "var(--ink)", cursor: "pointer" }}
+            >
+              {darkMode ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              )}
+            </button>
+            {savedIds.length > 0 && (
+              <button
+                className={`nav-link ${page === "__saved__" ? "active" : ""}`}
+                style={{fontSize:18, padding:"4px 8px", position:"relative"}}
+                title={lang !== "ru" ? "Saqlangan" : "Сохранённые"}
+                onClick={() => { setPage("__saved__"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+              >🔖 <span style={{fontSize:12,fontWeight:800}}>{savedIds.length}</span></button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* 📱 Mobile Drawer Menu */}
+      <div className={`mobile-drawer-overlay ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen(false)} />
+      <div className={`mobile-drawer ${menuOpen ? "open" : ""}`}>
+        <div className="drawer-header">
+          <span className="drawer-logo">VATAN</span>
+          <button className="drawer-close" onClick={() => setMenuOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <nav className="drawer-nav">
+          {pages.map((item) => (
+            <button
+              key={item}
+              className={`drawer-link ${page === item ? "active" : ""}`}
+              onClick={() => {
+                setPage(item);
+                setFilter("all");
+                setActiveStory(null);
+                setMenuOpen(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
+        <div className="drawer-footer">
+          <div className="drawer-lang-toggle">
+            <button className={lang === "uzk" ? "active" : ""} onClick={() => { changeLang("uzk"); setMenuOpen(false); }}>{"\u040e\u0417"}</button>
+            <button className={lang === "uz" ? "active" : ""} onClick={() => { changeLang("uz"); setMenuOpen(false); }}>UZ</button>
+            <button className={lang === "ru" ? "active" : ""} onClick={() => { changeLang("ru"); setMenuOpen(false); }}>RU</button>
+          </div>
+          <button className="drawer-theme-btn" onClick={() => { setDarkMode(!darkMode); setMenuOpen(false); }}>
+            {darkMode 
+              ? (lang === "ru" ? "☀️ Светлая тема" : (lang === "uzk" ? "☀️ Ёруғ мавзу" : "☀️ Yorug' mavzu"))
+              : (lang === "ru" ? "🌙 Тёмная тема" : (lang === "uzk" ? "🌙 Қоронғу мавзу" : "🌙 Qorong'u mavzu"))
+            }
+          </button>
+        </div>
+      </div>
+      {serverMessage && page !== "admin" && <div className="api-banner">{serverMessage}</div>}
+
+      {activeStory ? (
+        <ArticlePage
+          lang={lang} t={t} story={activeStory} stories={stories}
+          savedIds={savedIds} onToggleSave={toggleSave}
+          copiedShare={copiedShare} setCopiedShare={setCopiedShare}
+          onClose={() => { setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }}
+          onView={handleView}
+          reactions={reactions} addReaction={addReaction}
+          onAuthorClick={(author) => { setActiveAuthor(author); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+          onTagClick={(tag) => { setActiveTag(tag); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+        />
+      ) : activeAuthor ? (
+        <AuthorPage
+          author={activeAuthor} stories={stories} lang={lang}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({top:0,behavior:"instant"}); }}
+          onBack={() => setActiveAuthor(null)}
+          savedIds={savedIds} onToggleSave={toggleSave}
+        />
+      ) : activeTag ? (
+        <TagPage
+          tag={activeTag} stories={stories} lang={lang}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({top:0,behavior:"instant"}); }}
+          onBack={() => setActiveTag(null)}
+          savedIds={savedIds} onToggleSave={toggleSave}
+        />
+      ) : (
+        <>
+          {page === pages[0] && <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} />}
+          {page !== "admin" && page !== "__saved__" && <AdBanner ads={ads} position="top" />}
+
+          {page === "admin" ? (
+            <AdminPanel
+              lang={lang}
+              setLang={setLang}
+              allStories={allStories}
+              stories={adminStories}
+              setAllStories={setAllStories}
+              refreshPublicStories={refreshPublicStories}
+              siteConfig={siteConfig}
+              setSiteConfig={setSiteConfig}
+              pinnedHeroId={pinnedHeroId}
+              setPinnedHeroId={setPinnedHeroId}
+              pinnedSideIds={pinnedSideIds}
+              setPinnedSideIds={setPinnedSideIds}
+              ads={ads}
+              setAds={setAds}
+            />
+          ) : page === "__saved__" ? (
+            <main className="section saved-page">
+              <div className="section-inner">
+                <div className="section-head">
+                  <div>
+                    <h2 className="section-title">🔖 {lang !== "ru" ? "Saqlangan maqolalar" : "Сохранённые статьи"}</h2>
+                    <p className="saved-count">{savedIds.length} ta maqola saqlangan</p>
+                  </div>
+                  {savedIds.length > 0 && (
+                    <button className="adm-btn ghost" style={{fontSize:12}} onClick={() => setSavedIds([])}>
+                      {lang !== "ru" ? "Hammasini o'chirish" : "Очистить всё"}
+                    </button>
+                  )}
+                </div>
+                {savedIds.length === 0 ? (
+                  <div className="saved-empty">
+                    <span>🔖</span>
+                    <p>{lang !== "ru" ? "Hozircha hech narsa saqlanmagan" : "Ничего не сохранено"}</p>
+                    <small>{lang !== "ru" ? "Maqolalardagi в… tugmasini bosing" : "Нажмите в… в статье"}</small>
+                  </div>
+                ) : (
+                  <div className="layout">
+                    <div className="stories-grid">
+                      {stories.filter(s => savedIds.includes(s.id)).map(story => (
+                        <StoryCard lang={lang} key={story.id} story={story} savedIds={savedIds} onToggleSave={toggleSave}
+                          onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                      ))}
+                    </div>
+                    <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                  </div>
+                )}
+              </div>
+            </main>
+          ) : page === "Aloqa" ? (
+            <ContactPage t={t} page={page} />
+          ) : (page === "Videolar" || page === "Видеолар" || page === "Видео") ? (
+            <VideosPage 
+              lang={lang} 
+              t={t} 
+              mediaItems={mediaItems[lang] || mediaItems.uz}
+              onOpen={(video) => {
+                setActiveStory(video);
+                window.scrollTo({ top: 0, behavior: "instant" });
+              }}
+              setPage={setPage}
+            />
+          ) : (page === "Fotolar" || page === "Фотолар" || page === "Фото") ? (
+            <PhotosPage 
+              lang={lang} 
+              t={t} 
+              mediaItems={mediaItems[lang] || mediaItems.uz}
+              onOpen={(photo) => {
+                setActiveStory(photo);
+                window.scrollTo({ top: 0, behavior: "instant" });
+              }}
+              setPage={setPage}
+            />
+          ) : (
+            <main className={`section ${page === pages[0] ? "home-section" : "category-section"}`}>
+              <div className="section-inner">
+                {page !== pages[0] && (
+                  <div className="category-masthead">
+                    <span>{t.portal}</span>
+                    <h1>{page}</h1>
+                    <p>{t.pageNotes[page]}</p>
+                  </div>
+                )}
+                <div className="section-head">
+                  <div>
+                    <h2 className="section-title" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+                      <span className="dot"></span>
+                      {page === pages[0] ? T("Maqolalar") : page}
+                    </h2>
+                    <p className="section-note">{page === pages[0] ? t.latestNote : t.pageNotes[page]}</p>
+                  </div>
+                  <div className="page-tools">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        className={`chip ${(filter === cat || (filter === "all" && cat === t.all)) ? "active" : ""}`}
+                        onClick={() => setFilter(cat === t.all ? "all" : cat)}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="layout">
+                  <div>
+                    <AdBanner ads={ads} position="inline" />
+                    <div className="stories-grid">
+                      {loading
+                        ? Array.from({length: 6}).map((_, i) => <SkeletonCard key={i} />)
+                        : visibleStories.length ? (page === pages[0] ? [...visibleStories, ...visibleStories].slice(0, 8) : visibleStories).map((story, index) => (
+                          <StoryCard lang={lang} key={`${story.id}-${index}`} story={story} featured={page !== pages[0] && index === 0}
+                            savedIds={savedIds} onToggleSave={toggleSave}
+                            onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                        )) : <div className="empty-state">{T("Bu bo'limda hozircha maqola yo'q.")}</div>}
+                    </div>
+                    {page === pages[0] && visibleStories.length > 8 && (
+                      <div style={{textAlign:"center", marginTop:24}}>
+                        <button className="load-more-btn" onClick={() => setFilter("all") & setPage && window.scrollTo({top:0,behavior:"smooth"})}>
+                          {lang !== "ru" ? `Ko'proq ko'rish (${visibleStories.length - 8} ta qoldi)` : `Показать ещё (осталось ${visibleStories.length - 8})`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                </div>
+              </div>
+            </main>
+          )}
+
+          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Фото" && page !== "Videolar" && page !== "Видеолар" && page !== "Видео" && <AdBanner ads={ads} position="bottom" />}
+          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Фото" && page !== "Videolar" && page !== "Видеолар" && page !== "Видео" && <BreakingBanner lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Фото" && page !== "Videolar" && page !== "Видеолар" && page !== "Видео" && <MediaSection lang={lang} items={mediaItems[lang] || mediaItems.uz} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
+          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Фото" && page !== "Videolar" && page !== "Видеолар" && page !== "Видео" && <Special t={t} siteConfig={siteConfig} dial={false} />}
+        </>
+      )}
+
+      <Footer t={t} pages={pages} setPage={(p) => { setPage(p); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
+
+      <button
+        className={`scroll-top-btn ${scrollVisible ? "visible" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        title="Yuqoriga"
+      >↑</button>
+
+      {/* 📱 Mobile bottom navigation */}
+      <nav className="mobile-bottom-nav">
+        <button className={`mob-nav-btn ${page === pages[0] && !activeStory ? "active" : ""}`}
+          onClick={() => { setPage(pages[0]); setActiveStory(null); setActiveAuthor(null); setActiveTag(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>{lang === "uz" ? "Bosh" : (lang === "uzk" ? "Бош" : "Главная")}</span>
+        </button>
+        <button className={`mob-nav-btn ${query ? "active" : ""}`}
+          onClick={() => document.querySelector(".search")?.focus()}>
+          <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>{lang === "uz" ? "Qidirish" : (lang === "uzk" ? "Қидириш" : "Поиск")}</span>
+        </button>
+        <button className={`mob-nav-btn ${page === "__saved__" ? "active" : ""}`}
+          onClick={() => { setPage("__saved__"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <div style={{position: "relative", display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+            {savedIds.length > 0 && <span className="mob-nav-badge-dot">{savedIds.length}</span>}
+          </div>
+          <span>{lang === "uz" ? "Saqlangan" : (lang === "uzk" ? "Сақланган" : "Закладки")}</span>
+        </button>
+        <button className={`mob-nav-btn ${page === "admin" ? "active" : ""}`}
+          onClick={() => { setPage("admin"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Admin</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+function BreakingBanner({ lang, stories, onOpen }) {
+  const isUz = lang !== "ru";
+
+  
+
+  const label = T(isUz ? "TEZKOR" : "СРОЧНО");
+  const title = T(isUz ? "Haftaning eng dolzarb xabarlari" : "Самые актуальные новости недели");
+  const sub = T(isUz ? "Tahririyat tanlovi" : "Выбор редакции");
+  const btnLabel = T(isUz ? "Barchasini o'qish" : "Читать все");
+  const picks = stories.slice(0, 3);
+
+  return (
+    <div className="breaking-banner">
+      <div className="breaking-inner">
+        <div className="breaking-left">
+          <span className="breaking-badge">
+            <span className="breaking-live-dot" />
+            {label}
+          </span>
+          <h2>{title}</h2>
+          <p>{sub}</p>
+        </div>
+        <div className="breaking-cards">
+          {picks.map((story) => (
+            <button key={story.id} className="breaking-card" onClick={() => onOpen(story)}>
+              <img src={story.image} alt="" />
+              <div className="breaking-card-overlay" />
+              <div className="breaking-card-body">
+                <span className="breaking-cat">{story.category}</span>
+                <strong>{story.title}</strong>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MediaSection({ lang, items, onOpen, setPage }) {
+  const isUz = lang !== "ru";
+  const safeItems = items || [];
+  const videos = safeItems.filter((item) => item.type === "video");
+  const photos = safeItems.filter((item) => item.type === "photo");
+
+  const videoLabel = T(isUz ? "Video" : "Видео");
+  const photoLabel = T(isUz ? "Foto" : "Фото");
+  const videoNote = T(isUz ? "Kunning eng muhim videolari" : "Главные видео дня");
+  const photoNote = T(isUz ? "Fotoreportajlar va vizual materiallar" : "Фоторепортажи и визуальные материалы");
+  const watchLabel = T(isUz ? "Tomosha qilish →" : "Смотреть →");
+  const viewLabel = T(isUz ? "Ko'rish →" : "Посмотреть →");
+
+  function MediaBlock({ type, blockItems, title, note, onOpen }) {
+    const handleOpen = (item) => {
+      if (!onOpen) return;
+      const { type, title: itemTitle, meta, url: image } = item;
+      onOpen({
+        id: `media-${Date.now()}-${Math.random()}`,
+        title: itemTitle,
+        category: meta ? meta.split(' | ')[0] : type,
+        time: meta ? meta.split(' | ')[1] : "",
+        image: type === "video" ? null : image,
+        body: type === "video" 
+          ? `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 24px;">
+               <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+             </div>
+             <p>${itemTitle} haqida batafsil ma'lumot...</p>`
+          : `<p style="text-align:center; padding: 40px; background: #eee; border-radius: 12px; font-weight: bold; margin-bottom: 20px;">[ Fotogalereya Placeholder ]</p><p>${itemTitle} haqida batafsil ma'lumot...</p>`
+      });
+    };
+    if (!blockItems.length) return null;
+    const featured = blockItems[0];
+    const rest = blockItems.slice(1);
+    return (
+      <div className="media-block">
+        <div className="media-block-head">
+          {type === "photo" ? (
+            <button 
+              className="media-block-icon-label photo"
+              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(195, 25, 50, 0.1)" }}
+              onClick={() => {
+                const targetPage = lang === "uz" ? "Fotolar" : (lang === "uzk" ? "Фотолар" : "Фото");
+                if (setPage) {
+                  setPage(targetPage);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+            >
+              ◉ {title}
+            </button>
+          ) : (
+            <button 
+              className="media-block-icon-label video"
+              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(195, 25, 50, 0.1)" }}
+              onClick={() => {
+                const targetPage = lang === "uz" ? "Videolar" : (lang === "uzk" ? "Видеолар" : "Видео");
+                if (setPage) {
+                  setPage(targetPage);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+            >
+              ▶ {title}
+            </button>
+          )}
+          <p>{note}</p>
+        </div>
+
+        {type === "video" ? (
+          <div className="media-v2-layout">
+            <article className="media-featured" onClick={() => handleOpen(featured)} style={{cursor: "pointer"}}>
+              <div className="media-featured-thumb">
+                <img src={featured.url} alt="" />
+                <div className="media-featured-overlay" />
+                <span className={`media-featured-icon video`}>▶</span>
+                <div className="media-featured-meta">
+                  <span className="media-type-badge video">{title}</span>
+                  <span>{featured.meta}</span>
+                </div>
+              </div>
+              <div className="media-featured-body">
+                <strong>{featured.title}</strong>
+                <button className="media-play-btn" onClick={(e) => { e.stopPropagation(); handleOpen(featured); }}>{watchLabel}</button>
+              </div>
+            </article>
+            <div className="media-v2-list">
+              {rest.slice(0, 5).map((item, idx) => {
+                const { title: itemTitle, meta, url: image } = item;
+                return (
+                <article className="media-list-item" key={idx}>
+                  <button onClick={() => handleOpen(item)}>
+                    <span className="media-list-thumb">
+                      <img src={image} alt="" />
+                      <span className="media-list-icon video">▶</span>
+                    </span>
+                    <span className="media-list-body">
+                      <strong>{itemTitle}</strong>
+                      <small>{meta}</small>
+                    </span>
+                  </button>
+                </article>
+              )})}
+            </div>
+          </div>
+        ) : (
+          <div className="media-photo-grid">
+            {blockItems.slice(0, 8).map((item, idx) => {
+              const { title: itemTitle, meta, url: image } = item;
+              return (
+              <article className="media-photo-card" key={idx}>
+                <button onClick={() => handleOpen(item)}>
+                  <div className="media-photo-thumb">
+                    <img src={image} alt="" />
+                    <div className="media-photo-overlay" />
+                    <span className="media-photo-icon">◉</span>
+                    <span className="media-photo-meta">{meta}</span>
+                  </div>
+                  <div className="media-photo-body">
+                    <strong>{itemTitle}</strong>
+                  </div>
+                </button>
+              </article>
+            )})}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <section className="section media-section">
+      <div className="section-inner">
+        <MediaBlock type="video" blockItems={videos} title={videoLabel} note={videoNote} onOpen={onOpen} />
+        <div style={{ margin: "48px 0", borderTop: "1px dashed var(--line)" }} />
+        <MediaBlock type="photo" blockItems={photos} title={photoLabel} note={photoNote} onOpen={onOpen} />
+      </div>
+    </section>
+  );
+}
+
+
+function WeatherBar({ lang }) {
+  const [weather, setWeather] = useState(null);
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=41.2995&longitude=69.2401&current=temperature_2m,weathercode,windspeed_10m&timezone=Asia%2FTashkent")
+      .then(r => r.json())
+      .then(data => {
+        const code = data.current.weathercode;
+        const temp = Math.round(data.current.temperature_2m);
+        const wind = Math.round(data.current.windspeed_10m);
+        const icons = {
+          0:"☀️", 1:"🌤", 2:"⛅", 3:"вЃпёЏ",
+          45:"🌫", 48:"🌫", 51:"🌦", 53:"🌦", 55:"🌧",
+          61:"🌧", 63:"🌧", 65:"🌧", 71:"🌨", 73:"🌨",
+          75:"🌨", 80:"🌦", 81:"🌧", 82:"⛈", 95:"⛈", 96:"⛈", 99:"⛈"
+        };
+        const descs = {
+          uz:  { 0:"Ochiq", 1:"Asosan ochiq", 2:"Qisman bulutli", 3:"Bulutli", 45:"Tuman", 48:"Tuman",
+            51:"Yengil yomg'ir", 53:"Yomg'ir", 55:"Kuchli yomg'ir", 61:"Yomg'ir", 63:"Yomg'ir",
+            65:"Kuchli yomg'ir", 71:"Qor", 73:"Qor", 75:"Kuchli qor", 80:"Yomg'ir", 81:"Yomg'ir",
+            82:"Momaqaldiroq", 95:"Momaqaldiroq", 96:"Do'l", 99:"Do'l" },
+          uzk: { 0:"Очиқ", 1:"Асосан очиқ", 2:"Қисман булутли", 3:"Булутли", 45:"Туман", 48:"Туман",
+            51:"Енгил ёмғир", 53:"Ёмғир", 55:"Кучли ёмғир", 61:"Ёмғир", 63:"Ёмғир",
+            65:"Кучли ёмғир", 71:"Қор", 73:"Қор", 75:"Кучли қор", 80:"Ёмғир", 81:"Ёмғир",
+            82:"Момақалдироқ", 95:"Момақалдироқ", 96:"Дўл", 99:"Дўл" },
+          ru:  { 0:"Ясно", 1:"Преимущественно ясно", 2:"Переменная облачность", 3:"Пасмурно",
+            45:"Туман", 48:"Туман", 51:"Лёгкий дождь", 53:"Дождь", 55:"Сильный дождь",
+            61:"Дождь", 63:"Дождь", 65:"Ливень", 71:"Снег", 73:"Снег", 75:"Сильный снег",
+            80:"Дождь", 81:"Дождь", 82:"Гроза", 95:"Гроза", 96:"Град", 99:"Град" }
+        };
+        const langKey = lang === "ru" ? "ru" : lang === "uzk" ? "uzk" : "uz";
+        const fallback = lang === "ru" ? "Погода" : lang === "uzk" ? "Об-ҳаво" : "Ob-havo";
+        const desc = (descs[langKey] || descs.uz)[code] || fallback;
+        setWeather({ temp, wind, icon: icons[code] || "🌡", desc });
+      })
+      .catch(() => {});
+  }, [lang]);
+
+  const isUz = lang !== "ru";
+  const locale = lang === "ru" ? "ru-RU" : "uz-UZ";
+  const dd = String(time.getDate()).padStart(2, "0");
+  const mm = String(time.getMonth() + 1).padStart(2, "0");
+  const yyyy = time.getFullYear();
+  const timeStr = time.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+
+  return (
+    <div className="weather-bar">
+      <div className="weather-bar-inner">
+        <div className="weather-left">
+          {weather ? (
+            <>
+              <span className="weather-icon">{weather.icon}</span>
+              <span className="weather-city">Toshkent</span>
+              <span className="weather-temp">{weather.temp}°C</span>
+              <span className="weather-desc">{weather.desc}</span>
+              <span className="weather-wind">💨 {weather.wind} km/h</span>
+            </>
+          ) : (
+            <span className="weather-loading">🌡 {isUz ? "Yuklanmoqda..." : "Загрузка..."}</span>
+          )}
+        </div>
+        <div className="weather-right">
+          <span className="wdate-dot">
+            <span className="wdate-part">{dd}</span>
+            <span className="wdate-sep">.</span>
+            <span className="wdate-part">{mm}</span>
+            <span className="wdate-sep">.</span>
+            <span className="wdate-part">{yyyy}</span>
+          </span>
+          <span className="weather-time">{timeStr}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Hero({ t, hero, gridStories, latestStories, openStory }) {
+  return (
+    <section className="hero">
+      <div className="hero-grid">
+        <div className="hero-left-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <h2>{t.pages[0]}</h2>
+          </div>
+          
+          <article className="hero-main" onClick={() => openStory(hero)} style={{ cursor: "pointer" }}>
+            <div className="hero-main-content">
+              <span className="kicker">{hero.category}</span>
+              <h1>{hero.title}</h1>
+              <p>{hero.summary}</p>
+            </div>
+            <div className="hero-main-thumb">
+              <img src={hero.image} alt={hero.title} />
+            </div>
+          </article>
+
+          <div className="hero-sub-grid">
+            {gridStories.map((story, idx) => (
+              <button
+                className="hero-sub-card"
+                key={`${story.id || story.title}-${idx}`}
+                onClick={() => openStory(story)}
+              >
+                <div className="side-thumb">
+                  <img src={story.image} alt={story.title} />
+                </div>
+                <span className="side-copy">
+                  <span className="kicker-small">{story.category}</span>
+                  <h3>{story.title}</h3>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="hero-right-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <h2>{t.latest || 'So\'nggi yangiliklar'}</h2>
+          </div>
+          
+          <div className="hero-latest-list">
+            {latestStories.map((story, idx) => (
+              <button
+                className="hero-latest-card"
+                key={`${story.id || story.title}-${idx}`}
+                onClick={() => openStory(story)}
+              >
+                <span className="latest-copy">
+                  <span className="kicker-small">{story.category}</span>
+                  <h3>{story.title}</h3>
+                </span>
+                <div className="latest-thumb">
+                  <img src={story.image} alt={story.title} />
+                </div>
+              </button>
+            ))}
+          </div>
+          <button className="more-news-btn">{T("Ko'proq yangiliklar")}</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StoryBadge({ story }) {
+  if (story.isBreaking) return <span className="story-badge breaking">🔴 TEZKOR</span>;
+  if (story.isEditorPick) return <span className="story-badge editor">⭐ MUHARRIR</span>;
+  if ((story.views || 0) > 50) return <span className="story-badge trend">🔥 TREND</span>;
+  return null;
+}
+
+function calcReadTime(text, lang) {
+  if (!text) return null;
+  const words = text.replace(/<[^>]+>/g,"").split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(words / 200));
+  return lang === "ru" ? `${mins} мин` : `${mins} daq`;
+}
+
+function StoryCard({ story, onOpen, featured = false, savedIds = [], onToggleSave }) {
+  const isSaved = savedIds.includes(story.id);
+  return (
+    <article className={`story-card fade-in-up ${featured ? "featured-story" : ""}`} style={{position:"relative"}}>
+      <StoryBadge story={story} />
+      <button onClick={onOpen}>
+        <img className="story-image" src={story.image} alt="" loading="lazy" />
+        <div className="story-body">
+          <span className="category" data-cat={story.category}>{story.category}</span>
+          <h3>{story.title}</h3>
+          <p>{story.summary}</p>
+          <div className="story-footer">
+            <span>{story.read}</span>
+            {(story.views || 0) > 0 && <span className="story-views">👁 {story.views}</span>}
+          </div>
+        </div>
+      </button>
+      {onToggleSave && (
+        <button
+          className={`bookmark-corner ${isSaved ? "saved" : ""}`}
+          onClick={e => { e.stopPropagation(); onToggleSave(story.id); }}
+          title={isSaved ? T("Saqlangandan olib tashlash") : T("Saqlash")}
+        >{isSaved ? "в…" : "в†"}</button>
+      )}
+    </article>
+  );
+}
+
+function Sidebar({ t, stories, onOpen }) {
+  const [email, setEmail] = React.useState("");
+  const [subscribed, setSubscribed] = React.useState(false);
+  const [history] = React.useState(() => JSON.parse(localStorage.getItem("yk-history") || "[]"));
+  function handleSubscribe(e) {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    setSubscribed(true);
+    setEmail("");
+    setTimeout(() => setSubscribed(false), 4000);
+  }
+  return (
+    <aside className="sidebar">
+      <div className="panel">
+        <h3>{t.popular}</h3>
+        {stories.slice(0, 5).map((story, index) => (
+          <button className="trend" key={story.id} onClick={() => onOpen && onOpen(story)} style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: "12px", width: "100%", border: 0, background: "transparent", textAlign: "left", cursor: "pointer", padding: "12px 0", borderTop: index === 0 ? 0 : "1px solid var(--line)" }}>
+            <span className="trend-num">{index + 1}</span>
+            <span>
+              <strong style={{ display: "block", lineHeight: "1.28", color: "var(--ink)" }}>{story.title}</strong>
+              <small style={{ color: "var(--muted)" }}>{story.category}</small>
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className="panel newsletter">
+        <h3>{t.newsletterTitle}</h3>
+        <p>{t.newsletterText}</p>
+        {subscribed ? (
+          <p style={{ color: "#4ade80", fontWeight: 700, margin: "8px 0 0" }}>✓ Muvaffaqiyatli obuna bo'ldingiz!</p>
+        ) : (
+          <form onSubmit={handleSubscribe}>
+            <input value={email} onChange={e => setEmail(e.target.value)} placeholder={t.email} type="email" />
+            <button className="primary" type="submit" style={{ width: "100%", marginTop: "2px" }}>{t.subscribe}</button>
+          </form>
+        )}
+      </div>
+
+      <div className="panel ai-recommend-panel">
+        <div className="ai-panel-head">
+          <span className="ai-badge">AI</span>
+          <h3>{T("Siz uchun tavsiyalar")}</h3>
+        </div>
+        <p className="ai-panel-sub">{t.close === "Yopish" ? "O'qish tarixingiz asosida" : "На основе истории чтения"}</p>
+        {(() => {
+          const historyIds = JSON.parse(localStorage.getItem("yk-history") || "[]").map(h => h.id);
+          const readCats = JSON.parse(localStorage.getItem("yk-history") || "[]").map(h => h.category);
+          const topCat = readCats.length ? readCats.sort((a,b) => readCats.filter(c=>c===b).length - readCats.filter(c=>c===a).length)[0] : null;
+          const recommended = topCat
+            ? stories.filter(s => s.category === topCat && !historyIds.includes(s.id)).slice(0, 4)
+            : stories.filter(s => (s.views||0) > 0).sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,4);
+          const fallback = stories.slice(0,4);
+          const list = recommended.length ? recommended : fallback;
+          return list.map((s, i) => (
+            <button key={s.id} className="ai-rec-item" onClick={() => onOpen && onOpen(s)}
+              style={{borderTop: i === 0 ? 0 : "1px solid var(--line)"}}>
+              <img src={s.image} alt="" loading="lazy" />
+              <div>
+                <span className="ai-rec-cat">{s.category}</span>
+                <p>{s.title}</p>
+              </div>
+            </button>
+          ));
+        })()}
+        {(() => {
+          const h = JSON.parse(localStorage.getItem("yk-history")||"[]").map(x=>x.category);
+          const top = h.length ? h.sort((a,b)=>h.filter(c=>c===b).length-h.filter(c=>c===a).length)[0] : null;
+          return top ? (
+            <div className="ai-panel-tag">
+              <span>🎯</span>
+              {T("Ko'p o'qiysiz: ")}
+              <strong>{top}</strong>
+            </div>
+          ) : null;
+        })()}
+      </div>
+    </aside>
+  );
+}
+
+function useCountUp(target, duration = 1500) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    const num = parseInt(target);
+    if (isNaN(num)) { setCount(target); return; }
+    const obs = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      obs.disconnect();
+      let start = 0;
+      const step = Math.ceil(num / (duration / 16));
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= num) { setCount(target); clearInterval(timer); }
+        else setCount(start + (target.includes("+") ? "+" : ""));
+      }, 16);
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [target]);
+  return [count, ref];
+}
+
+function StatNum({ value }) {
+  const [count, ref] = useCountUp(String(value));
+  return <strong ref={ref} className="counter-num">{count || value}</strong>;
+}
+
+function Special({ t, siteConfig }) {
+  const currentLang = window.__currentLang || "uz";
+  const isUz = currentLang !== "ru";
+  const cfg = siteConfig
+    ? (isUz ? siteConfig.specialUz : siteConfig.specialRu)
+    : null;
+
+  const kicker   = T(cfg?.kicker   || t.special);
+  const title    = T(cfg?.title    || t.specialTitle);
+  const text     = T(cfg?.text     || t.specialText);
+  const badge    = T(cfg?.badge    || (isUz ? "Jonli tahririyat" : "Живая редакция"));
+  const imgSrc   = cfg?.image    || images.newsroom;
+  const features = cfg?.features
+    ? cfg.features.split(",").map(f => T(f.trim())).filter(Boolean)
+    : (isUz
+      ? ["Tezkor yangiliklar", "Mustaqil tahlil", "Ikki tilda", "Ishonchli manba"]
+      : ["Быстрые новости", "Независимый анализ", "На двух языках", "Надёжный источник"]).map(f => T(f));
+
+  const stats = [
+    { num: cfg?.stat1 || "24/7", label: T(cfg?.stat1label || (isUz ? "Monitoring" : "Мониторинг")) },
+    { num: cfg?.stat2 || "7",    label: T(cfg?.stat2label || (isUz ? "Bo'lim" : "Разделов")) },
+    { num: cfg?.stat3 || "2",    label: T(cfg?.stat3label || (isUz ? "Til" : "Языка")) },
+    { num: cfg?.stat4 || "100+", label: T(cfg?.stat4label || (isUz ? "Maqola" : "Статей")) },
+  ];
+
+  return (
+    <section className="special-section">
+      <div className="special-bg-grid" />
+      <div className="special-inner">
+        <div className="special-left">
+          <span className="special-kicker">
+            <span className="dot"></span>
+            {kicker}
+          </span>
+          <h2 className="special-title">{title}</h2>
+          <p className="special-desc">{text}</p>
+          <div className="special-features">
+            {features.map((f) => (
+              <span key={f} className="special-feature-tag">
+                <span className="special-dot" />
+                {f}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="special-right">
+          <div className="special-img-wrap">
+            <img src={imgSrc} alt="" className="special-img" />
+            <div className="special-img-overlay" />
+            <div className="special-img-badge">
+              <span className="live-dot" />
+              {badge}
+            </div>
+          </div>
+          <div className="special-stats">
+            {stats.map((s) => (
+              <div key={s.num + s.label} className="special-stat fade-in-up">
+                <StatNum value={s.num} />
+                <span>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactPage({ t, page }) {
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">{page}</h2>
+            <p className="section-note">{t.pageNotes[page]}</p>
+          </div>
+        </div>
+        <div className="contact-grid">
+          {t.contact.map(([title, text]) => (
+            <div className="contact-card" key={title}>
+              <strong>{title}</strong>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <article className="story-card skeleton-card">
+      <div className="skeleton-img skeleton-anim" />
+      <div className="story-body">
+        <div className="skeleton-line skeleton-anim" style={{width:"40%",height:14,marginBottom:8}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"90%",height:18,marginBottom:6}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"75%",height:18,marginBottom:12}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"60%",height:13}} />
+      </div>
+    </article>
+  );
+}
+
+function AuthorPage({ author, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
+  const authorStories = stories.filter(s => (s.author || "Vatan.uz tahririyati") === author);
+  const initials = author.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const isUz = lang !== "ru";
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <button className="article-back-btn" onClick={onBack} style={{marginBottom:24}}>
+          <span>&#8592;</span> {isUz ? "Orqaga" : "Назад"}
+        </button>
+        <div className="author-page-header">
+          <div className="author-page-avatar">{initials}</div>
+          <div>
+            <h1 className="author-page-name">{author}</h1>
+            <p className="author-page-count">{authorStories.length} {isUz ? "ta maqola" : "материалов"}</p>
+          </div>
+        </div>
+        <div className="stories-grid" style={{marginTop:32}}>
+          {authorStories.length === 0 ? (
+            <p style={{color:"var(--muted)"}}>{isUz ? "Maqolalar topilmadi" : "Материалы не найдены"}</p>
+          ) : authorStories.map(story => (
+            <StoryCard lang={lang} key={story.id} story={story} savedIds={savedIds} onToggleSave={onToggleSave}
+              onOpen={() => onOpen(story)} />
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function TagPage({ tag, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
+  const tagStories = stories.filter(s => s.tags && s.tags.split(",").map(t => t.trim()).includes(tag));
+  const isUz = lang !== "ru";
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <button className="article-back-btn" onClick={onBack} style={{marginBottom:24}}>
+          <span>&#8592;</span> {isUz ? "Orqaga" : "Назад"}
+        </button>
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">🏷️ #{tag}</h2>
+            <p className="section-note">{tagStories.length} {isUz ? "ta maqola" : "материалов"}</p>
+          </div>
+        </div>
+        <div className="stories-grid" style={{marginTop:24}}>
+          {tagStories.length === 0 ? (
+            <p style={{color:"var(--muted)"}}>{isUz ? "Bu teg bo'yicha maqolalar topilmadi" : "Материалы по этому тегу не найдены"}</p>
+          ) : tagStories.map(story => (
+            <StoryCard lang={lang} key={story.id} story={story} savedIds={savedIds} onToggleSave={onToggleSave}
+              onOpen={() => onOpen(story)} />
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function ArticlePage({ t, story, stories, onClose, onOpen, onView, savedIds = [], onToggleSave, copiedShare, setCopiedShare, reactions = {}, addReaction, onAuthorClick, onTagClick, lang }) {
+  const initials = (story.author || "YK").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const isHtml = story.body && /<[a-z]/.test(story.body);
+  const paragraphs = isHtml ? [] : (story.body || story.summary || "").split("\n\n").filter(Boolean);
+  const related = stories.filter(s => s.id !== story.id && s.category === story.category).slice(0, 3);
+  const more = stories.filter(s => s.id !== story.id && s.category !== story.category).slice(0, 3);
+  const readMore = related.length ? related : more;
+  const tags = story.tags ? story.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+  const [readProgress, setReadProgress] = useState(0);
+  const [comments, setComments] = useState(() => JSON.parse(localStorage.getItem("yk-comments-" + story.id) || "[]"));
+  const [commentName, setCommentName] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [commentSent, setCommentSent] = useState(false);
+  const isUz = lang !== "ru";
+  const [cleanRead, setCleanRead] = useState(false);
+  const readTime = calcReadTime((story.body || story.summary || ""), t.close !== "Yopish" ? "ru" : "uz");
+  // Table of contents (h2 headings dan)
+  const headings = isHtml ? Array.from(new DOMParser().parseFromString(story.body,"text/html").querySelectorAll("h2")).map(h=>h.textContent) : [];
+  // Swipe navigation
+  const storyIndex = stories.findIndex(s => s.id === story.id);
+  const prevStory = storyIndex > 0 ? stories[storyIndex - 1] : null;
+  const nextStory = storyIndex < stories.length - 1 ? stories[storyIndex + 1] : null;
+  const touchRef = useRef(null);
+  useEffect(() => {
+    function onTouchStart(e) { touchRef.current = e.touches[0].clientX; }
+    function onTouchEnd(e) {
+      if (touchRef.current === null) return;
+      const diff = touchRef.current - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 60) {
+        if (diff > 0 && nextStory) { onOpen(nextStory); window.scrollTo({top:0,behavior:"instant"}); }
+        if (diff < 0 && prevStory) { onOpen(prevStory); window.scrollTo({top:0,behavior:"instant"}); }
+      }
+      touchRef.current = null;
+    }
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => { document.removeEventListener("touchstart", onTouchStart); document.removeEventListener("touchend", onTouchEnd); };
+  }, [nextStory, prevStory]);
+
+  useEffect(() => {
+    if (onView) onView(story.id);
+    const history = JSON.parse(localStorage.getItem("yk-history") || "[]");
+    const filtered = history.filter(h => h.id !== story.id);
+    const updated = [{ id: story.id, title: story.title, image: story.image, category: story.category, time: story.time }, ...filtered].slice(0, 15);
+    localStorage.setItem("yk-history", JSON.stringify(updated));
+  }, [story.id]);
+
+  useEffect(() => {
+    document.title = `${story.title} — Vatan.uz`;
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = story.summary || "";
+    let og = document.querySelector('meta[property="og:title"]');
+    if (!og) { og = document.createElement('meta'); og.setAttribute('property','og:title'); document.head.appendChild(og); }
+    og.content = story.title;
+    let ogImg = document.querySelector('meta[property="og:image"]');
+    if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+    ogImg.content = story.image || "";
+    return () => { document.title = "Vatan.uz"; };
+  }, [story.id]);
+
+  useEffect(() => {
+    function onScroll() {
+      const el = document.documentElement;
+      const scrolled = el.scrollTop || document.body.scrollTop;
+      const total = el.scrollHeight - el.clientHeight;
+      setReadProgress(total > 0 ? Math.min(100, Math.round((scrolled / total) * 100)) : 0);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  function submitComment(e) {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const newComment = {
+      id: Date.now(),
+      name: commentName.trim() || (isUz ? "Mehmon" : "Гость"),
+      text: commentText.trim(),
+      date: new Date().toLocaleDateString(isUz ? "uz-UZ" : "ru-RU"),
+    };
+    const updated = [newComment, ...comments];
+    setComments(updated);
+    localStorage.setItem("yk-comments-" + story.id, JSON.stringify(updated));
+    setCommentText("");
+    setCommentName("");
+    setCommentSent(true);
+    setTimeout(() => setCommentSent(false), 3000);
+  }
+
+  return (
+    <div className={`article-page ${cleanRead ? "clean-read-active" : ""}`}>
+      <div className="read-progress-bar" style={{width: readProgress + "%"}} />
+      <div className="article-page-inner">
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+          <button className="article-back-btn" onClick={onClose} style={{ margin: 0 }}>
+            <span>&#8592;</span> {lang === "uz" ? "Orqaga" : (lang === "uzk" ? "Орқага" : "Назад")}
+          </button>
+          
+          <button 
+            className="clean-read-btn"
+            onClick={() => setCleanRead(!cleanRead)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 16px",
+              borderRadius: "999px",
+              border: "1px solid var(--line)",
+              background: cleanRead ? "var(--brand)" : "var(--fill)",
+              color: cleanRead ? "#fff" : "var(--ink)",
+              fontSize: "13px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+          >
+            {cleanRead 
+              ? (lang === "uz" ? "👓 Standart o'qish" : (lang === "uzk" ? "👓 Стандарт ўқиш" : "👓 Обычный вид"))
+              : (lang === "uz" ? "👓 Toza o'qish" : (lang === "uzk" ? "👓 Тоза ўқиш" : "👓 Чистое чтение"))
+            }
+          </button>
+        </div>
+
+        <article className="article-full"><div className="article-page-content">
+          {/* Breadcrumbs */}
+          <div className="article-breadcrumbs" style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "16px" }}>
+            {lang === "uz" ? "Bosh sahifa" : (lang === "uzk" ? "Бош саҳифа" : "Главная")} &gt; {story.category}
+          </div>
+
+          {/* Title */}
+          <h1 className="article-main-title" style={{ fontSize: "28px", fontWeight: "800", color: "var(--ink)", lineHeight: "1.3", marginBottom: "12px", fontFamily: "inherit" }}>
+            {story.title}
+          </h1>
+
+          {/* Lead / Subtitle */}
+          {story.summary && (
+            <p className="article-main-lead" style={{ fontSize: "16px", color: "var(--muted)", lineHeight: "1.5", marginBottom: "20px", fontWeight: "500" }}>
+              {story.summary}
+            </p>
+          )}
+
+          {/* Meta Bar */}
+          <div className="article-meta-bar" style={{ display: "flex", alignItems: "center", gap: "16px", padding: "12px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", marginBottom: "20px", flexWrap: "wrap" }}>
+            <span className="category-badge" style={{ background: "rgba(195, 25, 50, 0.08)", color: "var(--brand)", padding: "4px 10px", borderRadius: "4px", fontSize: "12px", fontWeight: "700" }}>
+              {story.category}
+            </span>
+            <span style={{ fontSize: "13px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "4px" }}>
+              👁 {(story.views || 0) > 0 ? story.views : 1}
+            </span>
+            <span style={{ fontSize: "13px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "4px" }}>
+              🕒 {story.time || "2 soat oldin"}
+            </span>
+            <span style={{ fontSize: "13px", color: "var(--muted)", marginLeft: "auto" }}>
+              {story.date || new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "uz-UZ")}
+            </span>
+          </div>
+
+          {/* Inline Hero Image */}
+          {story.image && (
+            <div className="article-inline-image-wrap" style={{ borderRadius: "12px", overflow: "hidden", marginBottom: "24px" }}>
+              <img src={story.image} alt={story.title} style={{ width: "100%", height: "auto", display: "block" }} />
+            </div>
+          )}
+
+          <div>
+            {tags.length > 0 && (
+              <div className="article-tags" style={{ marginBottom: "20px" }}>
+                {tags.map(tag => <button key={tag} className="article-tag tag-btn" onClick={() => onTagClick && onTagClick(tag)}>#{tag}</button>)}
+              </div>
+            )}
+
+            {headings.length > 1 && (
+              <nav className="toc-box">
+                <strong className="toc-title">{isUz ? "📋 Mundarija" : "📋 Содержание"}</strong>
+                <ol className="toc-list">
+                  {headings.map((h, i) => (
+                    <li key={i}><a href={`#heading-${i}`} className="toc-link">{h}</a></li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+
+            {story.videoUrl && (
+              <div className="article-video" style={{ margin: "20px 0", borderRadius: "8px", overflow: "hidden", aspectRatio: "16/9" }}>
+                <iframe width="100%" height="100%" src={story.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+              </div>
+            )}
+
+            <div className="article-body-text">
+              {isHtml
+                ? <div dangerouslySetInnerHTML={{__html: story.body}} />
+                : paragraphs.length > 1
+                  ? paragraphs.map((para, i) => <p key={i}>{para}</p>)
+                  : <p>{story.body || story.summary}</p>}
+            </div>
+
+            {/* Author Row wrapped with horizontal lines */}
+            <div style={{ borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", padding: "16px 0", margin: "24px 0", display: "flex", justifyContent: "flex-end" }}>
+              <div className="article-author-row" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <button className="article-avatar author-btn" onClick={() => onAuthorClick && onAuthorClick(story.author || "Vatan.uz tahririyati")}>{initials}</button>
+                <div>
+                  <button className="author-name-btn" onClick={() => onAuthorClick && onAuthorClick(story.author || "Vatan.uz tahririyati")}>{story.author || "Vatan.uz tahririyati"}</button>
+                  <span style={{display:"flex",gap:10,alignItems:"center",fontSize:13,color:"var(--muted)"}}>
+                    {story.read}
+                    {readTime && <span style={{display:"flex",alignItems:"center",gap:4}}>⏱ {readTime}</span>}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="article-meta-row" style={{ marginBottom: "20px" }}>
+              <span className="article-views" style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600" }}>
+                👁 {(story.views || 0) > 0 ? story.views : 1} {lang === "uz" ? "marta o'qilgan" : (lang === "uzk" ? "марта ўқилган" : "просмотров")}
+              </span>
+            </div>
+
+            {addReaction && (() => {
+              const storyReactions = reactions[story.id] || {};
+              const myReaction = storyReactions._mine;
+              const emojis = ["👍", "❤️", "😮", "😂", "😢"];
+              return (
+                <div className="reactions-row">
+                  <span className="reactions-label">{lang === "uz" ? "Fikr bildiring:" : (lang === "uzk" ? "Фикр билдиринг:" : "Реакция:")}</span>
+                  {emojis.map(emoji => (
+                    <button
+                      key={emoji}
+                      className={`reaction-btn ${myReaction === emoji ? "active" : ""}`}
+                      onClick={() => addReaction(story.id, emoji)}
+                    >
+                      {emoji}
+                      {storyReactions[emoji] > 0 && <span className="reaction-count">{storyReactions[emoji]}</span>}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
+
+            <div className="article-share">
+              <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Поделиться:")}</span>
+              <a
+                className="share-btn telegram"
+                href={`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(story.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >✈️ Telegram</a>
+              <button
+                className={`share-btn ${copiedShare ? "copied" : ""}`}
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopiedShare(true);
+                  setTimeout(() => setCopiedShare(false), 2000);
+                }}
+              >{copiedShare 
+                ? (lang === "uz" ? "✓ Nusxalandi" : (lang === "uzk" ? "✓ Нусхаланди" : "✓ Скопировано")) 
+                : (lang === "uz" ? "🔗 Havola" : (lang === "uzk" ? "🔗 Ҳавола" : "🔗 Ссылка"))
+              }</button>
+              <button
+                className={`bookmark-btn ${savedIds.includes(story.id) ? "saved" : ""}`}
+                onClick={() => onToggleSave && onToggleSave(story.id)}
+              >{savedIds.includes(story.id) ? "★ Saqlangan" : "☆ Saqlash"}</button>
+              <button className="share-btn" onClick={() => window.print()}>🖨️ {lang === "uz" ? "Chop etish" : (lang === "uzk" ? "Чоп этиш" : "Печать")}</button>
+            </div>
+          </div>
+        </div></article>
+
+        {readMore.length > 0 && (
+          <section className="article-related">
+            <h2 className="section-title">{lang === "uz" ? "O'xshash maqolalar" : (lang === "uzk" ? "Ўхшаш мақолалар" : "Похожие материалы")}</h2>
+            <div className="article-related-grid">
+              {readMore.map(s => (
+                <article key={s.id} className="story-card">
+                  <button onClick={() => onOpen(s)}>
+                    <img className="story-image" src={s.image} alt="" loading="lazy" />
+                    <div className="story-body">
+                      <span className="category" data-cat={s.category}>{s.category}</span>
+                      <h3>{s.title}</h3>
+                      <p>{s.summary}</p>
+                      <div className="story-footer">
+                        <span>{s.time}</span>
+                        <span>{s.read}</span>
+                      </div>
+                    </div>
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="comments-section">
+          <h2 className="section-title">
+            💬 {T("Izohlar")}
+            {comments.length > 0 && <span className="comments-count">{comments.length}</span>}
+          </h2>
+
+          <form className="comment-form" onSubmit={submitComment}>
+            <input
+              className="comment-input"
+              placeholder={lang === "uz" ? "Ismingiz (ixtiyoriy)" : (lang === "uzk" ? "Исмингиз (ихтиёрий)" : "Ваше имя (необязательно)")}
+              value={commentName}
+              onChange={e => setCommentName(e.target.value)}
+              maxLength={60}
+            />
+            <textarea
+              className="comment-textarea"
+              placeholder={lang === "uz" ? "Fikringizni yozing..." : (lang === "uzk" ? "Фикрингизни ёзинг..." : "Напишите ваш комментарий...")}
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              rows={3}
+              maxLength={1000}
+              required
+            />
+            <div className="comment-form-footer">
+              {commentSent && (
+                <span className="comment-sent">
+                  ✓ {lang === "uz" ? "Izoh qo'shildi!" : (lang === "uzk" ? "Изоҳ қўшилди!" : "Комментарий добавлен!")}
+                </span>
+              )}
+              <button type="submit" className="adm-btn primary" style={{marginLeft:"auto"}}>
+                {lang === "uz" ? "Yuborish" : (lang === "uzk" ? "Юбориш" : "Отправить")}
+              </button>
+            </div>
+          </form>
+
+          {comments.length === 0 ? (
+            <div className="comments-empty">
+              <span>💬</span>
+              <p>{T("Hozircha izoh yo'q. Birinchi bo'ling!")}</p>
+            </div>
+          ) : (
+            <div className="comments-list">
+              {comments.map(c => (
+                <div key={c.id} className="comment-item">
+                  <div className="comment-avatar">{c.name[0].toUpperCase()}</div>
+                  <div className="comment-body">
+                    <div className="comment-meta">
+                      <strong>{c.name}</strong>
+                      <span>{c.date}</span>
+                    </div>
+                    <p>{c.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+
+
+// Main Admin Panel Component registered on window
+function AdminPanel({ 
+  lang, 
+  setLang, 
+  allStories, 
+  stories, 
+  setAllStories, 
+  refreshPublicStories, 
+  siteConfig, 
+  setSiteConfig, 
+  pinnedHeroId, 
+  setPinnedHeroId, 
+  pinnedSideIds, 
+  setPinnedSideIds, 
+  ads, 
+  setAds 
+}) {
+  const isUz = lang !== "ru";
+  
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [dashboardLogs, setDashboardLogs] = useState([]);
+  const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = window.Recharts || {};
+
+  useEffect(() => {
+    if (activeTab === "dashboard") {
+      fetch('/api/admin/dashboard/stats', {
+        headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.stats) setDashboardStats(data);
+      }).catch(console.error);
+
+      fetch('/api/admin/dashboard/logs', {
+        headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.logs) setDashboardLogs(data.logs);
+      }).catch(console.error);
+    }
+  }, [activeTab]);
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7'];
+
+const [activeTab, setActiveTab] = useState("dashboard");
+  const [translations, setTranslations] = useState({ uz: {}, ru: {} });
+  const [translationsLoading, setTranslationsLoading] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/translations')
+      .then(res => res.json())
+      .then(data => {
+        if (data.translations) setTranslations(data.translations);
+      });
+  }, []);
+
+  const saveTranslations = async () => {
+    setTranslationsLoading(true);
+    try {
+      const res = await fetch('/api/admin/translations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` },
+        body: JSON.stringify({ translations })
+      });
+      if (res.ok) alert("Tarjimalar saqlandi!");
+    } catch(err) {
+      alert("Xatolik yuz berdi");
+    }
+    setTranslationsLoading(false);
+  };
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  // Authentication state
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  
+  // Articles state
+  const [editingStory, setEditingStory] = useState(null);
+  const [tagInput, setTagInput] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageUpload = (file) => {
+    if (!file) return;
+    setImageUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dataUrl: e.target.result })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setForm(prev => ({ ...prev, image: data.url }));
+        }
+      } catch (err) {
+        alert("Rasm yuklashda xatolik yuz berdi.");
+      } finally {
+        setImageUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddTag = (e) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      const currentTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+      if (!currentTags.includes(tagInput.trim())) {
+        const newTags = [...currentTags, tagInput.trim()].join(", ");
+        setForm(prev => ({ ...prev, tags: newTags }));
+      }
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    const currentTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+    const newTags = currentTags.filter(t => t !== tagToRemove).join(", ");
+    setForm(prev => ({ ...prev, tags: newTags }));
+  };
+
+  const [form, setForm] = useState({
+    title: "",
+    category: isUz ? "Siyosat" : "Политика",
+    summary: "",
+    body: "",
+    image: "",
+    author: "Tahririyat",
+    status: "draft",
+    time: "Bugun",
+    read: "4 daqiqa",
+    tags: "",
+    seoTitle: "",
+    seoDescription: "",
+    seoKeywords: "",
+    focusKeyword: "",
+    videoUrl: ""
+  });
+
+  // Backup & Import
+  const [backupLogs, setBackupLogs] = useState([]);
+  const importFileRef = useRef(null);
+
+  // SEO scoring helper
+  const [seoScore, setSeoScore] = useState(0);
+  const [seoSuggestions, setSeoSuggestions] = useState([]);
+
+  // Auto-save logic (runs every 5 seconds)
+  useEffect(() => {
+    if (activeTab !== "editor" || !form.title) return;
+    const interval = setInterval(() => {
+      localStorage.setItem("yk-cms-draft", JSON.stringify(form));
+      console.log("Draft auto-saved successfully.");
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeTab, form]);
+
+  // Load draft if exists
+  const loadDraft = () => {
+    const draft = localStorage.getItem("yk-cms-draft");
+    if (draft) {
+      setForm(JSON.parse(draft));
+      alert("Qoralama muvaffaqiyatli tiklandi.");
+    }
+  };
+
+  // SEO Live score calculator
+  useEffect(() => {
+    let score = 0;
+    const suggestions = [];
+
+    if (form.title.length > 10) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Sarlavha juda qisqa (kamida 10 ta belgi bo'lishi kerak)" : "Заголовок слишком короткий");
+    }
+
+    if (form.summary.length > 30) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Tavsif (summary) juda qisqa" : "Описание слишком короткое");
+    }
+
+    if (form.focusKeyword && form.title.toLowerCase().includes(form.focusKeyword.toLowerCase())) {
+      score += 25;
+    } else if (form.focusKeyword) {
+      suggestions.push(isUz ? "Klit so'zni sarlavhaga kiriting" : "Добавьте ключевое слово в заголовок");
+    }
+
+    if (form.body.length > 200) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Maqola matni juda qisqa (kamida 200 ta belgi)" : "Текст статьи слишком короткий");
+    }
+
+    setSeoScore(score);
+    setSeoSuggestions(suggestions);
+  }, [form.title, form.summary, form.body, form.focusKeyword]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+        setAuthError("");
+      } else {
+        setAuthError(isUz ? "Parol noto'g'ri" : "Неверный пароль");
+      }
+    } catch (err) {
+      setAuthError("Server connection error.");
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      const langKey = lang === "ru" ? "ru" : "uz";
+      let res;
+      if (editingStory) {
+        res = await fetch(`/api/admin/stories/${langKey}/${editingStory.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ story: form })
+        });
+      } else {
+        res = await fetch("/api/admin/stories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang: langKey, story: form })
+        });
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setAllStories(data.stories);
+        alert(isUz ? "Maqola muvaffaqiyatli saqlandi!" : "Статья успешно сохранена!");
+        setActiveTab("articles");
+        setEditingStory(null);
+        setForm({
+          title: "",
+          category: isUz ? "Siyosat" : "Политика",
+          summary: "",
+          body: "",
+          image: "",
+          author: "Tahririyat",
+          status: "draft",
+          time: "Bugun",
+          read: "4 daqiqa",
+          tags: "",
+          seoTitle: "",
+          seoDescription: "",
+          seoKeywords: "",
+          focusKeyword: "",
+          videoUrl: ""
+        });
+        localStorage.removeItem("yk-cms-draft");
+      }
+    } catch (err) {
+      alert("Error saving story.");
+    }
+  };
+
+  const handleEdit = (story) => {
+    setEditingStory(story);
+    setForm(story);
+    setActiveTab("editor");
+  };
+
+  const handleDelete = async (story) => {
+    if (!confirm(isUz ? "Maqolani o'chirishni tasdiqlaysizmi?" : "Подтверждаете удаление?")) return;
+    try {
+      const langKey = lang === "ru" ? "ru" : "uz";
+      const res = await fetch(`/api/admin/stories/${langKey}/${story.id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAllStories(data.stories);
+      }
+    } catch (err) {
+      alert("Error deleting story.");
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      const res = await fetch("/api/admin/backup/export");
+      if (res.ok) {
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data.data.content, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `vatanuz-backup-${Date.now()}.json`;
+        a.click();
+      }
+    } catch (e) {
+      alert("Export failed.");
+    }
+  };
+
+  const importData = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const parsed = JSON.parse(evt.target.result);
+        const res = await fetch("/api/admin/backup/import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parsed)
+        });
+        if (res.ok) {
+          alert(isUz ? "Zaxira muvaffaqiyatli yuklandi!" : "Резервная копия успешно восстановлена!");
+          window.location.reload();
+        } else {
+          alert("Import failed.");
+        }
+      } catch (err) {
+        alert("Invalid file format.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  if (!authenticated) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", background: "var(--fill)", padding: "24px" }}>
+        <form onSubmit={handleLogin} style={{ background: "var(--surface)", padding: "40px", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <h2 style={{ textAlign: "center", color: "var(--brand)", fontSize: "24px", fontWeight: "800" }}>🔑 VATAN.UZ CMS</h2>
+          <p style={{ textAlign: "center", color: "var(--muted)", fontSize: "14px" }}>
+            {isUz ? "Tahririyat paneliga kirish uchun parolni kiriting:" : "Введите пароль для входа в панель:"}
+          </p>
+          <input 
+            type="password" 
+            placeholder="••••••••" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", outline: "none", fontSize: "16px" }}
+          />
+          {authError && <div style={{ color: "var(--brand)", fontSize: "14px", fontWeight: "600", textAlign: "center" }}>{authError}</div>}
+          <button type="submit" className="more-news-btn" style={{ padding: "14px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>
+            {isUz ? "Kirish" : "Войти"}
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // Flatten stories list
+  const langKey = lang === "ru" ? "ru" : "uz";
+  const storiesList = allStories[langKey] || [];
+  
+  // Filter lists
+  const filteredStories = storiesList.filter(story => {
+    const matchesSearch = story.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          story.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || story.category === selectedCategory;
+    const matchesStatus = selectedStatus === "all" || story.status === selectedStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "85vh", background: "var(--fill)", fontFamily: "inherit" }}>
+      
+      {/* Sidebar Navigation */}
+      <aside style={{ background: "var(--surface)", borderRight: "1px solid var(--line)", padding: "24px 16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <h3 style={{ fontSize: "14px", fontWeight: "800", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px", paddingLeft: "12px" }}>📂 CMS Menu</h3>
+        
+        <button 
+          onClick={() => setActiveTab("dashboard")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "dashboard" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "dashboard" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >📊 Dashboard</button>
+        
+        <button 
+          onClick={() => setActiveTab("articles")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "articles" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "articles" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >📝 Maqolalar</button>
+
+        <button 
+          onClick={() => {
+            setEditingStory(null);
+            setForm({
+              title: "",
+              category: isUz ? "Siyosat" : "Политика",
+              summary: "",
+              body: "",
+              image: "",
+              author: "Tahririyat",
+              status: "draft",
+              time: "Bugun",
+              read: "4 daqiqa",
+              tags: "",
+              seoTitle: "",
+              seoDescription: "",
+              seoKeywords: "",
+              focusKeyword: "",
+              videoUrl: ""
+            });
+            setActiveTab("editor");
+          }} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "editor" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "editor" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >✍️ Yangi Maqola</button>
+
+        <button 
+          onClick={() => setActiveTab("settings")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "settings" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "settings" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >⚙️ Sozlamalar</button>
+
+        <button 
+          onClick={() => setAuthenticated(false)} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: "transparent", color: "var(--brand)", fontWeight: "700", textAlign: "left", cursor: "pointer", marginTop: "auto" }}
+        >🚪 Chiqish</button>
+      </aside>
+
+      {/* Main Content Area */}
+      <main style={{ padding: "40px" }}>
+        
+        {/* Tab 1: Dashboard */}
+        {activeTab === "dashboard" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>Бошқарув панели</h2>
+              <button onClick={() => window.location.reload()} style={{ background: "var(--brand)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}>↻ Yangilash</button>
+            </div>
+            
+            {dashboardStats ? (
+              <>
+                {/* Stats Cards */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Umumiy Maqolalar</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "var(--ink)", marginTop: "8px" }}>{dashboardStats.stats.totalArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Chop etilganlar</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#10b981", marginTop: "8px" }}>{dashboardStats.stats.publishedArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Qoralamalar (Draft)</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#f59e0b", marginTop: "8px" }}>{dashboardStats.stats.draftArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Rejalashtirilgan</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#a855f7", marginTop: "8px" }}>{dashboardStats.stats.scheduledArticles}</h3>
+                  </div>
+                </div>
+
+                {/* Charts Area */}
+                {window.Recharts && (
+                  <div style={{ display: "grid", gridTemplateColumns: "2fr 2fr", gap: "24px" }}>
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📈 Haftalik Ko'rishlar (LineChart)</h4>
+                      <div style={{ width: "100%", height: 300 }}>
+                        <ResponsiveContainer>
+                          <LineChart data={dashboardStats.weeklyViews} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                            <Line type="monotone" dataKey="views" stroke="#3b82f6" strokeWidth={3} />
+                            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false} />
+                            <XAxis dataKey="name" tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <YAxis tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <Tooltip contentStyle={{ background: "var(--surface)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                    
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📊 Maqolalar (BarChart)</h4>
+                      <div style={{ width: "100%", height: 300 }}>
+                        <ResponsiveContainer>
+                          <BarChart data={dashboardStats.weeklyViews} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false} />
+                            <XAxis dataKey="name" tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <YAxis tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <Tooltip contentStyle={{ background: "var(--surface)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+                            <Bar dataKey="views" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Widgets */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "24px" }}>
+                  {/* Category Pie Chart */}
+                  {window.Recharts && (
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>🔘 Ruknlar Bo'yicha</h4>
+                      <div style={{ width: "100%", height: 250 }}>
+                        <ResponsiveContainer>
+                          <PieChart>
+                            <Pie
+                              data={dashboardStats.categoryData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              paddingAngle={5}
+                              dataKey="value"
+                            >
+                              {dashboardStats.categoryData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend verticalAlign="bottom" height={36} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Logs & Memory Status */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>⚡ Server Holati (Xotira)</h4>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)" }}>RAM Yuklanishi: {dashboardStats.serverStatus.memUsagePercent}%</span>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>{dashboardStats.serverStatus.usedMemGB} GB / {dashboardStats.serverStatus.totalMemGB} GB</span>
+                      </div>
+                      <div style={{ width: "100%", height: "8px", background: "var(--line)", borderRadius: "4px", overflow: "hidden" }}>
+                        <div style={{ width: `${dashboardStats.serverStatus.memUsagePercent}%`, height: "100%", background: dashboardStats.serverStatus.memUsagePercent > 80 ? "#ef4444" : "var(--brand)", transition: "width 0.5s ease" }} />
+                      </div>
+                      <div style={{ marginTop: "16px", fontSize: "13px", color: "var(--muted)" }}>
+                        CPU: {dashboardStats.serverStatus.cpuModel}
+                      </div>
+                    </div>
+
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)", flex: 1, maxHeight: "200px", overflowY: "auto" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📜 Server Loglari</h4>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {dashboardLogs.slice(0, 10).map((log, i) => (
+                          <div key={i} style={{ fontSize: "12px", color: "var(--ink)", padding: "8px", background: "var(--fill)", borderRadius: "4px", fontFamily: "monospace" }}>
+                            {log}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: "40px", textAlign: "center", color: "var(--muted)" }}>Yuklanmoqda...</div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: Articles Management */}
+        {activeTab === "articles" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>📝 Maqolalar Ro'yxati</h2>
+              <button 
+                onClick={() => { setEditingStory(null); setForm({ title: "", category: "Siyosat", summary: "", body: "", status: "draft", author: "Tahririyat" }); setActiveTab("editor"); }} 
+                className="more-news-btn" 
+                style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700" }}
+              >+ Yangi Maqola</button>
+            </div>
+
+            {/* Filter Bar */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px" }}>
+              <input 
+                type="text" 
+                placeholder="Mavzu bo'yicha qidiruv..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              />
+              <select 
+                value={selectedCategory} 
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">Barcha ruknlar</option>
+                <option value="Siyosat">Siyosat</option>
+                <option value="Iqtisodiyot">Iqtisodiyot</option>
+                <option value="Texnologiya">Texnologiya</option>
+                <option value="Sport">Sport</option>
+              </select>
+              <select 
+                value={selectedStatus} 
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">Barcha statuslar</option>
+                <option value="published">Chop etilgan</option>
+                <option value="draft">Qoralama</option>
+              </select>
+            </div>
+
+            {/* Articles Table Grid */}
+            <div style={{ background: "var(--surface)", borderRadius: "12px", border: "1px solid var(--line)", overflow: "hidden" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "var(--fill)", borderBottom: "1px solid var(--line)" }}>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Mavzu / Sarlavha</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Kategoriya</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Status</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)", textAlign: "right" }}>Amallar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStories.map(story => (
+                    <tr key={story.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "16px 24px", fontSize: "15px", fontWeight: "700", color: "var(--ink)" }}>{story.title}</td>
+                      <td style={{ padding: "16px 24px", fontSize: "14px", color: "var(--muted)" }}>{story.category}</td>
+                      <td style={{ padding: "16px 24px" }}>
+                        <span style={{ padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "700", background: story.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)", color: story.status === "published" ? "#10b981" : "#f59e0b" }}>
+                          {story.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px 24px", textAlign: "right", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                        <button onClick={() => handleEdit(story)} style={{ padding: "6px 12px", background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>Tahrirlash</button>
+                        <button onClick={() => handleDelete(story)} style={{ padding: "6px 12px", background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>O'chirish</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredStories.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ padding: "32px", textAlign: "center", color: "var(--muted)" }}>Maqolalar topilmadi.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Text Editor and Live SEO Optimizer */}
+        

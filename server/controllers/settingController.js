@@ -1,0 +1,267 @@
+const settingRepository = require('../repositories/settingRepository');
+const articleRepository = require('../repositories/articleRepository');
+const fs = require('fs');
+const path = require('path');
+const config = require('../config/config');
+const { formatResponse } = require('../utils/helpers');
+
+class SettingController {
+  async getSettings(req, res, next) {
+    try {
+      const settings = await settingRepository.getSettings();
+      return res.status(200).json(formatResponse({ data: settings }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateSettings(req, res, next) {
+    try {
+      const updated = await settingRepository.updateSettings(req.body);
+      return res.status(200).json(formatResponse({ message: 'Settings updated successfully', data: updated }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async exportBackup(req, res, next) {
+    try {
+      const articles = await articleRepository.getAll();
+      const settings = await settingRepository.getSettings();
+      
+      const backupData = {
+        articles,
+        settings,
+        exportedAt: new Date().toISOString()
+      };
+
+      // Ensure backup directory
+      fs.mkdirSync(config.backupsDir, { recursive: true });
+      const backupFilename = `backup-${Date.now()}.json`;
+      fs.writeFileSync(path.join(config.backupsDir, backupFilename), JSON.stringify(backupData, null, 2), 'utf8');
+
+      return res.status(200).json(formatResponse({ 
+        message: 'Backup exported successfully', 
+        data: { filename: backupFilename, content: backupData } 
+      }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async importBackup(req, res, next) {
+    try {
+      const { articles, settings } = req.body;
+      if (!articles || !settings) {
+        return res.status(400).json(formatResponse({ success: false, message: 'Invalid backup structure.' }));
+      }
+
+      await articleRepository.write(articles);
+      await settingRepository.updateSettings(settings);
+
+      return res.status(200).json(formatResponse({ message: 'Backup restored successfully.' }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getDashboardStats(req, res, next) {
+    try {
+      const os = require('os');
+      const articleRepository = require('../repositories/articleRepository');
+      const articles = await articleRepository.getAll();
+      const uzArticles = articles.uz || [];
+      const enArticles = articles.en || [];
+      const allArticles = [...uzArticles, ...enArticles];
+
+      const stats = {
+        totalArticles: allArticles.length,
+        publishedArticles: allArticles.filter(a => a.status === 'published').length,
+        draftArticles: allArticles.filter(a => a.status === 'draft').length,
+        scheduledArticles: allArticles.filter(a => a.status === 'scheduled').length,
+        categories: [...new Set(allArticles.map(a => a.category))],
+      };
+
+      // Realtime OS metrics
+      const totalMem = os.totalmem();
+      const freeMem = os.freemem();
+      const usedMem = totalMem - freeMem;
+      const memUsage = ((usedMem / totalMem) * 100).toFixed(2);
+      const cpus = os.cpus();
+      const cpuModel = cpus[0] ? cpus[0].model : 'Unknown';
+      const uptime = os.uptime();
+
+      const serverStatus = {
+        memUsagePercent: memUsage,
+        totalMemGB: (totalMem / 1024 / 1024 / 1024).toFixed(2),
+        usedMemGB: (usedMem / 1024 / 1024 / 1024).toFixed(2),
+        cpuModel,
+        uptimeSeconds: uptime
+      };
+
+      const weeklyViews = [
+        { name: 'Dushanba', views: 4000 },
+        { name: 'Seshanba', views: 3000 },
+        { name: 'Chorshanba', views: 5000 },
+        { name: 'Payshanba', views: 2780 },
+        { name: 'Juma', views: 8900 },
+        { name: 'Shanba', views: 2390 },
+        { name: 'Yakshanba', views: 3490 },
+      ];
+
+      const catCount = {};
+      allArticles.forEach(a => {
+        catCount[a.category] = (catCount[a.category] || 0) + 1;
+      });
+      const categoryData = Object.keys(catCount).map(c => ({ name: c, value: catCount[c] }));
+
+      return res.status(200).json({ stats, serverStatus, weeklyViews, categoryData });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getLogs(req, res, next) {
+    try {
+      const logType = req.query.type || 'combined'; // combined or error
+      const logFile = path.join(config.logsDir, logType === 'error' ? 'error.log' : 'combined.log');
+      let logs = [];
+      if (fs.existsSync(logFile)) {
+        const rawLogs = fs.readFileSync(logFile, 'utf8').split('\n').filter(Boolean).slice(-100);
+        logs = rawLogs.reverse(); // Newest first
+      } else {
+        logs = [`Tizim loglari (${logType}) mavjud emas.`];
+      }
+      return res.status(200).json({ logs });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getHealth(req, res, next) {
+    try {
+      const os = require('os');
+      const filesToCheck = [
+        'ads.json', 'articles.json', 'audit.json', 'categories.json', 'comments.json',
+        'languages.json', 'pages.json', 'photos.json', 'settings.json', 'subscriptions.json',
+        'tags.json', 'users.json', 'vapid.json', 'videos.json'
+      ];
+      
+      const fileStatus = [];
+      let totalStorageBytes = 0;
+      let corruptCount = 0;
+
+      filesToCheck.forEach(file => {
+        const filePath = path.join(config.storageDir, file);
+        const status = {
+          name: file,
+          exists: fs.existsSync(filePath),
+          sizeBytes: 0,
+          isValidJson: false,
+          error: null
+        };
+
+        if (status.exists) {
+          try {
+            const stats = fs.statSync(filePath);
+            status.sizeBytes = stats.size;
+            totalStorageBytes += stats.size;
+
+            const content = fs.readFileSync(filePath, 'utf8');
+            JSON.parse(content);
+            status.isValidJson = true;
+          } catch (e) {
+            status.isValidJson = false;
+            status.error = e.message;
+            corruptCount++;
+          }
+        } else {
+          corruptCount++;
+        }
+        fileStatus.push(status);
+      });
+
+      const health = {
+        status: corruptCount === 0 ? 'HEALTHY' : 'DEGRADED',
+        os: {
+          platform: os.platform(),
+          release: os.release(),
+          freeMemoryGB: (os.freemem() / 1024 / 1024 / 1024).toFixed(2),
+          totalMemoryGB: (os.totalmem() / 1024 / 1024 / 1024).toFixed(2),
+          cpuCount: os.cpus().length,
+          uptimeHours: (os.uptime() / 3600).toFixed(2)
+        },
+        storage: {
+          totalFilesChecked: filesToCheck.length,
+          totalStorageBytes,
+          corruptFilesCount: corruptCount,
+          files: fileStatus
+        }
+      };
+
+      return res.status(200).json({ success: true, health });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async repairDb(req, res, next) {
+    try {
+      const { filename } = req.body;
+      if (!filename) {
+        return res.status(400).json({ success: false, message: 'Fayl nomi kiritilmadi' });
+      }
+
+      const filePath = path.join(config.storageDir, filename);
+      let defaultValue = '[]';
+      
+      // Determine appropriate default structure
+      if (['settings.json', 'vapid.json'].includes(filename)) {
+        defaultValue = '{}';
+      } else if (filename === 'articles.json') {
+        defaultValue = '{"uz":[],"uzk":[],"en":[]}';
+      } else if (filename === 'photos.json' || filename === 'videos.json') {
+        defaultValue = '{"uz":[],"uzk":[],"en":[]}';
+      }
+
+      // Check if backup directory has any backups to restore from
+      let restoredFromBackup = false;
+      if (fs.existsSync(config.backupsDir)) {
+        const backups = fs.readdirSync(config.backupsDir).filter(f => f.endsWith('.json')).sort();
+        if (backups.length > 0) {
+          const latestBackup = backups[backups.length - 1];
+          try {
+            const backupData = JSON.parse(fs.readFileSync(path.join(config.backupsDir, latestBackup), 'utf8'));
+            if (filename === 'articles.json' && backupData.articles) {
+              fs.writeFileSync(filePath, JSON.stringify(backupData.articles, null, 2), 'utf8');
+              restoredFromBackup = true;
+            } else if (filename === 'settings.json' && backupData.settings) {
+              fs.writeFileSync(filePath, JSON.stringify(backupData.settings, null, 2), 'utf8');
+              restoredFromBackup = true;
+            }
+          } catch (e) {
+            // Backup corrupt, skip
+          }
+        }
+      }
+
+      if (!restoredFromBackup) {
+        fs.writeFileSync(filePath, defaultValue, 'utf8');
+      }
+
+      const logRepository = require('../repositories/logRepository');
+      await logRepository.addLog('DB_REPAIR', 'System', filename, req.user.username, `Baza fayli tiklandi: ${filename} (Zaxiradan: ${restoredFromBackup ? 'Ha' : 'Yo\'q'})`);
+
+      return res.status(200).json({ 
+        success: true, 
+        message: restoredFromBackup 
+          ? `${filename} oxirgi zaxiradan muvaffaqiyatli tiklandi.` 
+          : `${filename} bo'sh holatga keltirilib, qayta tiklandi.`
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+}
+
+module.exports = new SettingController();

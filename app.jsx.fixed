@@ -1,0 +1,3584 @@
+const { useEffect, useMemo, useRef, useState, useCallback } = React;
+
+const images = {
+  city: "url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?auto=format&fit=crop&w=1600&q=80')",
+  parliament: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1600&q=85",
+  business: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=85",
+  tech: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=85",
+  sport: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=85",
+  culture: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1600&q=85",
+  analysis: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=85",
+  world: "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80",
+  newsroom: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80",
+  power: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=900&q=80",
+  tourism: "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?auto=format&fit=crop&w=900&q=80",
+  cityPeople: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
+  road: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80",
+  debate: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=900&q=80",
+  diplomacy: "https://images.unsplash.com/photo-1541872705-1f73c6400ec9?auto=format&fit=crop&w=900&q=80",
+  map: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=900&q=80",
+  studio: "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=900&q=80",
+  photo1: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=900&q=80",
+  photo2: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80",
+  photo3: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=80",
+  photo4: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=900&q=80",
+  photo5: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80",
+  photo6: "https://images.unsplash.com/photo-1526495124232-a04e1849168c?auto=format&fit=crop&w=900&q=80",
+};
+
+const copy = {
+  uz: {
+    live: "Jonli lenta",
+    date: new Date().toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" }),
+    search: "Qidirish...",
+    portal: "Yangiliklar portali",
+    read: "O'qish",
+    popular: "Ko'p o'qilganlar",
+    newsletterTitle: "Kunlik dayjest",
+    newsletterText: "Muhim xabarlar, tahlillar va maxsus maqolalarni pochtangizga oling.",
+    email: "Email manzilingiz",
+    subscribe: "Obuna bo'lish",
+    latest: "So'nggi yangiliklar",
+    latestNote: "Tahririyat tanlagan dolzarb xabarlar, qisqa sharhlar va mavzuga oid ma'lumotlar.",
+    all: "Barchasi",
+    special: "Maxsus loyiha",
+    specialTitle: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
+    specialText:
+      "Yangi Kun tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+    pages: ["Bosh sahifa", "Siyosat", "Iqtisod", "Texnologiya", "Sport", "Madaniyat", "Aloqa"],
+    pageNotes: {
+      "Bosh sahifa": "Asosiy xabarlar, trendlar va kunning eng muhim mavzulari.",
+      Siyosat: "Davlat boshqaruvi, parlament, mahalliy kengashlar va jamoatchilik muhokamalari.",
+      Iqtisod: "Bozorlar, biznes, moliya, bandlik va tadbirkorlik muhiti.",
+      Texnologiya: "Startaplar, sun'iy intellekt, raqamli xizmatlar va kiberxavfsizlik.",
+      Sport: "Futbol, olimpiya sportlari, turnirlar va sportchilar hikoyalari.",
+      Madaniyat: "Kino, teatr, kitob, musiqa va shahar hayotidagi madaniy voqealar.",
+      Aloqa: "Tahririyat bilan bog'lanish, reklama va hamkorlik uchun ma'lumotlar.",
+    },
+    contact: [
+      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: news@yangikun.uz"],
+      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@yangikun.uz"],
+      ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
+    ],
+    close: "Yopish",
+  },
+  ru: {
+    live: "Лента",
+    date: new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }),
+    search: "Поиск...",
+    portal: "Новостной портал",
+    read: "Читать",
+    popular: "Популярное",
+    newsletterTitle: "Ежедневный дайджест",
+    newsletterText: "Получайте главные новости, аналитику и специальные материалы на почту.",
+    email: "Ваш email",
+    subscribe: "Подписаться",
+    latest: "Последние новости",
+    latestNote: "Актуальные сообщения, короткие разборы и контекст от редакции.",
+    all: "Все",
+    special: "Спецпроект",
+    specialTitle: "Журналистика на основе данных: отделяем события от шума",
+    specialText:
+      "Редакция Yangi Kun понятным языком объясняет важные процессы в политике, экономике, технологиях, спорте и культуре.",
+    pages: ["Главная", "Политика", "Экономика", "Технологии", "Спорт", "Культура", "Контакты"],
+    pageNotes: {
+      "Главная": "Главные материалы, тренды и ключевые темы дня.",
+      "Политика": "Госуправление, парламент, местные советы и общественные обсуждения.",
+      "Экономика": "Рынки, бизнес, финансы, занятость и предпринимательская среда.",
+      "Технологии": "Стартапы, искусственный интеллект, цифровые сервисы и кибербезопасность.",
+      "Спорт": "Футбол, олимпийские виды, турниры и истории спортсменов.",
+      "Культура": "Кино, театр, книги, музыка и культурные события городской жизни.",
+      "Контакты": "Связь с редакцией, реклама и партнёрские проекты.",
+    },
+    contact: [
+      ["Редакция", "Новости, пресс-релизы и фотоматериалы: news@yangikun.uz"],
+      ["Реклама", "Бренд-проекты, баннеры и специальные страницы: ads@yangikun.uz"],
+      ["Адрес", "Ташкент, медиацентр, 4 этаж. Понедельник-пятница 09:00-18:00."],
+    ],
+    close: "Закрыть",
+  },
+};
+
+copy["uzk"] = {
+  live: "\u0416\u043e\u043d\u043b\u0438 \u043b\u0435\u043d\u0442\u0430",
+  date: new Date().toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" }),
+  search: "\u049a\u0438\u0434\u0438\u0440\u0438\u0448...",
+  portal: "\u042f\u043d\u0433\u0438\u043b\u0438\u043a\u043b\u0430\u0440 \u043f\u043e\u0440\u0442\u0430\u043b\u0438",
+  read: "\u040e\u049b\u0438\u0448",
+  popular: "\u041a\u045e\u043f \u045e\u049b\u0438\u043b\u0433\u0430\u043d\u043b\u0430\u0440",
+  newsletterTitle: "\u041a\u0443\u043d\u043b\u0438\u043a \u0434\u0430\u0439\u0436\u0435\u0441\u0442",
+  newsletterText: "\u041c\u0443\u04b3\u0438\u043c \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u0442\u0430\u04b3\u043b\u0438\u043b\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u043c\u0430\u049b\u043e\u043b\u0430\u043b\u0430\u0440\u043d\u0438 \u043f\u043e\u0448\u0442\u0430\u043d\u0433\u0438\u0437\u0433\u0430 \u043e\u043b\u0438\u043d\u0433.",
+  email: "Email \u043c\u0430\u043d\u0437\u0438\u043b\u0438\u043d\u0433\u0438\u0437",
+  subscribe: "\u041e\u0431\u0443\u043d\u0430 \u0431\u045e\u043b\u0438\u0448",
+  latest: "\u0421\u045e\u043d\u0433\u0433\u0438 \u044f\u043d\u0433\u0438\u043b\u0438\u043a\u043b\u0430\u0440",
+  latestNote: "\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442 \u0442\u0430\u043d\u043b\u0430\u0433\u0430\u043d \u0434\u043e\u043b\u0437\u0430\u0440\u0431 \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u049b\u0438\u0441\u049b\u0430 \u0448\u0430\u0440\u04b3\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0432\u0437\u0443\u0433\u0430 \u043e\u0438\u0434 \u043c\u0430\u044a\u043b\u0443\u043c\u043e\u0442\u043b\u0430\u0440.",
+  all: "\u0411\u0430\u0440\u0447\u0430\u0441\u0438",
+  special: "\u041c\u0430\u0445\u0441\u0443\u0441 \u043b\u043e\u0439\u0438\u04b3\u0430",
+  specialTitle: "\u041c\u0430\u044a\u043b\u0443\u043c\u043e\u0442\u0433\u0430 \u0442\u0430\u044f\u043d\u0433\u0430\u043d \u0436\u0443\u0440\u043d\u0430\u043b\u0438\u0441\u0442\u0438\u043a\u0430",
+  specialText: "\u042f\u043d\u0433\u0438 \u041a\u0443\u043d \u0442\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442\u0438 \u0441\u0438\u0451\u0441\u0430\u0442, \u0438\u049b\u0442\u0438\u0441\u043e\u0434, \u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u044f, \u0441\u043f\u043e\u0440\u0442 \u0432\u0430 \u043c\u0430\u0434\u0430\u043d\u0438\u044f\u0442\u0434\u0430\u0433\u0438 \u043c\u0443\u04b3\u0438\u043c \u0436\u0430\u0440\u0430\u0451\u043d\u043b\u0430\u0440\u043d\u0438 \u0440\u0430\u0432\u043e\u043d \u0442\u0438\u043b\u0434\u0430 \u0442\u0443\u0448\u0443\u043d\u0442\u0438\u0440\u0430\u0434\u0438.",
+  pages: ["Бош саҳифа", "Сиёсат", "Иқтисод", "Технология", "Спорт", "Маданият", "Алоқа"],
+  pageNotes: {
+    "\u0411\u043e\u0448 \u0441\u0430\u04b3\u0438\u0444\u0430": "\u0410\u0441\u043e\u0441\u0438\u0439 \u0445\u0430\u0431\u0430\u0440\u043b\u0430\u0440, \u0442\u0440\u0435\u043d\u0434\u043b\u0430\u0440 \u0432\u0430 \u043a\u0443\u043d\u043d\u0438\u043d\u0433 \u044d\u043d\u0433 \u043c\u0443\u04b3\u0438\u043c \u043c\u0430\u0432\u0437\u0443\u043b\u0430\u0440\u0438.",
+    "\u0421\u0438\u0451\u0441\u0430\u0442": "\u0414\u0430\u0432\u043b\u0430\u0442 \u0431\u043e\u0448\u049b\u0430\u0440\u0443\u0432\u0438, \u043f\u0430\u0440\u043b\u0430\u043c\u0435\u043d\u0442, \u043c\u0430\u04b3\u0430\u043b\u043b\u0438\u0439 \u043a\u0435\u043d\u0433\u0430\u0448\u043b\u0430\u0440 \u0432\u0430 \u0436\u0430\u043c\u043e\u0430\u0442\u0447\u0438\u043b\u0438\u043a \u043c\u0443\u04b3\u043e\u043a\u0430\u043c\u0430\u043b\u0430\u0440\u0438.",
+    "Тарих": "Ўтмиш саҳифалари, тарихий воқеалар ва шахслар.",
+    "Фалсафа": "Фалсафий қарашлар, мутафаккирлар ва дунёқараш.",
+    "Адабиёт": "Шеърият, наср, китобхонлик ва адабий танқид.",
+  },
+  contact: [
+    ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: news@yangikun.uz"],
+    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@yangikun.uz"],
+    ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
+  ],
+  close: "\u0401\u043f\u0438\u0448",
+};
+
+const categoryMap = {
+  uz: {
+    "Bosh sahifa": null,
+    "Siyosat": "Siyosat",
+    "Iqtisod": "Iqtisod",
+    "Texnologiya": "Texnologiya",
+    "Sport": "Sport",
+    "Madaniyat": "Madaniyat",
+    "Aloqa": "Aloqa"
+  },
+  ru: {
+    "Главная": null,
+    "Политика": "Siyosat",
+    "Экономика": "Iqtisod",
+    "Технологии": "Texnologiya",
+    "Спорт": "Sport",
+    "Культура": "Madaniyat",
+    "Контакты": "Aloqa"
+  }
+};
+categoryMap["uzk"] = {
+  "Бош саҳифа": null,
+  "Сиёсат": "Siyosat",
+  "Иқтисод": "Iqtisod",
+  "Технология": "Texnologiya",
+  "Спорт": "Sport",
+  "Маданият": "Madaniyat",
+  "Алоқа": "Aloqa"
+};
+
+const storyData = {
+  uz: [
+    {
+      category: "Siyosat",
+      title: "Hududlarda ochiq budjet muhokamalari yangi tartibda o'tkaziladi",
+      summary: "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi.",
+      image: images.newsroom,
+      author: "Ali Valiyev",
+      time: "Bugun, 10:30",
+      read: "3 daqiqa",
+      body: "Maqola matni...",
+      status: "published",
+      tags: "byudjet, islohot",
+      views: 120,
+    },
+    {
+      category: "Iqtisod",
+      title: "Kichik biznes uchun eksport maslahat markazlari ishga tushmoqda",
+      summary: "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi.",
+      image: images.newsroom,
+      author: "Nodir Rahimov",
+      time: "Kecha, 15:45",
+      read: "5 daqiqa",
+      body: "Iqtisodiy tahlil...",
+      status: "published",
+      tags: "biznes, eksport",
+      views: 340,
+    }
+  ],
+  ru: [
+    {
+      category: "Политика",
+      title: "Новый порядок обсуждения открытого бюджета в регионах",
+      summary: "Местные советы опубликуют цифровой график рассмотрения предложений граждан.",
+      image: images.newsroom,
+      author: "Али Валиев",
+      time: "Сегодня, 10:30",
+      read: "3 минуты",
+      body: "Текст статьи...",
+      status: "published",
+      tags: "бюджет, реформа",
+      views: 120,
+    }
+  ]
+};
+
+const mediaItems = {
+  uz: [
+    { type: "video", title: "Yangi loyiha taqdimoti", meta: "Video | 10:00", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "photo", title: "Fotogalereya: Shahar ko'chalari", meta: "Foto | Kecha", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "video", title: "Intervyu: Yosh tadbirkorlar", meta: "Video | 2 kun oldin", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "video", title: "Tahliliy ko'rsatuv", meta: "Video | 1 hafta oldin", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
+  ],
+  ru: [
+    { type: "video", title: "Презентация нового проекта", meta: "Видео | 10:00", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "photo", title: "Фотогалерея: Улицы города", meta: "Фото | Вчера", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "video", title: "Интервью: Молодые предприниматели", meta: "Видео | 2 дня назад", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { type: "video", title: "Аналитическая программа", meta: "Видео | Неделю назад", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
+  ]
+};
+
+const DEFAULT_PASSWORD = "admin2026";
+const emptyStory = {
+  category: "Siyosat",
+  title: "",
+  summary: "",
+  image: images.newsroom,
+  author: "",
+  time: "Hozir",
+  read: "3 daqiqa",
+  body: "",
+  status: "published",
+  tags: "",
+  metaTitle: "",
+  metaDesc: "",
+  views: 0,
+  isHero: false,
+  isEditorPick: false,
+  isBreaking: false,
+  countViews: true,
+  publishAt: "", // Rejalashtirish sanasi (YYYY-MM-DDTHH:mm)
+};
+
+const DEFAULT_SITE_CONFIG = {
+  siteName: "Yangi Kun",
+  logoUrl: "",
+  email: "news@yangikun.uz",
+  telegram: "https://t.me/yangikun",
+  bannerText: "",
+  bannerActive: false,
+  specialUz: {
+    kicker: "Maxsus loyiha",
+    title: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
+    text: "Yangi Kun tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+    badge: "Jonli tahririyat",
+    image: "",
+    features: "Tezkor yangiliklar, Mustaqil tahlil, Ikki tilda, Ishonchli manba",
+    stat1: "24/7", stat1label: "Monitoring",
+    stat2: "7",    stat2label: "Bo'lim",
+    stat3: "2",    stat3label: "Til",
+    stat4: "100+", stat4label: "Maqola",
+  },
+  specialRu: {
+    kicker: "Спецпроект",
+    title: "Журналистика на основе данных: отделяем события от шума",
+    text: "Редакция Yangi Kun понятным языком объясняет важные процессы в политике, экономике, технологиях, спорте и культуре.",
+    badge: "Живая редакция",
+    image: "",
+    features: "Быстрые новости, Независимый анализ, На двух языках, Надёжный источник",
+    stat1: "24/7", stat1label: "Мониторинг",
+    stat2: "7",    stat2label: "Разделов",
+    stat3: "2",    stat3label: "Языка",
+    stat4: "100+", stat4label: "Статей",
+  },
+  ads: [],
+};
+const fallbackStory = {
+  ...emptyStory,
+  id: "fallback-story",
+  title: "Yangi maqola qo'shing",
+  summary: "Admin panel orqali birinchi yangilikni joylashtiring.",
+  author: "Yangi Kun",
+  body: "Bu vaqtinchalik matn. Admin paneldan maqola qo'shilganda sayt lentasi yangilanadi.",
+};
+
+function makeId() {
+  return `story-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function RichEditor({ value, onChange }) {
+  const editorRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const isComposing = useRef(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const el = editorRef.current;
+    if (!el) return;
+    if (el.innerHTML !== value) {
+      el.innerHTML = value || "";
+    }
+  }, []);
+
+  function exec(cmd, val = null) {
+    editorRef.current.focus();
+    document.execCommand(cmd, false, val);
+    syncContent();
+  }
+
+  function syncContent() {
+    if (editorRef.current) onChange(editorRef.current.innerHTML);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      exec("insertHTML", "&nbsp;&nbsp;&nbsp;&nbsp;");
+    }
+  }
+
+  async function uploadAndInsert(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const res = await fetch("/api/admin/upload", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl: reader.result }),
+          });
+          const data = await res.json();
+          if (data.url) {
+            editorRef.current.focus();
+            document.execCommand("insertImage", false, data.url);
+            syncContent();
+          }
+        } catch {}
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch { setUploading(false); }
+  }
+
+  function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        uploadAndInsert(item.getAsFile());
+        return;
+      }
+    }
+  }
+
+  function handleDrop(e) {
+    const file = e.dataTransfer?.files?.[0];
+    if (file?.type.startsWith("image/")) {
+      e.preventDefault();
+      uploadAndInsert(file);
+    }
+  }
+
+  const AlignLeftIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/>
+    </svg>
+  );
+  const AlignCenterIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+  );
+  const AlignRightIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/>
+    </svg>
+  );
+  const AlignJustifyIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  );
+
+  function insertLink() {
+    const url = prompt("Havola URL:", "https://");
+    if (url) exec("createLink", url);
+  }
+
+  function insertImage() {
+    const url = prompt("Rasm URL:", "https://");
+    if (url) exec("insertImage", url);
+  }
+
+  function clearFormat() {
+    exec("removeFormat");
+    exec("formatBlock", "p");
+  }
+
+  const Divider = () => <span className="rich-divider" />;
+
+  return (
+    <div className="rich-editor">
+      <div className="rich-toolbar">
+        <div className="rich-toolbar-row">
+          {/* Matn formatlash */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Qalin (Ctrl+B)" className="rich-tool-btn" style={{fontWeight:900}} onMouseDown={e=>{e.preventDefault();exec("bold");}}>B</button>
+            <button type="button" title="Kursiv (Ctrl+I)" className="rich-tool-btn" style={{fontStyle:"italic"}} onMouseDown={e=>{e.preventDefault();exec("italic");}}>I</button>
+            <button type="button" title="Chizilgan (Ctrl+U)" className="rich-tool-btn" style={{textDecoration:"underline"}} onMouseDown={e=>{e.preventDefault();exec("underline");}}>U</button>
+            <button type="button" title="O'tkazib chizilgan" className="rich-tool-btn" style={{textDecoration:"line-through"}} onMouseDown={e=>{e.preventDefault();exec("strikeThrough");}}>S</button>
+          </div>
+
+          <Divider />
+
+          {/* Sarlavhalar */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Katta sarlavha" className="rich-tool-btn rich-tool-h1" onMouseDown={e=>{e.preventDefault();exec("formatBlock","h2");}}>H1</button>
+            <button type="button" title="Kichik sarlavha" className="rich-tool-btn rich-tool-h2" onMouseDown={e=>{e.preventDefault();exec("formatBlock","h3");}}>H2</button>
+            <button type="button" title="Paragraf" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("formatBlock","p");}}>¶</button>
+          </div>
+
+          <Divider />
+
+          {/* Hizalanish */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Chapga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyLeft");}}><AlignLeftIcon /></button>
+            <button type="button" title="Markazga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyCenter");}}><AlignCenterIcon /></button>
+            <button type="button" title="O'ngga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyRight");}}><AlignRightIcon /></button>
+            <button type="button" title="Ikki tomonga hizalash" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("justifyFull");}}><AlignJustifyIcon /></button>
+          </div>
+
+          <Divider />
+
+          {/* Ro'yxatlar */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Raqamli ro'yxat" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertOrderedList");}}>1.</button>
+            <button type="button" title="Nuqtali ro'yxat" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertUnorderedList");}}>•</button>
+            <button type="button" title="Ajratgich chiziq" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("insertHorizontalRule");}}>—</button>
+          </div>
+
+          <Divider />
+
+          {/* Qo'shish */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Havola qo'shish" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();insertLink();}}>🔗</button>
+            <button
+              type="button"
+              title="Rasm yuklash (kompyuterdan)"
+              className={`rich-tool-btn rich-tool-img ${uploading ? "uploading" : ""}`}
+              onMouseDown={e=>{ e.preventDefault(); fileInputRef.current?.click(); }}
+            >{uploading ? "⏳" : "🖼"}</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{display:"none"}}
+              onChange={e => { uploadAndInsert(e.target.files?.[0]); e.target.value=""; }}
+            />
+          </div>
+
+          <Divider />
+
+          {/* Undo/Redo + Tozalash */}
+          <div className="rich-toolbar-group">
+            <button type="button" title="Bekor qilish (Ctrl+Z)" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("undo");}}>↺</button>
+            <button type="button" title="Qayta qilish (Ctrl+Y)" className="rich-tool-btn" onMouseDown={e=>{e.preventDefault();exec("redo");}}>↻</button>
+            <button type="button" title="Formatlashni tozalash" className="rich-tool-btn rich-tool-clear" onMouseDown={e=>{e.preventDefault();clearFormat();}}>✕</button>
+          </div>
+        </div>
+      </div>
+      {uploading && (
+        <div className="rich-upload-bar">
+          <span className="rich-upload-spinner" /> Rasm yuklanmoqda...
+        </div>
+      )}
+      <div
+        ref={editorRef}
+        className="rich-content"
+        contentEditable
+        suppressContentEditableWarning
+        onInput={syncContent}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onDrop={handleDrop}
+        onDragOver={e => e.preventDefault()}
+        onCompositionStart={() => { isComposing.current = true; }}
+        onCompositionEnd={() => { isComposing.current = false; syncContent(); }}
+        data-placeholder="To'liq maqola matni. Paragraflarni Enter bilan ajrating..."
+      />
+    </div>
+  );
+}
+
+function withIds(stories) {
+  return {
+    uz: stories.uz.map((story, index) => ({ id: story.id || `uz-seed-${index}`, status: story.status || "published", ...story })),
+    ru: stories.ru.map((story, index) => ({ id: story.id || `ru-seed-${index}`, status: story.status || "published", ...story })),
+    uzk: stories.uz.map((story, index) => ({ id: story.id || `uzk-seed-${index}`, status: story.status || "published", ...story })),
+  };
+}
+
+// Лотин <-> Кирилл о'гириш
+const latToCyr = {
+  'a':'а','b':'б','d':'д','e':'е','f':'ф','g':'г','h':'ҳ','i':'и','j':'ж','k':'к','l':'л','m':'м','n':'н',
+  'o':'о','p':'п','q':'қ','r':'р','s':'с','t':'т','u':'у','v':'в','x':'х','y':'й','z':'з',
+  // о'збек апостроф турлари
+  "o'":'ў',"oʻ":'ў',"o`":'ў',"oʻ":'ў',"oʼ":'ў',
+  "g'":'ғ',"gʻ":'ғ',"g`":'ғ',"gʻ":'ғ',"gʼ":'ғ',
+  // икки ҳарфли комбинациялар
+  'sh':'ш','ch':'ч','yo':'ё','yu':'ю','ya':'я','ye':'е','yo\'':'йў',
+  '"':'ъ',
+  'A':'А','B':'Б','D':'Д','E':'Е','F':'Ф','G':'Г','H':'Ҳ','I':'Р','J':'Ж','K':'К','L':'Л','M':'М','N':'Н',
+  'O':'О','P':'П','Q':'Қ','R':'Р','S':'С','T':'Т','U':'У','V':'В','X':'Х','Y':'Й','Z':'З',
+  "O'":'Ў',"Oʻ":'Ў',"O`":'Ў',"Oʻ":'Ў',"Oʼ":'Ў',
+  "G'":'Ғ',"Gʻ":'Ғ',"G`":'Ғ',"Gʻ":'Ғ',"Gʼ":'Ғ',
+  'Sh':'Ш','Ch':'Ч','Yo':'Ё','Yu':'Ю','Ya':'Я','Ye':'Е'
+};
+const cyrToLat = {
+  'а':'a','б':'b','в':'v','д':'d','е':'e','э':'e','ф':'f','г':'g','ҳ':'h','и':'i','ж':'j','к':'k','л':'l','м':'m','н':'n',
+  'о':'o','п':'p','қ':'q','р':'r','с':'s','т':'t','у':'u','ў':'oʻ','ғ':'gʻ',
+  'ш':'sh','ч':'ch','ё':'yo','ю':'yu','я':'ya','ъ':'"','ь':'',
+  'А':'A','Б':'B','В':'V','Д':'D','Е':'E','Э':'E','Ф':'F','Г':'G','Ҳ':'H','Р':'I','Ж':'J','К':'K','Л':'L','М':'M','Н':'N',
+  'О':'O','П':'P','Қ':'Q','Р':'R','С':'S','Т':'T','У':'U','Ў':'Oʻ','Ғ':'Gʻ',
+  'Ш':'Sh','Ч':'Ch','Ё':'Yo','Ю':'Yu','Я':'Ya'
+};
+function convertText(text, toCyrillic) {
+  if (!text) return text;
+  const map = toCyrillic ? latToCyr : cyrToLat;
+  let result = '';
+  let i = 0;
+  while (i < text.length) {
+    // 2-белгили комбинацияларни текшириш
+    if (i < text.length - 1) {
+      const two = text.substring(i, i+2);
+      const twoLower = two.toLowerCase();
+      const found = Object.keys(map).find(k => k.toLowerCase() === twoLower && k.length === 2);
+      if (found) {
+        result += map[found];
+        i += 2;
+        continue;
+      }
+    }
+    // 1-белгили
+    const ch = text[i];
+    result += map[ch] || ch;
+    i++;
+  }
+  return result;
+}
+
+function App() {
+  const [lang, setLang] = useState("uz");
+  const [page, setPage] = useState(
+    window.location.hash === "#admin" ? "admin" : copy.uz.pages[0]
+  );
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [activeStory, setActiveStory] = useState(null);
+  const [allStories, setAllStories] = useState(withIds(storyData));
+  const [serverMessage, setServerMessage] = useState("");
+  const [siteConfig, setSiteConfig] = useState(DEFAULT_SITE_CONFIG);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("yk-dark") === "1");
+  const [savedIds, setSavedIds] = useState(() => JSON.parse(localStorage.getItem("yk-saved") || "[]"));
+  const [scrollVisible, setScrollVisible] = useState(false);
+  const [pinnedHeroId, setPinnedHeroId] = useState(() => localStorage.getItem("yk-hero") || "");
+  const [pinnedSideIds, setPinnedSideIds] = useState(() => JSON.parse(localStorage.getItem("yk-sides") || "[]"));
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [activeAuthor, setActiveAuthor] = useState(null);
+  const [activeTag, setActiveTag] = useState(null);
+  const [reactions, setReactions] = useState(() => JSON.parse(localStorage.getItem("yk-reactions") || "{}"));
+  const [ads, setAds] = useState(() => JSON.parse(localStorage.getItem("yk-ads") || "[]"));
+
+  useEffect(() => {
+    localStorage.setItem("yk-ads", JSON.stringify(ads));
+  }, [ads]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-reactions", JSON.stringify(reactions));
+  }, [reactions]);
+
+  function addReaction(storyId, emoji) {
+    setReactions(prev => {
+      const cur = prev[storyId] || {};
+      const myPrev = cur._mine;
+      if (myPrev === emoji) return prev;
+      const updated = { ...cur };
+      if (myPrev) updated[myPrev] = Math.max(0, (updated[myPrev] || 1) - 1);
+      updated[emoji] = (updated[emoji] || 0) + 1;
+      updated._mine = emoji;
+      return { ...prev, [storyId]: updated };
+    });
+  }
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("yk-dark", darkMode ? "1" : "0");
+  }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-saved", JSON.stringify(savedIds));
+  }, [savedIds]);
+
+  useEffect(() => {
+    if (pinnedHeroId) localStorage.setItem("yk-hero", pinnedHeroId);
+    else localStorage.removeItem("yk-hero");
+  }, [pinnedHeroId]);
+
+  useEffect(() => {
+    localStorage.setItem("yk-sides", JSON.stringify(pinnedSideIds));
+  }, [pinnedSideIds]);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrollVisible(window.scrollY > 400);
+      // Glassmorphism header scrolled class
+      const header = document.querySelector(".header");
+      if (header) header.classList.toggle("scrolled", window.scrollY > 10);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll fade-in animation (IntersectionObserver)
+  useEffect(() => {
+    const els = document.querySelectorAll(".fade-in-up");
+    if (!els.length) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  });
+
+  // Keyboard shortcuts: / → search, ESC → close story
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "/" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        document.querySelector(".search")?.focus();
+      }
+      if (e.key === "Escape" && activeStory) {
+        setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"});
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeStory]);
+
+  function toggleSave(id) {
+    setSavedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  function handleView(storyId) {
+    setAllStories(prev => ({
+      ...prev,
+      uz: prev.uz.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
+      ru: prev.ru.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
+    }));
+  }
+
+  useEffect(() => {
+    function onHash() {
+      if (window.location.hash === "#admin") setPage("admin");
+    }
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const t = copy[lang] || copy.uz;
+  const dataLang = lang;
+  const now = new Date().toISOString();
+  const rawStories = (allStories[dataLang] || []).filter((story) => {
+    if (story.status !== "published") return false;
+    // Rejalashtirish sanasi o'tganmi yoki yo'qmi
+    if (story.publishAt && story.publishAt > now) return false;
+    return true;
+  });
+  // Крилл тилда кўрсатишда матнни автоматик ўгириш
+  const stories = rawStories.map(story => {
+    if (dataLang !== "uzk") return story;
+    return {
+      ...story,
+      title: convertText(story.title, true),
+      summary: convertText(story.summary, true),
+      body: convertText(story.body, true),
+      category: convertText(story.category, true),
+      author: convertText(story.author, true)
+    };
+  });
+  const adminStories = allStories[dataLang] || [];
+  const pages = t.pages;
+  const selectedCategory = (categoryMap[lang] || categoryMap.uz)[page] ?? null;
+
+  function changeLang(nextLang) {
+    try {
+      const currentIndex = Math.max(0, pages.indexOf(page));
+      const nextCopy = copy[nextLang] || copy.uz;
+      const nextPages = nextCopy.pages || copy.uz.pages;
+      setLang(nextLang);
+      setPage(nextPages[currentIndex] || nextPages[0]);
+      setFilter("all");
+      setQuery("");
+      setActiveStory(null);
+    } catch(e) {
+      console.error("changeLang error:", e);
+    }
+  }
+
+  const categories = useMemo(() => [t.all, ...new Set(stories.map((story) => story.category))], [stories, t.all]);
+
+  const visibleStories = stories.filter((story) => {
+    const matchesPage = !selectedCategory || story.category === selectedCategory;
+    const matchesFilter = filter === "all" || story.category === filter || filter === t.all;
+    const text = `${story.title} ${story.summary} ${story.category}`.toLowerCase();
+    return matchesPage && matchesFilter && text.includes(query.toLowerCase());
+  });
+
+  const pinnedStory = pinnedHeroId ? stories.find(s => s.id === pinnedHeroId) : null;
+  const hero = pinnedStory || stories[2] || stories[0] || adminStories[0] || fallbackStory;
+  const pinnedSideStories = pinnedSideIds.map(id => stories.find(s => s.id === id)).filter(Boolean);
+  
+  // Exclude hero and pinned grid stories
+  const remainingStories = stories.filter(s => s.id !== hero.id && !pinnedSideIds.includes(s.id));
+  const allAvailable = [...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories];
+  
+  // gridStories takes pinned ones first, then fills up to 9
+  const gridStories = [...pinnedSideStories, ...allAvailable].slice(0, 9);
+  
+  // latestStories takes the next 9 items
+  const usedForGrid = gridStories.filter(s => !pinnedSideIds.includes(s.id)).length;
+  const latestStories = allAvailable.slice(usedForGrid, usedForGrid + 9);
+
+  useEffect(() => {
+    refreshPublicStories();
+  }, []);
+
+  async function refreshPublicStories() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/stories");
+      if (!response.ok) throw new Error("API javob bermadi");
+      const data = await response.json();
+      const uzStories = data.stories.uz.length ? data.stories.uz : withIds(storyData).uz;
+      const uzkStories = data.stories.uzk && data.stories.uzk.length ? data.stories.uzk : uzStories;
+      setAllStories(prev => ({
+        ...prev,
+        uz: uzStories,
+        ru: data.stories.ru.length ? data.stories.ru : withIds(storyData).ru,
+        uzk: uzkStories,
+      }));
+      setServerMessage("");
+    } catch (error) {
+      setServerMessage("Server API bilan aloqa bo'lmadi, demo maqolalar ko'rsatilmoqda.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="app">
+      <WeatherBar lang={lang} />
+      <header className="header">
+        <div className="nav-inner">
+          <button className="brand nav-link" onClick={() => { setPage(pages[0]); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} aria-label="VATAN" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src={siteConfig.logoUrl || "./logo.png"} alt="Logo" height="44" style={{ objectFit: "contain", borderRadius: "4px" }} />
+          </button>
+          <nav className="nav-links" aria-label="Main navigation">
+            {pages.slice(1).map((item) => (
+              <button
+                key={item}
+                className={`nav-link ${page === item ? "active" : ""}`}
+                onClick={() => {
+                  setPage(item);
+                  setFilter("all");
+                  setActiveStory(null);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+          <div className="actions">
+            <input
+              className="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t.search}
+              aria-label={t.search}
+            />
+            <div className="lang-toggle" aria-label="Language">
+              <button className={lang === "uzk" ? "active" : ""} onClick={() => changeLang("uzk")}>{"\u040e\u0417"}</button>
+              <button className={lang === "uz" ? "active" : ""} onClick={() => changeLang("uz")}>UZ</button>
+              <button className={lang === "ru" ? "active" : ""} onClick={() => changeLang("ru")}>RU</button>
+            </div>
+            <button
+              className="dark-toggle"
+              title={darkMode ? "Kunduz rejimi" : "Qorong'u rejim"}
+              onClick={() => setDarkMode(d => !d)}
+            >{darkMode ? "вЂпёЏ" : "🌙"}</button>
+            {savedIds.length > 0 && (
+              <button
+                className={`nav-link ${page === "__saved__" ? "active" : ""}`}
+                style={{fontSize:18, padding:"4px 8px", position:"relative"}}
+                title={lang !== "ru" ? "Saqlangan" : "Сохранённые"}
+                onClick={() => { setPage("__saved__"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+              >🔖 <span style={{fontSize:12,fontWeight:800}}>{savedIds.length}</span></button>
+            )}
+          </div>
+        </div>
+      </header>
+      {serverMessage && page !== "admin" && <div className="api-banner">{serverMessage}</div>}
+
+      {activeStory ? (
+        <ArticlePage
+          t={t} story={activeStory} stories={stories}
+          savedIds={savedIds} onToggleSave={toggleSave}
+          copiedShare={copiedShare} setCopiedShare={setCopiedShare}
+          onClose={() => { setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }}
+          onView={handleView}
+          reactions={reactions} addReaction={addReaction}
+          onAuthorClick={(author) => { setActiveAuthor(author); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+          onTagClick={(tag) => { setActiveTag(tag); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}
+        />
+      ) : activeAuthor ? (
+        <AuthorPage
+          author={activeAuthor} stories={stories} lang={lang}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({top:0,behavior:"instant"}); }}
+          onBack={() => setActiveAuthor(null)}
+          savedIds={savedIds} onToggleSave={toggleSave}
+        />
+      ) : activeTag ? (
+        <TagPage
+          tag={activeTag} stories={stories} lang={lang}
+          onOpen={(s) => { setActiveStory(s); window.scrollTo({top:0,behavior:"instant"}); }}
+          onBack={() => setActiveTag(null)}
+          savedIds={savedIds} onToggleSave={toggleSave}
+        />
+      ) : (
+        <>
+          {page !== "admin" && page !== "__saved__" && <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} />}
+          {page !== "admin" && page !== "__saved__" && <AdBanner ads={ads} position="top" />}
+
+          {page === "admin" ? (
+            <AdminPanel
+              lang={lang}
+              setLang={setLang}
+              allStories={allStories}
+              stories={adminStories}
+              setAllStories={setAllStories}
+              refreshPublicStories={refreshPublicStories}
+              siteConfig={siteConfig}
+              setSiteConfig={setSiteConfig}
+              pinnedHeroId={pinnedHeroId}
+              setPinnedHeroId={setPinnedHeroId}
+              pinnedSideIds={pinnedSideIds}
+              setPinnedSideIds={setPinnedSideIds}
+              ads={ads}
+              setAds={setAds}
+            />
+          ) : page === "__saved__" ? (
+            <main className="section saved-page">
+              <div className="section-inner">
+                <div className="section-head">
+                  <div>
+                    <h2 className="section-title">🔖 {lang !== "ru" ? "Saqlangan maqolalar" : "Сохранённые статьи"}</h2>
+                    <p className="saved-count">{savedIds.length} ta maqola saqlangan</p>
+                  </div>
+                  {savedIds.length > 0 && (
+                    <button className="adm-btn ghost" style={{fontSize:12}} onClick={() => setSavedIds([])}>
+                      {lang !== "ru" ? "Hammasini o'chirish" : "Очистить всё"}
+                    </button>
+                  )}
+                </div>
+                {savedIds.length === 0 ? (
+                  <div className="saved-empty">
+                    <span>🔖</span>
+                    <p>{lang !== "ru" ? "Hozircha hech narsa saqlanmagan" : "Ничего не сохранено"}</p>
+                    <small>{lang !== "ru" ? "Maqolalardagi в… tugmasini bosing" : "Нажмите в… в статье"}</small>
+                  </div>
+                ) : (
+                  <div className="layout">
+                    <div className="stories-grid">
+                      {stories.filter(s => savedIds.includes(s.id)).map(story => (
+                        <StoryCard key={story.id} story={story} savedIds={savedIds} onToggleSave={toggleSave}
+                          onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                      ))}
+                    </div>
+                    <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                  </div>
+                )}
+              </div>
+            </main>
+          ) : page === pages[6] ? (
+            <ContactPage t={t} page={page} />
+          ) : (
+            <main className={`section ${page === pages[0] ? "home-section" : "category-section"}`}>
+              <div className="section-inner">
+                {page !== pages[0] && (
+                  <div className="category-masthead">
+                    <span>{t.portal}</span>
+                    <h1>{page}</h1>
+                    <p>{t.pageNotes[page]}</p>
+                  </div>
+                )}
+                <div className="section-head">
+                  <div>
+                    <h2 className="section-title">{page === pages[0] ? (t.lang === 'ru' ? 'Статьи' : 'Maqolalar') : page}</h2>
+                    <p className="section-note">{page === pages[0] ? t.latestNote : t.pageNotes[page]}</p>
+                  </div>
+                  <div className="page-tools">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        className={`chip ${(filter === cat || (filter === "all" && cat === t.all)) ? "active" : ""}`}
+                        onClick={() => setFilter(cat === t.all ? "all" : cat)}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="layout">
+                  <div>
+                    <AdBanner ads={ads} position="inline" />
+                    <div className="stories-grid">
+                      {loading
+                        ? Array.from({length: 6}).map((_, i) => <SkeletonCard key={i} />)
+                        : visibleStories.length ? (page === pages[0] ? [...visibleStories, ...visibleStories].slice(0, 8) : visibleStories).map((story, index) => (
+                          <StoryCard key={`${story.id}-${index}`} story={story} featured={page !== pages[0] && index === 0}
+                            savedIds={savedIds} onToggleSave={toggleSave}
+                            onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                        )) : <div className="empty-state">Bu bo'limda hozircha maqola yo'q.</div>}
+                    </div>
+                    {page === pages[0] && visibleStories.length > 8 && (
+                      <div style={{textAlign:"center", marginTop:24}}>
+                        <button className="load-more-btn" onClick={() => setFilter("all") & setPage && window.scrollTo({top:0,behavior:"smooth"})}>
+                          {lang !== "ru" ? `Ko'proq ko'rish (${visibleStories.length - 8} ta qoldi)` : `Показать ещё (осталось ${visibleStories.length - 8})`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                </div>
+              </div>
+            </main>
+          )}
+
+          {page !== "admin" && <AdBanner ads={ads} position="bottom" />}
+          {page !== "admin" && page !== pages[6] && <BreakingBanner lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page !== "admin" && page !== pages[6] && <MediaSection lang={lang} items={mediaItems[lang] || mediaItems.uz} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page !== "admin" && <Special t={t} siteConfig={siteConfig} />}
+        </>
+      )}
+
+      <Footer t={t} pages={pages} setPage={(p) => { setPage(p); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
+
+      <button
+        className={`scroll-top-btn ${scrollVisible ? "visible" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        title="Yuqoriga"
+      >↑</button>
+
+      {/* 📱 Mobile bottom navigation */}
+      <nav className="mobile-bottom-nav">
+        <button className={`mob-nav-btn ${page === pages[0] && !activeStory ? "active" : ""}`}
+          onClick={() => { setPage(pages[0]); setActiveStory(null); setActiveAuthor(null); setActiveTag(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <span>🏠</span><span>{t.close === "Yopish" ? "Bosh" : "Главная"}</span>
+        </button>
+        <button className={`mob-nav-btn ${query ? "active" : ""}`}
+          onClick={() => document.querySelector(".search")?.focus()}>
+          <span>🔍</span><span>{t.close === "Yopish" ? "Qidirish" : "Поиск"}</span>
+        </button>
+        <button className={`mob-nav-btn ${page === "__saved__" ? "active" : ""}`}
+          onClick={() => { setPage("__saved__"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <span>🔖</span><span>{t.close === "Yopish" ? "Saqlangan" : "Сохранённые"}</span>
+          {savedIds.length > 0 && <span className="mob-nav-badge">{savedIds.length}</span>}
+        </button>
+        <button className={`mob-nav-btn ${page === "admin" ? "active" : ""}`}
+          onClick={() => { setPage("admin"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <span>⚙️</span><span>Admin</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+function BreakingBanner({ lang, stories, onOpen }) {
+  const isUz = lang !== "ru";
+  const label = isUz ? "TEZKOR" : "СРОЧНО";
+  const title = isUz ? "Haftaning eng dolzarb xabarlari" : "Самые актуальные новости недели";
+  const sub = isUz ? "Tahririyat tanlovi" : "Выбор редакции";
+  const btnLabel = isUz ? "Barchasini o'qish" : "Читать все";
+  const picks = stories.slice(0, 3);
+
+  return (
+    <div className="breaking-banner">
+      <div className="breaking-inner">
+        <div className="breaking-left">
+          <span className="breaking-badge">
+            <span className="breaking-live-dot" />
+            {label}
+          </span>
+          <h2>{title}</h2>
+          <p>{sub}</p>
+        </div>
+        <div className="breaking-cards">
+          {picks.map((story) => (
+            <button key={story.id} className="breaking-card" onClick={() => onOpen(story)}>
+              <img src={story.image} alt="" />
+              <div className="breaking-card-overlay" />
+              <div className="breaking-card-body">
+                <span className="breaking-cat">{story.category}</span>
+                <strong>{story.title}</strong>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MediaSection({ lang, items, onOpen }) {
+  const isUz = lang !== "ru";
+  const safeItems = items || [];
+  const videos = safeItems.filter((item) => item.type === "video");
+  const photos = safeItems.filter((item) => item.type === "photo");
+
+  const videoLabel = isUz ? "Video" : "Видео";
+  const photoLabel = isUz ? "Foto" : "Фото";
+  const videoNote = isUz ? "Kunning eng muhim videolari" : "Главные видео дня";
+  const photoNote = isUz ? "Fotoreportajlar va vizual materiallar" : "Фоторепортажи и визуальные материалы";
+  const watchLabel = isUz ? "Tomosha qilish →" : "Смотреть →";
+  const viewLabel = isUz ? "Ko'rish →" : "Посмотреть →";
+
+  function MediaBlock({ type, blockItems, title, note, onOpen }) {
+    const handleOpen = (item) => {
+      if (!onOpen) return;
+      const { type, title: itemTitle, meta, url: image } = item;
+      onOpen({
+        id: `media-${Date.now()}-${Math.random()}`,
+        title: itemTitle,
+        category: meta ? meta.split(' | ')[0] : type,
+        time: meta ? meta.split(' | ')[1] : "",
+        image: type === "video" ? null : image,
+        body: type === "video" 
+          ? `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 24px;">
+               <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+             </div>
+             <p>${itemTitle} haqida batafsil ma'lumot...</p>`
+          : `<p style="text-align:center; padding: 40px; background: #eee; border-radius: 12px; font-weight: bold; margin-bottom: 20px;">[ Fotogalereya Placeholder ]</p><p>${itemTitle} haqida batafsil ma'lumot...</p>`
+      });
+    };
+    if (!blockItems.length) return null;
+    const featured = blockItems[0];
+    const rest = blockItems.slice(1);
+    return (
+      <div className="media-block">
+        <div className="media-block-head">
+          <span className={`media-block-icon-label ${type}`}>
+            {type === "video" ? "▶" : "◉"} {title}
+          </span>
+          <p>{note}</p>
+        </div>
+
+        {type === "video" ? (
+          <div className="media-v2-layout">
+            <article className="media-featured" onClick={() => handleOpen(featured)} style={{cursor: "pointer"}}>
+              <div className="media-featured-thumb">
+                <img src={featured.url} alt="" />
+                <div className="media-featured-overlay" />
+                <span className={`media-featured-icon video`}>▶</span>
+                <div className="media-featured-meta">
+                  <span className="media-type-badge video">{title}</span>
+                  <span>{featured.meta}</span>
+                </div>
+              </div>
+              <div className="media-featured-body">
+                <strong>{featured.title}</strong>
+                <button className="media-play-btn" onClick={(e) => { e.stopPropagation(); handleOpen(featured); }}>{isUz ? "Tomosha qilish →" : "Смотреть →"}</button>
+              </div>
+            </article>
+            <div className="media-v2-list">
+              {rest.map((item, idx) => {
+                const { title: itemTitle, meta, url: image } = item;
+                return (
+                <article className="media-list-item" key={idx}>
+                  <button onClick={() => handleOpen(item)}>
+                    <span className="media-list-thumb">
+                      <img src={image} alt="" />
+                      <span className="media-list-icon video">▶</span>
+                    </span>
+                    <span className="media-list-body">
+                      <strong>{itemTitle}</strong>
+                      <small>{meta}</small>
+                    </span>
+                  </button>
+                </article>
+              )})}
+            </div>
+          </div>
+        ) : (
+          <div className="media-photo-grid">
+            {blockItems.map((item, idx) => {
+              const { title: itemTitle, meta, url: image } = item;
+              return (
+              <article className="media-photo-card" key={idx}>
+                <button onClick={() => handleOpen(item)}>
+                  <div className="media-photo-thumb">
+                    <img src={image} alt="" />
+                    <div className="media-photo-overlay" />
+                    <span className="media-photo-icon">◉</span>
+                    <span className="media-photo-meta">{meta}</span>
+                  </div>
+                  <div className="media-photo-body">
+                    <strong>{itemTitle}</strong>
+                  </div>
+                </button>
+              </article>
+            )})}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <section className="media-section-v2">
+      <div className="section-inner">
+        <MediaBlock type="video" blockItems={videos} title={videoLabel} note={videoNote} actionLabel={watchLabel} onOpen={onOpen} />
+        <MediaBlock type="photo" blockItems={photos} title={photoLabel} note={photoNote} actionLabel={viewLabel} onOpen={onOpen} />
+      </div>
+    </section>
+  );
+}
+
+
+function WeatherBar({ lang }) {
+  const [weather, setWeather] = useState(null);
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=41.2995&longitude=69.2401&current=temperature_2m,weathercode,windspeed_10m&timezone=Asia%2FTashkent")
+      .then(r => r.json())
+      .then(data => {
+        const code = data.current.weathercode;
+        const temp = Math.round(data.current.temperature_2m);
+        const wind = Math.round(data.current.windspeed_10m);
+        const icons = {
+          0:"вЂпёЏ", 1:"🌤", 2:"⛅", 3:"вЃпёЏ",
+          45:"🌫", 48:"🌫", 51:"🌦", 53:"🌦", 55:"🌧",
+          61:"🌧", 63:"🌧", 65:"🌧", 71:"🌨", 73:"🌨",
+          75:"🌨", 80:"🌦", 81:"🌧", 82:"⛈", 95:"⛈", 96:"⛈", 99:"⛈"
+        };
+        const descs = {
+          uz:  { 0:"Ochiq", 1:"Asosan ochiq", 2:"Qisman bulutli", 3:"Bulutli", 45:"Tuman", 48:"Tuman",
+            51:"Yengil yomg'ir", 53:"Yomg'ir", 55:"Kuchli yomg'ir", 61:"Yomg'ir", 63:"Yomg'ir",
+            65:"Kuchli yomg'ir", 71:"Qor", 73:"Qor", 75:"Kuchli qor", 80:"Yomg'ir", 81:"Yomg'ir",
+            82:"Momaqaldiroq", 95:"Momaqaldiroq", 96:"Do'l", 99:"Do'l" },
+          uzk: { 0:"Очиқ", 1:"Асосан очиқ", 2:"Қисман булутли", 3:"Булутли", 45:"Туман", 48:"Туман",
+            51:"Енгил ёмғир", 53:"Ёмғир", 55:"Кучли ёмғир", 61:"Ёмғир", 63:"Ёмғир",
+            65:"Кучли ёмғир", 71:"Қор", 73:"Қор", 75:"Кучли қор", 80:"Ёмғир", 81:"Ёмғир",
+            82:"Момақалдироқ", 95:"Момақалдироқ", 96:"Дўл", 99:"Дўл" },
+          ru:  { 0:"Ясно", 1:"Преимущественно ясно", 2:"Переменная облачность", 3:"Пасмурно",
+            45:"Туман", 48:"Туман", 51:"Лёгкий дождь", 53:"Дождь", 55:"Сильный дождь",
+            61:"Дождь", 63:"Дождь", 65:"Ливень", 71:"Снег", 73:"Снег", 75:"Сильный снег",
+            80:"Дождь", 81:"Дождь", 82:"Гроза", 95:"Гроза", 96:"Град", 99:"Град" }
+        };
+        const langKey = lang === "ru" ? "ru" : lang === "uzk" ? "uzk" : "uz";
+        const fallback = lang === "ru" ? "Погода" : lang === "uzk" ? "Об-ҳаво" : "Ob-havo";
+        const desc = (descs[langKey] || descs.uz)[code] || fallback;
+        setWeather({ temp, wind, icon: icons[code] || "🌡", desc });
+      })
+      .catch(() => {});
+  }, [lang]);
+
+  const isUz = lang !== "ru";
+  const locale = lang === "ru" ? "ru-RU" : "uz-UZ";
+  const dd = String(time.getDate()).padStart(2, "0");
+  const mm = String(time.getMonth() + 1).padStart(2, "0");
+  const yyyy = time.getFullYear();
+  const timeStr = time.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+
+  return (
+    <div className="weather-bar">
+      <div className="weather-bar-inner">
+        <div className="weather-left">
+          {weather ? (
+            <>
+              <span className="weather-icon">{weather.icon}</span>
+              <span className="weather-city">Toshkent</span>
+              <span className="weather-temp">{weather.temp}°C</span>
+              <span className="weather-desc">{weather.desc}</span>
+              <span className="weather-wind">💨 {weather.wind} km/h</span>
+            </>
+          ) : (
+            <span className="weather-loading">🌡 {isUz ? "Yuklanmoqda..." : "Загрузка..."}</span>
+          )}
+        </div>
+        <div className="weather-right">
+          <span className="wdate-dot">
+            <span className="wdate-part">{dd}</span>
+            <span className="wdate-sep">.</span>
+            <span className="wdate-part">{mm}</span>
+            <span className="wdate-sep">.</span>
+            <span className="wdate-part">{yyyy}</span>
+          </span>
+          <span className="weather-time">{timeStr}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Hero({ t, hero, gridStories, latestStories, openStory }) {
+  return (
+    <section className="hero">
+      <div className="hero-grid">
+        <div className="hero-left-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <h2>{t.lang === 'ru' ? 'Главная' : 'Bosh sahifa'}</h2>
+          </div>
+          
+          <article className="hero-main" onClick={() => openStory(hero)} style={{ cursor: "pointer" }}>
+            <div className="hero-main-content">
+              <span className="kicker">{hero.category} &bull; {hero.time}</span>
+              <h1>{hero.title}</h1>
+              <p>{hero.summary}</p>
+            </div>
+            <div className="hero-main-thumb">
+              <img src={hero.image} alt={hero.title} />
+            </div>
+          </article>
+
+          <div className="hero-sub-grid">
+            {gridStories.map((story, idx) => (
+              <button
+                className="hero-sub-card"
+                key={`${story.id || story.title}-${idx}`}
+                onClick={() => openStory(story)}
+              >
+                <div className="side-thumb">
+                  <img src={story.image} alt={story.title} />
+                </div>
+                <span className="side-copy">
+                  <span className="kicker-small">{story.category} &bull; {story.time}</span>
+                  <h3>{story.title}</h3>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="hero-right-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <h2>{t.latest || 'So\'nggi yangiliklar'}</h2>
+          </div>
+          
+          <div className="hero-latest-list">
+            {latestStories.map((story, idx) => (
+              <button
+                className="hero-latest-card"
+                key={`${story.id || story.title}-${idx}`}
+                onClick={() => openStory(story)}
+              >
+                <span className="latest-copy">
+                  <span className="kicker-small">{story.category} &bull; {story.time}</span>
+                  <h3>{story.title}</h3>
+                </span>
+                <div className="latest-thumb">
+                  <img src={story.image} alt={story.title} />
+                </div>
+              </button>
+            ))}
+          </div>
+          <button className="more-news-btn">Ko'proq yangiliklar</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StoryBadge({ story }) {
+  if (story.isBreaking) return <span className="story-badge breaking">🔴 TEZKOR</span>;
+  if (story.isEditorPick) return <span className="story-badge editor">⭐ MUHARRIR</span>;
+  if ((story.views || 0) > 50) return <span className="story-badge trend">🔥 TREND</span>;
+  return null;
+}
+
+function calcReadTime(text, lang) {
+  if (!text) return null;
+  const words = text.replace(/<[^>]+>/g,"").split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(words / 200));
+  return lang === "ru" ? `${mins} мин` : `${mins} daq`;
+}
+
+function StoryCard({ story, onOpen, featured = false, savedIds = [], onToggleSave }) {
+  const isSaved = savedIds.includes(story.id);
+  return (
+    <article className={`story-card fade-in-up ${featured ? "featured-story" : ""}`} style={{position:"relative"}}>
+      <StoryBadge story={story} />
+      <button onClick={onOpen}>
+        <img className="story-image" src={story.image} alt="" loading="lazy" />
+        <div className="story-body">
+          <span className="category" data-cat={story.category}>{story.category}</span>
+          <h3>{story.title}</h3>
+          <p>{story.summary}</p>
+          <div className="story-footer">
+            <span>{story.read}</span>
+            {(story.views || 0) > 0 && <span className="story-views">👁 {story.views}</span>}
+          </div>
+        </div>
+      </button>
+      {onToggleSave && (
+        <button
+          className={`bookmark-corner ${isSaved ? "saved" : ""}`}
+          onClick={e => { e.stopPropagation(); onToggleSave(story.id); }}
+          title={isSaved ? "Saqlangandan olib tashlash" : "Saqlash"}
+        >{isSaved ? "в…" : "в†"}</button>
+      )}
+    </article>
+  );
+}
+
+function Sidebar({ t, stories, onOpen }) {
+  const [email, setEmail] = React.useState("");
+  const [subscribed, setSubscribed] = React.useState(false);
+  const [history] = React.useState(() => JSON.parse(localStorage.getItem("yk-history") || "[]"));
+  function handleSubscribe(e) {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    setSubscribed(true);
+    setEmail("");
+    setTimeout(() => setSubscribed(false), 4000);
+  }
+  return (
+    <aside className="sidebar">
+      <div className="panel">
+        <h3>{t.popular}</h3>
+        {stories.slice(0, 5).map((story, index) => (
+          <button className="trend" key={story.id} onClick={() => onOpen && onOpen(story)} style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: "12px", width: "100%", border: 0, background: "transparent", textAlign: "left", cursor: "pointer", padding: "12px 0", borderTop: index === 0 ? 0 : "1px solid var(--line)" }}>
+            <span className="trend-num">{index + 1}</span>
+            <span>
+              <strong style={{ display: "block", lineHeight: "1.28", color: "var(--ink)" }}>{story.title}</strong>
+              <small style={{ color: "var(--muted)" }}>{story.category}</small>
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className="panel newsletter">
+        <h3>{t.newsletterTitle}</h3>
+        <p>{t.newsletterText}</p>
+        {subscribed ? (
+          <p style={{ color: "#4ade80", fontWeight: 700, margin: "8px 0 0" }}>✓ Muvaffaqiyatli obuna bo'ldingiz!</p>
+        ) : (
+          <form onSubmit={handleSubscribe}>
+            <input value={email} onChange={e => setEmail(e.target.value)} placeholder={t.email} type="email" />
+            <button className="primary" type="submit" style={{ width: "100%", marginTop: "2px" }}>{t.subscribe}</button>
+          </form>
+        )}
+      </div>
+
+      <div className="panel ai-recommend-panel">
+        <div className="ai-panel-head">
+          <span className="ai-badge">AI</span>
+          <h3>{t.close === "Yopish" ? "Siz uchun tavsiyalar" : "Рекомендации для вас"}</h3>
+        </div>
+        <p className="ai-panel-sub">{t.close === "Yopish" ? "O'qish tarixingiz asosida" : "На основе истории чтения"}</p>
+        {(() => {
+          const historyIds = JSON.parse(localStorage.getItem("yk-history") || "[]").map(h => h.id);
+          const readCats = JSON.parse(localStorage.getItem("yk-history") || "[]").map(h => h.category);
+          const topCat = readCats.length ? readCats.sort((a,b) => readCats.filter(c=>c===b).length - readCats.filter(c=>c===a).length)[0] : null;
+          const recommended = topCat
+            ? stories.filter(s => s.category === topCat && !historyIds.includes(s.id)).slice(0, 4)
+            : stories.filter(s => (s.views||0) > 0).sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,4);
+          const fallback = stories.slice(0,4);
+          const list = recommended.length ? recommended : fallback;
+          return list.map((s, i) => (
+            <button key={s.id} className="ai-rec-item" onClick={() => onOpen && onOpen(s)}
+              style={{borderTop: i === 0 ? 0 : "1px solid var(--line)"}}>
+              <img src={s.image} alt="" loading="lazy" />
+              <div>
+                <span className="ai-rec-cat">{s.category}</span>
+                <p>{s.title}</p>
+              </div>
+            </button>
+          ));
+        })()}
+        {(() => {
+          const h = JSON.parse(localStorage.getItem("yk-history")||"[]").map(x=>x.category);
+          const top = h.length ? h.sort((a,b)=>h.filter(c=>c===b).length-h.filter(c=>c===a).length)[0] : null;
+          return top ? (
+            <div className="ai-panel-tag">
+              <span>🎯</span>
+              {t.close === "Yopish" ? "Ko'p o'qiysiz: " : "Читаете чаще: "}
+              <strong>{top}</strong>
+            </div>
+          ) : null;
+        })()}
+      </div>
+    </aside>
+  );
+}
+
+function useCountUp(target, duration = 1500) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    const num = parseInt(target);
+    if (isNaN(num)) { setCount(target); return; }
+    const obs = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      obs.disconnect();
+      let start = 0;
+      const step = Math.ceil(num / (duration / 16));
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= num) { setCount(target); clearInterval(timer); }
+        else setCount(start + (target.includes("+") ? "+" : ""));
+      }, 16);
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [target]);
+  return [count, ref];
+}
+
+function StatNum({ value }) {
+  const [count, ref] = useCountUp(String(value));
+  return <strong ref={ref} className="counter-num">{count || value}</strong>;
+}
+
+function Special({ t, siteConfig }) {
+  const isUz = t.close === "Yopish";
+  const cfg = siteConfig
+    ? (isUz ? siteConfig.specialUz : siteConfig.specialRu)
+    : null;
+
+  const kicker   = cfg?.kicker   || t.special;
+  const title    = cfg?.title    || t.specialTitle;
+  const text     = cfg?.text     || t.specialText;
+  const badge    = cfg?.badge    || (isUz ? "Jonli tahririyat" : "Живая редакция");
+  const imgSrc   = cfg?.image    || images.newsroom;
+  const features = cfg?.features
+    ? cfg.features.split(",").map(f => f.trim()).filter(Boolean)
+    : (isUz
+      ? ["Tezkor yangiliklar", "Mustaqil tahlil", "Ikki tilda", "Ishonchli manba"]
+      : ["Быстрые новости", "Независимый анализ", "На двух языках", "Надёжный источник"]);
+
+  const stats = [
+    { num: cfg?.stat1 || "24/7", label: cfg?.stat1label || (isUz ? "Monitoring" : "Мониторинг") },
+    { num: cfg?.stat2 || "7",    label: cfg?.stat2label || (isUz ? "Bo'lim" : "Разделов") },
+    { num: cfg?.stat3 || "2",    label: cfg?.stat3label || (isUz ? "Til" : "Языка") },
+    { num: cfg?.stat4 || "100+", label: cfg?.stat4label || (isUz ? "Maqola" : "Статей") },
+  ];
+
+  return (
+    <section className="special-section">
+      <div className="special-bg-grid" />
+      <div className="special-inner">
+        <div className="special-left">
+          <span className="special-kicker">{kicker}</span>
+          <h2 className="special-title">{title}</h2>
+          <p className="special-desc">{text}</p>
+          <div className="special-features">
+            {features.map((f) => (
+              <span key={f} className="special-feature-tag">
+                <span className="special-dot" />
+                {f}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="special-right">
+          <div className="special-img-wrap">
+            <img src={imgSrc} alt="" className="special-img" />
+            <div className="special-img-overlay" />
+            <div className="special-img-badge">
+              <span className="live-dot" />
+              {badge}
+            </div>
+          </div>
+          <div className="special-stats">
+            {stats.map((s) => (
+              <div key={s.num + s.label} className="special-stat fade-in-up">
+                <StatNum value={s.num} />
+                <span>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactPage({ t, page }) {
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">{page}</h2>
+            <p className="section-note">{t.pageNotes[page]}</p>
+          </div>
+        </div>
+        <div className="contact-grid">
+          {t.contact.map(([title, text]) => (
+            <div className="contact-card" key={title}>
+              <strong>{title}</strong>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <article className="story-card skeleton-card">
+      <div className="skeleton-img skeleton-anim" />
+      <div className="story-body">
+        <div className="skeleton-line skeleton-anim" style={{width:"40%",height:14,marginBottom:8}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"90%",height:18,marginBottom:6}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"75%",height:18,marginBottom:12}} />
+        <div className="skeleton-line skeleton-anim" style={{width:"60%",height:13}} />
+      </div>
+    </article>
+  );
+}
+
+function AuthorPage({ author, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
+  const authorStories = stories.filter(s => (s.author || "Yangi Kun tahririyati") === author);
+  const initials = author.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const isUz = lang !== "ru";
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <button className="article-back-btn" onClick={onBack} style={{marginBottom:24}}>
+          <span>&#8592;</span> {isUz ? "Orqaga" : "Назад"}
+        </button>
+        <div className="author-page-header">
+          <div className="author-page-avatar">{initials}</div>
+          <div>
+            <h1 className="author-page-name">{author}</h1>
+            <p className="author-page-count">{authorStories.length} {isUz ? "ta maqola" : "материалов"}</p>
+          </div>
+        </div>
+        <div className="stories-grid" style={{marginTop:32}}>
+          {authorStories.length === 0 ? (
+            <p style={{color:"var(--muted)"}}>{isUz ? "Maqolalar topilmadi" : "Материалы не найдены"}</p>
+          ) : authorStories.map(story => (
+            <StoryCard key={story.id} story={story} savedIds={savedIds} onToggleSave={onToggleSave}
+              onOpen={() => onOpen(story)} />
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function TagPage({ tag, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
+  const tagStories = stories.filter(s => s.tags && s.tags.split(",").map(t => t.trim()).includes(tag));
+  const isUz = lang !== "ru";
+  return (
+    <main className="section">
+      <div className="section-inner">
+        <button className="article-back-btn" onClick={onBack} style={{marginBottom:24}}>
+          <span>&#8592;</span> {isUz ? "Orqaga" : "Назад"}
+        </button>
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">🏷️ #{tag}</h2>
+            <p className="section-note">{tagStories.length} {isUz ? "ta maqola" : "материалов"}</p>
+          </div>
+        </div>
+        <div className="stories-grid" style={{marginTop:24}}>
+          {tagStories.length === 0 ? (
+            <p style={{color:"var(--muted)"}}>{isUz ? "Bu teg bo'yicha maqolalar topilmadi" : "Материалы по этому тегу не найдены"}</p>
+          ) : tagStories.map(story => (
+            <StoryCard key={story.id} story={story} savedIds={savedIds} onToggleSave={onToggleSave}
+              onOpen={() => onOpen(story)} />
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function ArticlePage({ t, story, stories, onClose, onOpen, onView, savedIds = [], onToggleSave, copiedShare, setCopiedShare, reactions = {}, addReaction, onAuthorClick, onTagClick }) {
+  const initials = (story.author || "YK").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const isHtml = story.body && /<[a-z]/.test(story.body);
+  const paragraphs = isHtml ? [] : (story.body || story.summary || "").split("\n\n").filter(Boolean);
+  const related = stories.filter(s => s.id !== story.id && s.category === story.category).slice(0, 3);
+  const more = stories.filter(s => s.id !== story.id && s.category !== story.category).slice(0, 3);
+  const readMore = related.length ? related : more;
+  const tags = story.tags ? story.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+  const [readProgress, setReadProgress] = useState(0);
+  const [comments, setComments] = useState(() => JSON.parse(localStorage.getItem("yk-comments-" + story.id) || "[]"));
+  const [commentName, setCommentName] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [commentSent, setCommentSent] = useState(false);
+  const isUz = t.close === "Yopish";
+  const readTime = calcReadTime((story.body || story.summary || ""), t.close !== "Yopish" ? "ru" : "uz");
+  // Table of contents (h2 headings dan)
+  const headings = isHtml ? Array.from(new DOMParser().parseFromString(story.body,"text/html").querySelectorAll("h2")).map(h=>h.textContent) : [];
+  // Swipe navigation
+  const storyIndex = stories.findIndex(s => s.id === story.id);
+  const prevStory = storyIndex > 0 ? stories[storyIndex - 1] : null;
+  const nextStory = storyIndex < stories.length - 1 ? stories[storyIndex + 1] : null;
+  const touchRef = useRef(null);
+  useEffect(() => {
+    function onTouchStart(e) { touchRef.current = e.touches[0].clientX; }
+    function onTouchEnd(e) {
+      if (touchRef.current === null) return;
+      const diff = touchRef.current - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 60) {
+        if (diff > 0 && nextStory) { onOpen(nextStory); window.scrollTo({top:0,behavior:"instant"}); }
+        if (diff < 0 && prevStory) { onOpen(prevStory); window.scrollTo({top:0,behavior:"instant"}); }
+      }
+      touchRef.current = null;
+    }
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => { document.removeEventListener("touchstart", onTouchStart); document.removeEventListener("touchend", onTouchEnd); };
+  }, [nextStory, prevStory]);
+
+  useEffect(() => {
+    if (onView) onView(story.id);
+    const history = JSON.parse(localStorage.getItem("yk-history") || "[]");
+    const filtered = history.filter(h => h.id !== story.id);
+    const updated = [{ id: story.id, title: story.title, image: story.image, category: story.category, time: story.time }, ...filtered].slice(0, 15);
+    localStorage.setItem("yk-history", JSON.stringify(updated));
+  }, [story.id]);
+
+  useEffect(() => {
+    document.title = `${story.title} — Yangi Kun`;
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = story.summary || "";
+    let og = document.querySelector('meta[property="og:title"]');
+    if (!og) { og = document.createElement('meta'); og.setAttribute('property','og:title'); document.head.appendChild(og); }
+    og.content = story.title;
+    let ogImg = document.querySelector('meta[property="og:image"]');
+    if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+    ogImg.content = story.image || "";
+    return () => { document.title = "Yangi Kun"; };
+  }, [story.id]);
+
+  useEffect(() => {
+    function onScroll() {
+      const el = document.documentElement;
+      const scrolled = el.scrollTop || document.body.scrollTop;
+      const total = el.scrollHeight - el.clientHeight;
+      setReadProgress(total > 0 ? Math.min(100, Math.round((scrolled / total) * 100)) : 0);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  function submitComment(e) {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const newComment = {
+      id: Date.now(),
+      name: commentName.trim() || (isUz ? "Mehmon" : "Гость"),
+      text: commentText.trim(),
+      date: new Date().toLocaleDateString(isUz ? "uz-UZ" : "ru-RU"),
+    };
+    const updated = [newComment, ...comments];
+    setComments(updated);
+    localStorage.setItem("yk-comments-" + story.id, JSON.stringify(updated));
+    setCommentText("");
+    setCommentName("");
+    setCommentSent(true);
+    setTimeout(() => setCommentSent(false), 3000);
+  }
+
+  return (
+    <div className="article-page">
+      <div className="read-progress-bar" style={{width: readProgress + "%"}} />
+      <div className="article-page-inner">
+
+        <button className="article-back-btn" onClick={onClose}>
+          <span>&#8592;</span> {t.close === "Yopish" ? "Orqaga" : "Назад"}
+        </button>
+
+        <article className="article-full">
+          <div className="article-hero-wrap">
+            <img src={story.image} alt={story.title} className="article-hero-img" />
+            <div className="article-hero-overlay" />
+            <div className="article-hero-text">
+              <span className="kicker">{story.category}</span>
+              <h1>{story.title}</h1>
+              <p className="article-lead">{story.summary}</p>
+            </div>
+          </div>
+
+          <div className="article-page-content">
+            <div className="article-author-row">
+              <button className="article-avatar author-btn" onClick={() => onAuthorClick && onAuthorClick(story.author || "Yangi Kun tahririyati")}>{initials}</button>
+              <div>
+                <button className="author-name-btn" onClick={() => onAuthorClick && onAuthorClick(story.author || "Yangi Kun tahririyati")}>{story.author || "Yangi Kun tahririyati"}</button>
+                <span style={{display:"flex",gap:10,alignItems:"center",fontSize:13,color:"var(--muted)"}}>
+                  {story.read}
+                  {readTime && <span style={{display:"flex",alignItems:"center",gap:4}}>⏱ {readTime}</span>}
+                </span>
+              </div>
+            </div>
+
+            {tags.length > 0 && (
+              <div className="article-tags">
+                {tags.map(tag => <button key={tag} className="article-tag tag-btn" onClick={() => onTagClick && onTagClick(tag)}>#{tag}</button>)}
+              </div>
+            )}
+
+            {headings.length > 1 && (
+              <nav className="toc-box">
+                <strong className="toc-title">{isUz ? "📋 Mundarija" : "📋 Содержание"}</strong>
+                <ol className="toc-list">
+                  {headings.map((h, i) => (
+                    <li key={i}><a href={`#heading-${i}`} className="toc-link">{h}</a></li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+
+            <div className="article-video" style={{ margin: "20px 0", borderRadius: "8px", overflow: "hidden", aspectRatio: "16/9" }}>
+              <iframe width="100%" height="100%" src={story.videoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ"} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+            </div>
+
+            <div className="article-body-text">
+              {isHtml
+                ? <div dangerouslySetInnerHTML={{__html: story.body}} />
+                : paragraphs.length > 1
+                  ? paragraphs.map((para, i) => <p key={i}>{para}</p>)
+                  : <p>{story.body || story.summary}</p>}
+            </div>
+
+            <div className="article-meta-row">
+              {story.views > 0 && <span className="article-views">👁 {story.views} marta o'qilgan</span>}
+            </div>
+
+            {addReaction && (() => {
+              const storyReactions = reactions[story.id] || {};
+              const myReaction = storyReactions._mine;
+              const emojis = ["👍","❤️","рџ®","рџ‚","рџў"];
+              return (
+                <div className="reactions-row">
+                  <span className="reactions-label">{isUz ? "Fikr bildiring:" : "Реакция:"}</span>
+                  {emojis.map(emoji => (
+                    <button
+                      key={emoji}
+                      className={`reaction-btn ${myReaction === emoji ? "active" : ""}`}
+                      onClick={() => addReaction(story.id, emoji)}
+                    >
+                      {emoji}
+                      {storyReactions[emoji] > 0 && <span className="reaction-count">{storyReactions[emoji]}</span>}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
+
+            <div className="article-share">
+              <span className="article-share-label">{t.close === "Yopish" ? "Ulashish:" : "Поделиться:"}</span>
+              <a
+                className="share-btn telegram"
+                href={`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(story.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >✈️ Telegram</a>
+              <button
+                className={`share-btn ${copiedShare ? "copied" : ""}`}
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopiedShare(true);
+                  setTimeout(() => setCopiedShare(false), 2000);
+                }}
+              >{copiedShare ? "✓ Nusxalandi" : "🔗 Havola"}</button>
+              <button
+                className={`bookmark-btn ${savedIds.includes(story.id) ? "saved" : ""}`}
+                onClick={() => onToggleSave && onToggleSave(story.id)}
+              >{savedIds.includes(story.id) ? "в… Saqlangan" : "в† Saqlash"}</button>
+              <button className="share-btn" onClick={() => window.print()}>🖨️ {isUz ? "Chop etish" : "Печать"}</button>
+            </div>
+          </div>
+        </article>
+
+        {readMore.length > 0 && (
+          <section className="article-related">
+            <h2 className="section-title">{isUz ? "O'xshash maqolalar" : "Похожие материалы"}</h2>
+            <div className="article-related-grid">
+              {readMore.map(s => (
+                <article key={s.id} className="story-card">
+                  <button onClick={() => onOpen(s)}>
+                    <img className="story-image" src={s.image} alt="" loading="lazy" />
+                    <div className="story-body">
+                      <span className="category" data-cat={s.category}>{s.category}</span>
+                      <h3>{s.title}</h3>
+                      <p>{s.summary}</p>
+                      <div className="story-footer">
+                        <span>{s.time}</span>
+                        <span>{s.read}</span>
+                      </div>
+                    </div>
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="comments-section">
+          <h2 className="section-title">
+            💬 {isUz ? "Izohlar" : "Комментарии"}
+            {comments.length > 0 && <span className="comments-count">{comments.length}</span>}
+          </h2>
+
+          <form className="comment-form" onSubmit={submitComment}>
+            <input
+              className="comment-input"
+              placeholder={isUz ? "Ismingiz (ixtiyoriy)" : "Ваше имя (необязательно)"}
+              value={commentName}
+              onChange={e => setCommentName(e.target.value)}
+              maxLength={60}
+            />
+            <textarea
+              className="comment-textarea"
+              placeholder={isUz ? "Fikringizni yozing..." : "Напишите ваш комментарий..."}
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              rows={3}
+              maxLength={1000}
+              required
+            />
+            <div className="comment-form-footer">
+              {commentSent && <span className="comment-sent">✓ {isUz ? "Izoh qo'shildi!" : "Комментарий добавлен!"}</span>}
+              <button type="submit" className="adm-btn primary" style={{marginLeft:"auto"}}>
+                {isUz ? "Yuborish" : "Отправить"}
+              </button>
+            </div>
+          </form>
+
+          {comments.length === 0 ? (
+            <div className="comments-empty">
+              <span>💬</span>
+              <p>{isUz ? "Hozircha izoh yo'q. Birinchi bo'ling!" : "Комментариев пока нет. Будьте первым!"}</p>
+            </div>
+          ) : (
+            <div className="comments-list">
+              {comments.map(c => (
+                <div key={c.id} className="comment-item">
+                  <div className="comment-avatar">{c.name[0].toUpperCase()}</div>
+                  <div className="comment-body">
+                    <div className="comment-meta">
+                      <strong>{c.name}</strong>
+                      <span>{c.date}</span>
+                    </div>
+                    <p>{c.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function AdminPanel({ lang, setLang, allStories, stories, setAllStories, refreshPublicStories, siteConfig, setSiteConfig, pinnedHeroId, setPinnedHeroId, pinnedSideIds, setPinnedSideIds, ads, setAds }) {
+  const adminLang = lang === "uzk" ? "uz" : lang;
+  const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [message, setMessage] = useState("");
+  const [msgType, setMsgType] = useState("info");
+  const [editingId, setEditingId] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
+  const [form, setForm] = useState({ ...emptyStory, category: lang !== "ru" ? "Siyosat" : "Политика" });
+  // 🔄 Undo/Redo history
+  const [formHistory, setFormHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const maxHistory = 20; // Охирги 20 та амал
+  // 📱 Bulk actions
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [searchQ, setSearchQ] = useState("");
+  const [filterCat, setFilterCat] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [mediaFilter, setMediaFilter] = useState("all");
+  const [mediaUploading, setMediaUploading] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState("");
+  const mediaFileRef = useRef(null);
+  const importFileRef = useRef(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
+  const EMPTY_AD = { id: "", title: "", subtitle: "", image: "", link: "", position: "top", active: true };
+  const [adForm, setAdForm] = useState(EMPTY_AD);
+  const [editingAdId, setEditingAdId] = useState(null);
+
+  // 💾 Auto-save - har 30 sekundda qoralamani localStorage ga saqlash
+  useEffect(() => {
+    if (activeTab !== "editor" || !form.title) return;
+    const interval = setInterval(() => {
+      const draftKey = `yk-draft-${editingId || 'new'}`;
+      localStorage.setItem(draftKey, JSON.stringify({
+        form,
+        savedAt: new Date().toISOString(),
+        lang
+      }));
+      notify("💾 Qoralama saqlandi", "info", 1500);
+    }, 30000); // 30 sekund
+    return () => clearInterval(interval);
+  }, [activeTab, form, editingId, lang]);
+
+  // 🔄 Editor ochilganda draft ni tiklash
+  useEffect(() => {
+    if (activeTab === "editor" && !editingId) {
+      const draft = localStorage.getItem('yk-draft-new');
+      if (draft) {
+        const { form: savedForm, savedAt } = JSON.parse(draft);
+        const minutesAgo = Math.floor((Date.now() - new Date(savedAt).getTime()) / 60000);
+        if (minutesAgo < 60 && window.confirm(`💾 ${minutesAgo} daqiqa oldingi qoralama topildi. Tiklashni xohlaysizmi?`)) {
+          setForm(savedForm);
+        }
+      }
+    }
+  }, [activeTab, editingId]);
+
+  const categories = lang === "uz"
+    ? ["Siyosat", "Iqtisod", "Texnologiya", "Sport", "Madaniyat", "Tahlil"]
+    : lang === "uzk"
+    ? ["Сиёсат", "РТ›С‚РёСЃРѕРґ", "Технология", "Спорт", "Маданият", "Таҳлил"]
+    : ["Политика", "Экономика", "Технологии", "Спорт", "Культура", "Аналитика"];
+
+  async function loadMedia() {
+    try {
+      const res = await fetch("/api/admin/media", { credentials: "same-origin" });
+      const data = await res.json();
+      setMediaFiles(data.media || []);
+    } catch {}
+  }
+
+  async function uploadMediaFile(file) {
+    if (!file) return;
+    setMediaUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const res = await fetch("/api/admin/upload", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl: reader.result }),
+          });
+          const data = await res.json();
+          if (data.url) { await loadMedia(); notify("✓ Fayl yuklandi.", "success"); }
+          else notify(data.error || "Xatolik", "error");
+        } catch { notify("Yuklashda xatolik", "error"); }
+        setMediaUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch { setMediaUploading(false); }
+  }
+
+  async function deleteMedia(name) {
+    if (!confirm(`"${name}" ni o'chirasizmi?`)) return;
+    try {
+      await fetch(`/api/admin/media/${name}`, { method: "DELETE", credentials: "same-origin" });
+      await loadMedia();
+      notify("✓ O'chirildi.", "success");
+    } catch { notify("Xatolik", "error"); }
+  }
+
+  function copyUrl(url) {
+    navigator.clipboard.writeText(window.location.origin + url).then(() => {
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(""), 2000);
+    });
+  }
+
+  function notify(text, type = "info", timeout = 4000) {
+    setMessage(text);
+    setMsgType(type);
+    setTimeout(() => setMessage(""), timeout);
+    // 🔔 Browser notification
+    if (Notification.permission === "granted" && document.hidden) {
+      new Notification("Yangi Kun Admin", {
+        body: text,
+        icon: "📰",
+        tag: type,
+      });
+    }
+  }
+  // 🔔 Notification permission so'rash
+  function requestNotificationPermission() {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }
+
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn) loadMedia();
+  }, [loggedIn]);
+
+  useEffect(() => {
+    setForm((current) => ({ ...current, category: categories.includes(current.category) ? current.category : categories[0] }));
+  }, [lang]);
+
+  async function api(path, options = {}) {
+    const response = await fetch(path, {
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      ...options,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Server xatosi");
+    return data;
+  }
+
+  function loadUzkStories() {
+    return JSON.parse(localStorage.getItem("yk-uzk-stories") || "[]");
+  }
+
+  function saveUzkStories(list) {
+    localStorage.setItem("yk-uzk-stories", JSON.stringify(list));
+  }
+
+  async function loadAdminStories() {
+    const data = await api("/api/admin/stories");
+    setAllStories(prev => ({ ...prev, ...data.stories, uzk: loadUzkStories() }));
+  }
+
+  async function checkSession() {
+    try {
+      const data = await api("/api/admin/session");
+      setLoggedIn(data.authenticated);
+      if (data.authenticated) await loadAdminStories();
+    } catch (error) {
+      setLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function login(event) {
+    event.preventDefault();
+    try {
+      await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password }) });
+      setLoggedIn(true);
+      notify("Admin panelga xush kelibsiz! ", "success");
+      setPassword("");
+      requestNotificationPermission(); // 🔔 Notification so'rash
+      await loadAdminStories();
+    } catch (error) {
+      notify(`${error.message}. Standart parol: ${DEFAULT_PASSWORD}`, "error");
+    }
+  }
+
+  async function logout() {
+    await api("/api/admin/logout", { method: "POST", body: "{}" }).catch(() => null);
+    setLoggedIn(false);
+    await refreshPublicStories();
+    notify("Tizimdan chiqildi.", "info");
+  }
+
+  function validateForm(f) {
+    const errs = {};
+    if (!f.title.trim()) errs.title = "Sarlavha kiritish shart!";
+    else if (f.title.trim().length < 5) errs.title = "Sarlavha kamida 5 belgi bo'lsin";
+    if (!f.summary.trim()) errs.summary = "Qisqa mazmun kiritish shart!";
+    else if (f.summary.trim().length < 10) errs.summary = "Mazmun kamida 10 belgi bo'lsin";
+    if (!f.body.trim() || f.body === "<p></p>" || f.body === "<p><br></p>") errs.body = "Maqola matni kiritish shart!";
+    return errs;
+  }
+
+  function updateField(field, value) {
+    setIsDirty(true);
+    setForm((current) => {
+      const newForm = { ...current, [field]: value };
+      // Realtime validatsiya
+      if (formErrors[field]) {
+        const errs = validateForm(newForm);
+        setFormErrors(prev => ({ ...prev, [field]: errs[field] || null }));
+      }
+      // 🔄 History ga qo'shish
+      setFormHistory(prev => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        newHistory.push(newForm);
+        if (newHistory.length > maxHistory) newHistory.shift();
+        return newHistory;
+      });
+      setHistoryIndex(prev => Math.min(prev + 1, maxHistory - 1));
+      return newForm;
+    });
+  }
+
+  // 🔄 Undo/Redo funksiyalari
+  function undo() {
+    if (historyIndex > 0) {
+      const newIdx = historyIndex - 1;
+      setHistoryIndex(newIdx);
+      setForm(formHistory[newIdx]);
+      notify("↩️ Bekor qilindi", "info", 1000);
+    }
+  }
+  function redo() {
+    if (historyIndex < formHistory.length - 1) {
+      const newIdx = historyIndex + 1;
+      setHistoryIndex(newIdx);
+      setForm(formHistory[newIdx]);
+      notify("↪️ Qayta qilindi", "info", 1000);
+    }
+  }
+  // Ctrl+Z/Y/S/N shortcuts + beforeunload
+  useEffect(() => {
+    function onKey(e) {
+      if (!loggedIn) return;
+      const inInput = ["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName) || e.target.isContentEditable;
+      // Ctrl+S — saqlash
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (activeTab === "editor") document.getElementById("story-form")?.requestSubmit();
+      }
+      // Ctrl+N — yangi maqola
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        if (isDirty && !window.confirm("O'zgarishlar saqlanmagan. Yangi maqolaga o'tishni xohlaysizmi?")) return;
+        resetForm(); setActiveTab("editor");
+      }
+      if (activeTab !== "editor" || inInput) return;
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        e.shiftKey ? redo() : undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    }
+    function onBeforeUnload(e) {
+      if (isDirty && activeTab === "editor") {
+        e.preventDefault();
+        e.returnValue = "O'zgarishlar saqlanmagan. Sahifadan chiqishni xohlaysizmi?";
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+    };
+  }, [activeTab, historyIndex, formHistory, isDirty, loggedIn]);
+
+  function handleImageFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        setMessage("Rasm serverga yuklanmoqda...");
+        const data = await api("/api/admin/upload", {
+          method: "POST",
+          body: JSON.stringify({ dataUrl: reader.result }),
+        });
+        updateField("image", data.url);
+        setMessage("Rasm yuklandi.");
+      } catch (error) {
+        setMessage(error.message);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetForm() {
+    setEditingId(null);
+    setForm({ ...emptyStory, category: categories[0], image: images.newsroom });
+    setFormErrors({});
+    setIsDirty(false);
+  }
+
+  function duplicateStory(story) {
+    const dupl = { ...story, id: undefined, title: story.title + " (nusxa)", status: "draft" };
+    setForm(dupl);
+    setEditingId(null);
+    setActiveTab("editor");
+    setIsDirty(true);
+    notify("📋 Maqola nusxalandi — tahrirlash rejimi", "info");
+  }
+
+  function exportStories(format) {
+    if (format === "json") {
+      const blob = new Blob([JSON.stringify(stories, null, 2)], { type: "application/json" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = `yangikun-${lang}-${new Date().toISOString().slice(0,10)}.json`; a.click();
+    } else {
+      const cols = ["id","title","category","status","author","views","time"];
+      const rows = stories.map(s => cols.map(c => `"${String(s[c]||"").replace(/"/g,'""')}"`).join(","));
+      const csv = [cols.join(","), ...rows].join("\n");
+      const blob = new Blob(["\uFEFF"+csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = `yangikun-${lang}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    }
+    notify(`✓ ${format.toUpperCase()} sifatida yuklandi`, "success");
+  }
+
+  async function saveStory(event) {
+    event.preventDefault();
+    const errs = validateForm(form);
+    if (Object.keys(errs).length > 0) {
+      setFormErrors(errs);
+      notify("⚠️ Iltimos, xatolarni to'g'irlang", "error");
+      // Birinchi xato maydonga scroll
+      const firstErr = Object.keys(errs)[0];
+      document.querySelector(`[data-field="${firstErr}"]`)?.scrollIntoView({ behavior:"smooth", block:"center" });
+      return;
+    }
+    setFormErrors({});
+
+    const payload = {
+      ...form,
+      title: form.title.trim(),
+      summary: form.summary.trim(),
+      body: form.body.trim(),
+      author: form.author.trim() || "Yangi Kun tahririyati",
+      time: form.time.trim() || "Hozir",
+      read: form.read.trim() || "3 daqiqa",
+      image: form.image || images.newsroom,
+      script: lang === "uzk" ? "cyrillic" : (form.script || "latin"),
+    };
+
+    try {
+      const data = editingId
+        ? await api(`/api/admin/stories/${adminLang}/${editingId}`, { method: "PUT", body: JSON.stringify({ story: payload }) })
+        : await api("/api/admin/stories", { method: "POST", body: JSON.stringify({ lang: adminLang, story: payload }) });
+      const newUzk = lang === "uzk" ? (data.stories?.uz || []) : (allStories.uzk || []);
+      saveUzkStories(newUzk);
+      setAllStories(prev => ({
+        ...prev,
+        ...data.stories,
+        uzk: newUzk,
+      }));
+      if (form.isHero) {
+        const savedId = editingId || (data.stories?.[adminLang]?.[0]?.id);
+        if (savedId) setPinnedHeroId(savedId);
+      }
+      resetForm();
+      setActiveTab("list");
+      localStorage.removeItem(`yk-draft-${editingId || 'new'}`);
+      notify(editingId ? "✓ Maqola yangilandi." : "✓ Yangi maqola qo'shildi.", "success");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+
+  function editStory(story) {
+    setEditingId(story.id);
+    setForm({ ...emptyStory, ...story });
+    setActiveTab("editor");
+    notify("Tahrirlash rejimi yoqildi.", "info");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function deleteStory(id) {
+    if (!confirm("Maqolani o'chirishni tasdiqlaysizmi?")) return;
+    try {
+      const data = await api(`/api/admin/stories/${adminLang}/${id}`, { method: "DELETE" });
+      const newUzk = lang === "uzk" ? (data.stories?.uz || []) : (allStories.uzk || []);
+      saveUzkStories(newUzk);
+      setAllStories(prev => ({ ...prev, ...data.stories, uzk: newUzk }));
+      if (editingId === id) resetForm();
+      notify("Maqola o'chirildi.", "info");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+
+  async function changeStatus(story, status) {
+    try {
+      const data = await api(`/api/admin/stories/${adminLang}/${story.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ story: { ...story, status } }),
+      });
+      const newUzk = lang === "uzk" ? (data.stories?.uz || []) : (allStories.uzk || []);
+      saveUzkStories(newUzk);
+      setAllStories(prev => ({ ...prev, ...data.stories, uzk: newUzk }));
+      notify(status === "published" ? "✓ Maqola chop etildi." : "Qoralamaga o'tkazildi.", "success");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+
+  async function changePassword(event) {
+    event.preventDefault();
+    if (newPassword.trim().length < 6) {
+      notify("Parol kamida 6 ta belgidan iborat bo'lsin.", "error");
+      return;
+    }
+    try {
+      await api("/api/admin/password", { method: "POST", body: JSON.stringify({ password: newPassword.trim() }) });
+      setNewPassword("");
+      notify("✓ Parol yangilandi.", "success");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+
+  async function resetContent() {
+    if (!confirm("Demo maqolalar tiklanadi. Davom etamizmi?")) return;
+    try {
+      const data = await api("/api/admin/reset", { method: "POST", body: "{}" });
+      setAllStories(prev => ({ ...prev, ...data.stories, uzk: data.stories.uz || prev.uzk || [] }));
+      resetForm();
+      notify("✓ Demo maqolalar tiklandi.", "success");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+
+  const published = stories.filter(s => s.status === "published").length;
+  const drafts = stories.filter(s => s.status === "draft").length;
+  const uzTotal = allStories ? (allStories.uz || []).length : 0;
+  const uzkTotal = allStories ? (allStories.uzk || []).length : 0;
+
+  const filteredStories = stories
+    .filter(s => {
+      const matchCat = filterCat === "all" || s.category === filterCat;
+      const matchStatus = filterStatus === "all" || s.status === filterStatus;
+      const matchQ = !searchQ || `${s.title} ${s.summary} ${s.category}`.toLowerCase().includes(searchQ.toLowerCase());
+      return matchCat && matchStatus && matchQ;
+    })
+    .sort((a, b) => sortOrder === "newest" ? b.id.localeCompare(a.id) : a.id.localeCompare(b.id));
+
+  const topStories = [...stories].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        <div className="admin-spinner" />
+        <p>Sessiya tekshirilmoqda...</p>
+      </div>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <div className="admin-login-wrap">
+        <div className="admin-login-box">
+          <div className="admin-login-logo">
+            <span className="brand-mark">YK</span>
+            <div>
+              <strong>Yangi Kun CMS</strong>
+              <span>Boshqaruv paneli</span>
+            </div>
+          </div>
+          <form onSubmit={login}>
+            <h2>Tizimga kirish</h2>
+            <p>Maqolalarni boshqarish uchun admin parolni kiriting.</p>
+            <div className="admin-input-group">
+              <span className="admin-input-icon">🔒</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Parolni kiriting..."
+                autoFocus
+              />
+            </div>
+            <button className="admin-login-btn" type="submit">Kirish →</button>
+            {message && <div className={`admin-notify ${msgType}`}>{message}</div>}
+          </form>
+          <p className="admin-login-hint">Standart parol: <code>admin2026</code></p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="adm-wrap">
+      {message && <div className={`adm-toast ${msgType}`}>{message}</div>}
+
+      <aside className="adm-sidebar">
+        <div className="adm-sidebar-logo">
+          <span className="brand-mark">YK</span>
+          <div>
+            <strong>Yangi Kun</strong>
+            <span>CMS Panel</span>
+          </div>
+        </div>
+
+        <div className="adm-lang-switch">
+          <button className={lang === "uzk" ? "active" : ""} onClick={() => setLang("uzk")}>
+            🇺🇿 {"\u040e\u0417"} <span>{uzkTotal}</span>
+          </button>
+        </div>
+
+        <nav className="adm-nav">
+          <button className={activeTab === "stats" ? "active" : ""} onClick={() => setActiveTab("stats")}>
+            <span>📊</span> Dashboard
+          </button>
+          <button className={activeTab === "list" ? "active" : ""} onClick={() => setActiveTab("list")}>
+            <span>📋</span> Maqolalar
+            <span className="adm-nav-count">{stories.length}</span>
+          </button>
+          <button className={activeTab === "editor" ? "active" : ""} onClick={() => { setActiveTab("editor"); resetForm(); }}>
+            <span>✏️</span> {editingId ? "Tahrirlash" : "Yangi maqola"}
+          </button>
+          <button className={activeTab === "media" ? "active" : ""} onClick={() => { setActiveTab("media"); loadMedia(); }}>
+            <span>🖼</span> Media
+            {mediaFiles.length > 0 && <span className="adm-nav-count">{mediaFiles.length}</span>}
+          </button>
+          <button className={activeTab === "ads" ? "active" : ""} onClick={() => setActiveTab("ads")}>
+            <span>📢</span> Reklama
+            {(ads||[]).filter(a=>a.active).length > 0 && <span className="adm-nav-count">{(ads||[]).filter(a=>a.active).length}</span>}
+          </button>
+          <button className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>
+            <span>⚙️</span> Sozlamalar
+          </button>
+        </nav>
+
+        <div className="adm-sidebar-stats">
+          <div className="adm-stat-item">
+            <strong>{stories.length}</strong>
+            <span>Jami</span>
+          </div>
+          <div className="adm-stat-item published">
+            <strong>{published}</strong>
+            <span>Chop etilgan</span>
+          </div>
+          <div className="adm-stat-item draft">
+            <strong>{drafts}</strong>
+            <span>Qoralama</span>
+          </div>
+        </div>
+        <button className="adm-logout" onClick={logout}>← Chiqish</button>
+      </aside>
+
+      <main className="adm-main">
+        <header className="adm-header">
+          <div>
+            <h1>
+              {activeTab === "stats" && "Dashboard"}
+              {activeTab === "list" && "Maqolalar ro'yxati"}
+              {activeTab === "editor" && (editingId ? "Maqolani tahrirlash" : "Yangi maqola qo'shish")}
+              {activeTab === "media" && "Media kutubxonasi"}
+              {activeTab === "ads" && "Reklama bannerlari"}
+              {activeTab === "settings" && "Sozlamalar"}
+            </h1>
+            <p>Til: <strong>{lang.toUpperCase()}</strong> · Barcha o'zgarishlar server bazasida saqlanadi</p>
+          </div>
+          <div className="adm-header-actions">
+            {activeTab === "list" && (
+              <>
+                <button className="adm-btn ghost" onClick={() => {
+                  // 📤 Export all stories to JSON
+                  const data = {
+                    exportedAt: new Date().toISOString(),
+                    stories: allStories
+                  };
+                  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `yangikun-backup-${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  notify("📤 Eksport yuklandi", "success");
+                }}>📤 Eksport</button>
+                <button className="adm-btn ghost" onClick={() => importFileRef.current?.click()}>📥 Import</button>
+                <input type="file" ref={importFileRef} accept=".json" style={{display:"none"}} onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    if (data.stories) {
+                      if (confirm(`📥 ${file.name} dan ${Object.values(data.stories).flat().length} ta maqola yuklansinmi?`)) {
+                        setAllStories(data.stories);
+                        notify("📥 Import muvaffaqiyatli", "success");
+                      }
+                    }
+                  } catch(err) {
+                    notify("❌ Xato: Fayl noto'g'ri format", "error");
+                  }
+                  e.target.value = '';
+                }} />
+                <button className="adm-btn ghost" onClick={resetContent}>↺ Demo tiklash</button>
+                <button className="adm-btn primary" onClick={() => { resetForm(); setActiveTab("editor"); }}>+ Yangi maqola</button>
+              </>
+            )}
+            {activeTab === "editor" && (
+              <>
+                <button className="adm-btn ghost" type="button" onClick={() => { resetForm(); setActiveTab("list"); }}>← Ortga</button>
+                <button className="adm-btn ghost" type="button" onClick={undo} disabled={historyIndex <= 0} title="Ctrl+Z">↩️ Undo</button>
+                <button className="adm-btn ghost" type="button" onClick={redo} disabled={historyIndex >= formHistory.length - 1} title="Ctrl+Y">↪️ Redo</button>
+                <button className="adm-btn ghost" type="button" onClick={() => {
+                  const toCyr = lang !== "uzk";
+                  setForm(f => ({
+                    ...f,
+                    title: convertText(f.title, toCyr),
+                    summary: convertText(f.summary, toCyr),
+                    body: convertText(f.body, toCyr),
+                    category: convertText(f.category, toCyr)
+                  }));
+                  setLang(toCyr ? "uzk" : "uz");
+                }}>↹ {"\u041b\u043e\u0442\u0438\u043d"} ↔ {"\u041a\u0440\u0438\u043b\u043b"}</button>
+                <button className="adm-btn ghost" type="button" onClick={() => {
+                  // 👁️ Preview - yangi tabda ko'rish
+                  const previewWindow = window.open('', '_blank');
+                  const isDark = document.body.classList.contains('dark');
+                  const html = `
+<!DOCTYPE html>
+<html class="${isDark ? 'dark' : ''}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview: ${form.title || 'Maqola'}</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    body { padding: 20px; max-width: 800px; margin: 0 auto; }
+    .preview-badge { position: fixed; top: 10px; right: 10px; background: var(--accent); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; z-index: 1000; }
+  </style>
+</head>
+<body>
+  <div class="preview-badge">👁️ PREVIEW</div>
+  <article class="article-page">
+    <header class="article-header">
+      <span class="article-category">${form.category || 'Siyosat'}</span>
+      <h1 class="article-title">${form.title || 'Sarlavhasiz'}</h1>
+      <div class="article-meta">
+        <span>${form.author || 'Yangi Kun'}</span>
+        <span>•</span>
+        <span>${form.time || 'Hozir'}</span>
+        <span>•</span>
+        <span>${form.read || '3 daqiqa'}</span>
+      </div>
+    </header>
+    ${form.image ? `<img src="${form.image}" class="article-image" style="width:100%;border-radius:8px;margin:20px 0;">` : ''}
+    <div class="article-body">
+      <p class="article-summary" style="font-weight:500;margin-bottom:16px;">${form.summary || ''}</p>
+      <div class="article-text">${form.body ? form.body.replace(/\n/g, '<br>') : ''}</div>
+    </div>
+  </article>
+</body>
+</html>`;
+                  previewWindow.document.write(html);
+                  previewWindow.document.close();
+                }}>👁️ Ko'rish</button>
+                <button className="adm-btn primary" type="submit" form="story-form">{editingId ? "✓ Yangilash" : "+ Qo'shish"}</button>
+              </>
+            )}
+            {activeTab === "media" && (
+              <>
+                <button className="adm-btn ghost" onClick={() => loadMedia()}>↺ Yangilash</button>
+                <button className="adm-btn primary" onClick={() => mediaFileRef.current?.click()}>
+                  {mediaUploading ? "⏳ Yuklanmoqda..." : "+ Fayl yuklash"}
+                </button>
+                <input ref={mediaFileRef} type="file" accept="image/*,video/*" multiple style={{display:"none"}}
+                  onChange={e => { Array.from(e.target.files).forEach(f => uploadMediaFile(f)); e.target.value=""; }}
+                />
+              </>
+            )}
+          </div>
+        </header>
+
+        {activeTab === "stats" && (
+          <div className="adm-dashboard">
+            <div className="adm-dash-cards">
+              <div className="adm-dash-card blue">
+                <span className="adm-dash-icon">📰</span>
+                <div>
+                  <StatNum value={stories.length} />
+                  <span>Jami maqolalar ({lang.toUpperCase()})</span>
+                </div>
+              </div>
+              <div className="adm-dash-card green">
+                <span className="adm-dash-icon">✅</span>
+                <div>
+                  <StatNum value={published} />
+                  <span>Chop etilgan</span>
+                </div>
+              </div>
+              <div className="adm-dash-card yellow">
+                <span className="adm-dash-icon">📝</span>
+                <div>
+                  <StatNum value={drafts} />
+                  <span>Qoralama</span>
+                </div>
+              </div>
+              <div className="adm-dash-card purple">
+                <span className="adm-dash-icon">🌐</span>
+                <div>
+                  <StatNum value={uzTotal + uzkTotal} />
+                  <span>Jami (UZ + ЎЗ)</span>
+                </div>
+              </div>
+              {(() => {
+                const allReactions = JSON.parse(localStorage.getItem("yk-reactions") || "{}");
+                const totalReactions = Object.values(allReactions).reduce((sum, r) => {
+                  const {_mine, ...emojis} = r;
+                  return sum + Object.values(emojis).reduce((a,b) => a + (Number(b)||0), 0);
+                }, 0);
+                return (
+                  <div className="adm-dash-card brand">
+                    <span className="adm-dash-icon">👍</span>
+                    <div>
+                      <StatNum value={totalReactions} />
+                      <span>Jami reaksiyalar</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="adm-dash-grid">
+              <div className="adm-dash-section">
+                <h3>📂 Kategoriyalar bo'yicha</h3>
+                <div className="adm-cat-bars">
+                  {categories.map(cat => {
+                    const count = stories.filter(s => s.category === cat).length;
+                    const pct = stories.length ? Math.round(count / stories.length * 100) : 0;
+                    return (
+                      <div className="adm-cat-bar-row" key={cat}>
+                        <span>{cat}</span>
+                        <div className="adm-cat-bar-track">
+                          <div className="adm-cat-bar-fill" style={{width: `${pct}%`}} />
+                        </div>
+                        <strong>{count}</strong>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="adm-dash-section">
+                <h3>👁 Ko'p o'qilgan maqolalar</h3>
+                {stories.some(s => s.views > 0) ? (
+                  <div className="adm-views-chart">
+                    {[...stories].filter(s=>s.views>0).sort((a,b) => (b.views||0)-(a.views||0)).slice(0,5).map((s, i) => {
+                      const maxViews = Math.max(...stories.map(x => x.views || 0));
+                      const pct = maxViews ? Math.round((s.views / maxViews) * 100) : 0;
+                      const colors = ["var(--brand)","var(--blue)","var(--gold)","#16a34a","#7c3aed"];
+                      return (
+                        <div key={s.id} className="adm-views-row">
+                          <span className="adm-views-rank">{i + 1}</span>
+                          <div className="adm-views-info">
+                            <p>{s.title}</p>
+                            <div className="adm-views-bar-track">
+                              <div className="adm-views-bar-fill" style={{width: pct + "%", background: colors[i]}} />
+                            </div>
+                          </div>
+                          <strong className="adm-views-num">👁 {s.views}</strong>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{color:"var(--muted)",fontSize:13,padding:"20px 0",textAlign:"center"}}>
+                    📊 Hali hech kim o'qimagan — maqolalar saytda ochilganda hisoblanadi
+                  </div>
+                )}
+
+                <h3 style={{marginTop:24}}>🕐 So'nggi maqolalar</h3>
+                <div className="adm-dash-recent">
+                  {[...stories].slice(0, 5).map(s => (
+                    <div className="adm-dash-recent-item" key={s.id}>
+                      <img src={s.image} alt="" loading="lazy" />
+                      <div>
+                        <span className={`adm-status ${s.status}`}>{s.status === "published" ? "✓" : "◌"}</span>
+                        <p>{s.title}</p>
+                        <small>{s.category} · {s.time}</small>
+                      </div>
+                      <button className="adm-btn ghost" style={{fontSize:12}} onClick={() => editStory(s)}>✏</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "list" && (
+          <div className="adm-list">
+            <div className="adm-filters">
+              <div className="adm-search-wrap">
+                <span>🔍</span>
+                <input
+                  type="search"
+                  placeholder="Sarlavha, mazmun bo'yicha qidirish..."
+                  value={searchQ}
+                  onChange={e => setSearchQ(e.target.value)}
+                />
+              </div>
+              <select value={filterCat} onChange={e => setFilterCat(e.target.value)}>
+                <option value="all">Barcha kategoriyalar</option>
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <option value="all">Barcha holat</option>
+                <option value="published">Chop etilgan</option>
+                <option value="draft">Qoralama</option>
+              </select>
+              <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+                <option value="newest">Eng yangi</option>
+                <option value="oldest">Eng eski</option>
+              </select>
+              <span className="adm-filter-count">{filteredStories.length} ta</span>
+              <div className="adm-export-btns">
+                <button className="adm-btn ghost" title="JSON yuklab olish" onClick={() => exportStories("json")}>⬇ JSON</button>
+                <button className="adm-btn ghost" title="CSV yuklab olish" onClick={() => exportStories("csv")}>⬇ CSV</button>
+              </div>
+            </div>
+
+            {/* 📱 Bulk actions panel */}
+            {selectedIds.size > 0 && (
+              <div className="adm-bulk-panel" style={{display:"flex",gap:10,alignItems:"center",padding:"12px 16px",background:"var(--fill)",borderRadius:8,marginBottom:12}}>
+                <span style={{fontWeight:600}}>📱 {selectedIds.size} ta tanlandi</span>
+                <button className="adm-btn ghost" onClick={() => {
+                  selectedIds.forEach(id => changeStatus({id}, "published"));
+                  setSelectedIds(new Set());
+                }}>✓ Chop etish</button>
+                <button className="adm-btn ghost" onClick={() => {
+                  selectedIds.forEach(id => changeStatus({id}, "draft"));
+                  setSelectedIds(new Set());
+                }}>◌ Draftga</button>
+                <button className="adm-btn danger" onClick={() => {
+                  if (confirm(`❌ ${selectedIds.size} ta maqola o'chirilsinmi?`)) {
+                    selectedIds.forEach(id => deleteStory(id));
+                    setSelectedIds(new Set());
+                  }
+                }}>✕ O'chirish</button>
+                <button className="adm-btn ghost" onClick={() => setSelectedIds(new Set())} style={{marginLeft:"auto"}}>✗ Bekor</button>
+              </div>
+            )}
+
+            {filteredStories.length === 0 && (
+              <div className="adm-empty">
+                {searchQ || filterCat !== "all" || filterStatus !== "all"
+                  ? "Filter bo'yicha maqola topilmadi."
+                  : "Hozircha maqola yo'q. Yangi maqola qo'shing."}
+              </div>
+            )}
+            {filteredStories.map((story) => {
+              const storyReactions = JSON.parse(localStorage.getItem("yk-reactions") || "{}" )[story.id] || {};
+              const {_mine, ...emojiCounts} = storyReactions;
+              const reactionTotal = Object.values(emojiCounts).reduce((a,b) => a+(Number(b)||0), 0);
+              return (
+              <article className="adm-item" key={story.id} style={{position:"relative"}}>
+                {/* 📱 Bulk checkbox */}
+                <label style={{position:"absolute",top:8,left:8,zIndex:10,cursor:"pointer",padding:4,background:"rgba(255,255,255,0.9)",borderRadius:4}}>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedIds.has(story.id)}
+                    onChange={(e) => {
+                      const newSet = new Set(selectedIds);
+                      if (e.target.checked) newSet.add(story.id);
+                      else newSet.delete(story.id);
+                      setSelectedIds(newSet);
+                    }}
+                    style={{width:18,height:18,cursor:"pointer"}}
+                  />
+                </label>
+                {/* Hover preview */}
+                <div className="adm-item-preview">
+                  <img src={story.image} alt="" />
+                  <div className="adm-item-preview-body">
+                    <span className="kicker">{story.category}</span>
+                    <p>{story.summary || "Mazmun yo'q"}</p>
+                    <div style={{display:"flex",gap:10,fontSize:12,color:"var(--muted)",marginTop:6}}>
+                      {story.views > 0 && <span>👁 {story.views}</span>}
+                      {reactionTotal > 0 && <span>👍 {reactionTotal}</span>}
+                    </div>
+                  </div>
+                </div>
+                <img src={story.image} alt="" style={{marginLeft:32}} />
+                <div className="adm-item-body">
+                  <div className="adm-item-meta">
+                    <span className={`adm-status ${story.status}`}>
+                      {story.status === "published" ? (story.publishAt && story.publishAt > new Date().toISOString() ? "⏰ Rejalashtirilgan" : "✓ Chop etilgan") : "◌ Qoralama"}
+                    </span>
+                    <span className="adm-item-cat">{story.category}</span>
+                    {reactionTotal > 0 && <span className="adm-reaction-badge">👍 {reactionTotal}</span>}
+                    {(story.views||0) > 0 && <span className="adm-views-badge">👁 {story.views}</span>}
+                  </div>
+                  <h3>{story.title || "Sarlavhasiz"}</h3>
+                  <p>{story.summary}</p>
+                </div>
+                <div className="adm-item-actions">
+                  <button className="adm-btn ghost" onClick={() => editStory(story)}>✏ Tahrirlash</button>
+                  <button className="adm-btn ghost" title="Nusxalash" onClick={() => duplicateStory(story)}>⧉</button>
+                  <button
+                    className={`adm-btn ${story.status === "published" ? "ghost" : "primary"}`}
+                    onClick={() => changeStatus(story, story.status === "published" ? "draft" : "published")}
+                  >
+                    {story.status === "published" ? "⊙ Draft" : "✓ Chop et"}
+                  </button>
+                  <button className="adm-btn danger" onClick={() => deleteStory(story.id)}>✕</button>
+                </div>
+              </article>
+              );
+            })}
+          </div>
+        )}
+
+        {activeTab === "editor" && (
+          <div className="adm-editor-wrap">
+            <form id="story-form" className="adm-form" onSubmit={saveStory}>
+              <div className="adm-form-grid">
+                <div className="adm-form-left">
+                  <div className="adm-form-row">
+                    <label>
+                      Kategoriya
+                      <select value={form.category} onChange={(e) => updateField("category", e.target.value)}>
+                        {categories.map((cat) => <option key={cat}>{cat}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      Holat
+                      <select value={form.status} onChange={(e) => updateField("status", e.target.value)}>
+                        <option value="published">Chop etilgan</option>
+                        <option value="draft">Qoralama</option>
+                      </select>
+                    </label>
+                  </div>
+                  <label data-field="title">
+                    Sarlavha <span className="req">*</span>
+                    <input
+                      value={form.title}
+                      onChange={(e) => updateField("title", e.target.value)}
+                      placeholder="Maqola sarlavhasi..."
+                      className={formErrors.title ? "field-error" : ""}
+                    />
+                    <div className="field-footer">
+                      {formErrors.title ? <span className="field-err-msg">⚠ {formErrors.title}</span> : <span/>}
+                      <span className={`char-count ${form.title.length > 120 ? "over" : ""}`}>{form.title.length}/120</span>
+                    </div>
+                  </label>
+                  <label data-field="summary">
+                    Qisqa mazmun <span className="req">*</span>
+                    <textarea rows="3" value={form.summary} onChange={(e) => updateField("summary", e.target.value)} placeholder="Qisqa tavsif (card da ko'rinadi)..." className={formErrors.summary ? "field-error" : ""} />
+                    <div className="field-footer">
+                      {formErrors.summary ? <span className="field-err-msg">⚠ {formErrors.summary}</span> : <span/>}
+                      <span className={`char-count ${form.summary.length > 200 ? "over" : ""}`}>{form.summary.length}/200</span>
+                    </div>
+                  </label>
+                  <div className="adm-form-row">
+                    <label>
+                      Muallif
+                      <input value={form.author} onChange={(e) => updateField("author", e.target.value)} placeholder="Yangi Kun tahririyati" />
+                    </label>
+                    <label>
+                      O'qish vaqti
+                      <input value={form.read} onChange={(e) => updateField("read", e.target.value)} placeholder="3 daqiqa" />
+                    </label>
+                  </div>
+                  <div className="adm-rich-label" data-field="body">
+                    <span>Maqola matni <span className="req">*</span>{formErrors.body && <span className="field-err-msg" style={{marginLeft:8}}>⚠ {formErrors.body}</span>}</span>
+                    <RichEditor
+                      value={form.body}
+                      onChange={(html) => updateField("body", html)}
+                    />
+                  </div>
+
+                  <div className="adm-seo-section">
+                    <div className="adm-seo-head">
+                      <span>🔍 SEO sozlamalari</span>
+                      <small>Google qidiruv uchun</small>
+                    </div>
+                    <label>
+                      Teglar
+                      <input value={form.tags} onChange={e => updateField("tags", e.target.value)} placeholder="siyosat, iqtisod, yangilik (vergul bilan)" />
+                      <span className="adm-hint">Maqolaga teglar qo'shing, vergul bilan ajrating</span>
+                    </label>
+                    <label>
+                      Meta sarlavha
+                      <input value={form.metaTitle} onChange={e => updateField("metaTitle", e.target.value)} placeholder={form.title || "Meta sarlavha (bo'sh bo'lsa asosiy sarlavha ishlatiladi)"} />
+                    </label>
+                    <label>
+                      Meta tavsif
+                      <textarea rows="2" value={form.metaDesc} onChange={e => updateField("metaDesc", e.target.value)} placeholder={form.summary || "Meta tavsif (bo'sh bo'lsa qisqa mazmun ishlatiladi)"} />
+                      <span className={`adm-seo-counter ${(form.metaDesc || form.summary).length > 160 ? "over" : ""}`}>{(form.metaDesc || form.summary).length}/160</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="adm-form-right">
+                  <div className="adm-preview-box">
+                    <h4>Ko'rinish</h4>
+                    {form.image ? (
+                      <img src={form.image} alt="" className="adm-preview-img" />
+                    ) : (
+                      <div className="adm-preview-placeholder">Rasm tanlanmagan</div>
+                    )}
+                    <span className={`adm-status ${form.status}`}>
+                      {form.status === "published" ? "✓ Chop etilgan" : "◌ Qoralama"}
+                    </span>
+                    <strong className="adm-preview-title">{form.title || "Sarlavha..."}</strong>
+                    <p className="adm-preview-summary">{form.summary || "Qisqa mazmun..."}</p>
+                  </div>
+                  <label>
+                    Rasm URL
+                    <input value={form.image} onChange={(e) => updateField("image", e.target.value)} placeholder="https://images.unsplash.com/..." />
+                  </label>
+                  <label className="adm-file-label">
+                    <span>📎 Kompyuterdan yuklash</span>
+                    <input type="file" accept="image/*" onChange={handleImageFile} />
+                  </label>
+                  <div className="adm-form-toggles">
+                    <div className="adm-toggle-row">
+                      <span>Asosiy maqola</span>
+                      <label className="adm-toggle-switch">
+                        <input type="checkbox" checked={!!form.isHero} onChange={e=>{
+                          updateField("isHero", e.target.checked);
+                          if (e.target.checked) setPinnedHeroId("");
+                        }} />
+                        <span className="adm-toggle-slider" />
+                      </label>
+                    </div>
+                    <div className="adm-toggle-row">
+                      <span>Muharrir tanlovi</span>
+                      <label className="adm-toggle-switch">
+                        <input type="checkbox" checked={!!form.isEditorPick} onChange={e=>updateField("isEditorPick", e.target.checked)} />
+                        <span className="adm-toggle-slider" />
+                      </label>
+                    </div>
+                    <div className="adm-toggle-row">
+                      <span>Dolzarb mavzu</span>
+                      <label className="adm-toggle-switch">
+                        <input type="checkbox" checked={!!form.isBreaking} onChange={e=>updateField("isBreaking", e.target.checked)} />
+                        <span className="adm-toggle-slider" />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="adm-views-field">
+                    <label className="adm-views-label">Ko'rishlar soni</label>
+                    <div className="adm-views-input-row">
+                      <div className="adm-views-input-wrap">
+                        <span>👁</span>
+                        <input type="number" min="0" value={form.views||0} onChange={e=>updateField("views", Number(e.target.value))} />
+                      </div>
+                      <label className="adm-countviews-check">
+                        <input type="checkbox" checked={!!form.countViews} onChange={e=>updateField("countViews", e.target.checked)} />
+                        <span>SANASH</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="adm-schedule-box" style={{padding:12,background:"var(--fill)",borderRadius:8,marginBottom:8}}>
+                    <label style={{display:"flex",flexDirection:"column",gap:6,fontSize:13}}>
+                      🕐 Rejalashtirish (ixtiyoriy)
+                      <input 
+                        type="datetime-local" 
+                        value={form.publishAt ? form.publishAt.slice(0,16) : ""} 
+                        onChange={(e) => updateField("publishAt", e.target.value ? new Date(e.target.value).toISOString() : "")}
+                        style={{padding:"8px 10px",fontSize:13,border:"1px solid var(--line)",borderRadius:6}}
+                      />
+                      <small style={{color:"var(--muted)",fontSize:11}}>
+                        {form.publishAt ? "Belgilangan vaqtda avtomatik chiqadi" : "Hozir chiqadi"}
+                      </small>
+                    </label>
+                  </div>
+
+                  <div className="adm-form-actions" style={{flexDirection:"column",gap:8}}>
+                    <button className="adm-btn primary" type="submit" style={{width:"100%",padding:"13px",fontSize:15,justifyContent:"center",gap:8}}>
+                      💾 {editingId ? "Yangilash" : "Nashr etish"}
+                      {isDirty && <span style={{fontSize:10,opacity:0.7,marginLeft:4}}>• o'zgartirilgan</span>}
+                    </button>
+                    <div style={{display:"flex",gap:6}}>
+                      <button className="adm-btn ghost" type="button" onClick={() => {
+                        const draftKey = `yk-draft-${editingId || 'new'}`;
+                        localStorage.setItem(draftKey, JSON.stringify({form, savedAt: new Date().toISOString(), lang}));
+                        notify("💾 Qoralama saqlandi", "success", 2000);
+                        setIsDirty(false);
+                      }} style={{flex:1,justifyContent:"center"}}>
+                        📋 Draft
+                      </button>
+                      <button className="adm-btn ghost" type="button" onClick={resetForm} style={{flex:1,justifyContent:"center"}}>
+                        🔄 Bekor
+                      </button>
+                    </div>
+                    <small className="adm-shortcut-hint">💡 Ctrl+S — saqlash &nbsp;|&nbsp; Ctrl+Z — orqaga</small>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {activeTab === "media" && (
+          <div className="adm-media-wrap">
+            <div className="adm-media-toolbar">
+              <div className="adm-media-filter-btns">
+                {["all","image","video"].map(f => (
+                  <button key={f} className={`adm-media-filt ${mediaFilter===f?"active":""}`} onClick={()=>setMediaFilter(f)}>
+                    {f==="all"?"Hammasi":f==="image"?"🖼 Rasmlar":"🎬 Videolar"}
+                  </button>
+                ))}
+              </div>
+              <span className="adm-filter-count">{mediaFiles.filter(f=>mediaFilter==="all"||f.type===mediaFilter).length} ta fayl</span>
+            </div>
+
+            <div
+              className="adm-media-dropzone"
+              onDragOver={e=>e.preventDefault()}
+              onDrop={e=>{e.preventDefault();Array.from(e.dataTransfer.files).forEach(f=>uploadMediaFile(f));}}
+            >
+              {mediaUploading ? (
+                <div className="adm-media-dz-inner loading">
+                  <span className="rich-upload-spinner" style={{width:32,height:32,borderWidth:3}}/>
+                  <p>Yuklanmoqda...</p>
+                </div>
+              ) : (
+                <div className="adm-media-dz-inner">
+                  <span style={{fontSize:36}}>📂</span>
+                  <p>Foto yoki video fayllarni bu yerga tashlang</p>
+                  <small>PNG, JPG, WEBP, GIF, MP4, WEBM qabul qilinadi</small>
+                  <button className="adm-btn primary" style={{marginTop:10}} onClick={()=>mediaFileRef.current?.click()}>Fayl tanlash</button>
+                </div>
+              )}
+            </div>
+
+            {mediaFiles.filter(f=>mediaFilter==="all"||f.type===mediaFilter).length === 0 && !mediaUploading && (
+              <div className="adm-empty">Hozircha media fayl yo'q. Yuqoriga fayl tashlang yoki tanlang.</div>
+            )}
+
+            <div className="adm-media-grid">
+              {mediaFiles.filter(f=>mediaFilter==="all"||f.type===mediaFilter).map(file=>(
+                <div className="adm-media-card" key={file.name}>
+                  <div className="adm-media-thumb">
+                    {file.type==="image"
+                      ? <img src={file.url} alt={file.name}/>
+                      : (
+                        <div className="adm-media-video-thumb">
+                          <video src={file.url} muted />
+                          <span className="adm-media-play">▶</span>
+                        </div>
+                      )
+                    }
+                    <span className={`adm-media-type-badge ${file.type}`}>
+                      {file.type==="image"?"🖼":"🎬"}
+                    </span>
+                  </div>
+                  <div className="adm-media-info">
+                    <p title={file.name}>{file.name.length>22?file.name.slice(0,20)+"...":file.name}</p>
+                    <small>{(file.size/1024).toFixed(0)} KB</small>
+                  </div>
+                  <div className="adm-media-actions">
+                    <button
+                      className={`adm-btn ghost ${copiedUrl===file.url?"success":""}`}
+                      onClick={()=>copyUrl(file.url)}
+                    >{copiedUrl===file.url?"✓ Nusxalandi":"📋 URL"}</button>
+                    <button className="adm-btn danger" onClick={()=>deleteMedia(file.name)}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "ads" && (
+          <div className="adm-ads-wrap">
+            <div className="adm-ads-grid">
+              {/* Banner yaratish / tahrirlash formasi */}
+              <div className="adm-ads-form-card">
+                <h3>{editingAdId ? "✏️ Bannerni tahrirlash" : "➕ Yangi banner"}</h3>
+                <label>Banner sarlavhasi
+                  <input value={adForm.title} onChange={e=>setAdForm(p=>({...p,title:e.target.value}))} placeholder="Reklama matni..." />
+                </label>
+                <label>Qo'shimcha matn
+                  <input value={adForm.subtitle} onChange={e=>setAdForm(p=>({...p,subtitle:e.target.value}))} placeholder="Taklif, chegirma va h.k." />
+                </label>
+                <label>Rasm URL (ixtiyoriy)
+                  <input value={adForm.image} onChange={e=>setAdForm(p=>({...p,image:e.target.value}))} placeholder="https://..." />
+                  {adForm.image && <img src={adForm.image} alt="" style={{width:"100%",maxHeight:80,objectFit:"cover",borderRadius:6,marginTop:6}} />}
+                </label>
+                <label>Havola URL
+                  <input value={adForm.link} onChange={e=>setAdForm(p=>({...p,link:e.target.value}))} placeholder="https://..." />
+                </label>
+                <label>Pozitsiya
+                  <select value={adForm.position} onChange={e=>setAdForm(p=>({...p,position:e.target.value}))}>
+                    <option value="top">⬆ Yuqori (Header osti — Leaderboard)</option>
+                    <option value="inline">📄 O'rta (Maqolalar ustida)</option>
+                    <option value="bottom">⬇ Pastki (Footer osti)</option>
+                    <option value="sidebar">◼ Sidebar (O'ng panel)</option>
+                  </select>
+                </label>
+                <label style={{display:"flex",alignItems:"center",gap:10,fontWeight:700}}>
+                  <input type="checkbox" checked={adForm.active} onChange={e=>setAdForm(p=>({...p,active:e.target.checked}))} />
+                  Faol (saitda ko'rinsin)
+                </label>
+                <div style={{display:"flex",gap:8,marginTop:4}}>
+                  <button className="adm-btn primary" style={{flex:1}} onClick={() => {
+                    if (!adForm.title && !adForm.image) { notify("⚠️ Sarlavha yoki rasm kerak","error"); return; }
+                    const id = editingAdId || `ad-${Date.now()}`;
+                    const newAd = {...adForm, id};
+                    setAds(prev => editingAdId ? prev.map(a=>a.id===editingAdId?newAd:a) : [...prev, newAd]);
+                    setAdForm(EMPTY_AD); setEditingAdId(null);
+                    notify(editingAdId ? "✓ Banner yangilandi" : "✓ Banner qo'shildi", "success");
+                  }}>
+                    {editingAdId ? "✓ Yangilash" : "➕ Qo'shish"}
+                  </button>
+                  {editingAdId && (
+                    <button className="adm-btn ghost" onClick={()=>{setAdForm(EMPTY_AD);setEditingAdId(null);}}>✕ Bekor</button>
+                  )}
+                </div>
+              </div>
+
+              {/* Banner ro'yxati */}
+              <div className="adm-ads-list-col">
+                <h3>📋 Barcha bannerlar ({(ads||[]).length} ta)</h3>
+                {!(ads||[]).length && (
+                  <div className="adm-empty">Hozircha banner yo'q. Yangi banner qo'shing.</div>
+                )}
+                {(ads||[]).map(ad => (
+                  <div key={ad.id} className={`adm-ad-item ${ad.active ? "active" : "inactive"}`}>
+                    <div className={`adm-ad-pos-badge adm-ad-pos-${ad.position}`}>
+                      {{top:"⬆ Yuqori",inline:"📄 O'rta",bottom:"⬇ Pastki",sidebar:"◼ Sidebar"}[ad.position]}
+                    </div>
+                    {ad.image && <img src={ad.image} alt="" className="adm-ad-thumb" />}
+                    <div className="adm-ad-info">
+                      <strong>{ad.title || <em style={{color:"var(--muted)"}}>Sarlavsiz</em>}</strong>
+                      {ad.subtitle && <span>{ad.subtitle}</span>}
+                      {ad.link && <small>🔗 {ad.link.slice(0,40)}{ad.link.length>40?"...":""}</small>}
+                    </div>
+                    <div className="adm-ad-actions">
+                      <label className="adm-toggle-switch" title={ad.active?"O'chirish":"Yoqish"}>
+                        <input type="checkbox" checked={ad.active} onChange={e=>setAds(prev=>prev.map(a=>a.id===ad.id?{...a,active:e.target.checked}:a))} />
+                        <span className="adm-toggle-slider" />
+                      </label>
+                      <button className="adm-btn ghost" onClick={()=>{setAdForm({...ad});setEditingAdId(ad.id);window.scrollTo({top:0,behavior:"smooth"});}}>✏</button>
+                      <button className="adm-btn danger" onClick={()=>{ if(!confirm("Bannerni o'chirish?")) return; setAds(prev=>prev.filter(a=>a.id!==ad.id)); notify("Banner o'chirildi","info"); }}>✕</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="adm-ads-preview-section">
+              <h3>👁 Saitdagi ko'rinish (preview)</h3>
+              <div className="adm-ads-preview-layout">
+                {["top","inline","bottom","sidebar"].map(pos => {
+                  const posAds = (ads||[]).filter(a=>a.active && a.position===pos);
+                  return (
+                    <div key={pos} className="adm-preview-pos-block">
+                      <div className="adm-preview-pos-label">{{top:"⬆ Yuqori",inline:"📄 O'rta",bottom:"⬇ Pastki",sidebar:"◼ Sidebar"}[pos]}</div>
+                      {posAds.length ? posAds.map(ad => (
+                        <div key={ad.id} className="adm-preview-ad-card">
+                          {ad.image && <img src={ad.image} alt="" />}
+                          <div>
+                            {ad.title && <strong>{ad.title}</strong>}
+                            {ad.subtitle && <span>{ad.subtitle}</span>}
+                          </div>
+                        </div>
+                      )) : <div className="adm-preview-empty">Faol banner yo'q</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "settings" && (
+          <div className="adm-settings">
+            <div className="adm-settings-card">
+              <h3>🌟 Maxsus loyiha sektsiyasi</h3>
+              <p>Bosh sahifadagi qora fon sektsiya matni (UZ / RU alohida)</p>
+              <div className="adm-special-tabs">
+                <div className="adm-special-lang-group">
+                  <strong>🇺🇿 UZ versiyasi</strong>
+                  <label>Kicker (tepa yorliq)
+                    <input value={siteConfig.specialUz.kicker} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,kicker:e.target.value}}))} placeholder="Maxsus loyiha" />
+                  </label>
+                  <label>Sarlavha
+                    <input value={siteConfig.specialUz.title} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,title:e.target.value}}))} placeholder="Sarlavha..." />
+                  </label>
+                  <label>Tavsif
+                    <textarea rows="2" value={siteConfig.specialUz.text} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,text:e.target.value}}))} placeholder="Tavsif matni..." />
+                  </label>
+                  <label>Rasm badji matni
+                    <input value={siteConfig.specialUz.badge} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,badge:e.target.value}}))} placeholder="Jonli tahririyat" />
+                  </label>
+                  <label>Rasm URL
+                    <input value={siteConfig.specialUz.image} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,image:e.target.value}}))} placeholder="https://... (bo'sh bo'lsa standart rasm)" />
+                  </label>
+                  <label>Xususiyatlar (vergul bilan)
+                    <input value={siteConfig.specialUz.features} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,features:e.target.value}}))} placeholder="Tezkor yangiliklar, Mustaqil tahlil, ..." />
+                  </label>
+                  <div className="adm-form-row" style={{gap:8}}>
+                    {["stat1","stat2","stat3","stat4"].map(k=>(
+                      <div key={k} style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:80}}>
+                        <input value={siteConfig.specialUz[k]} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,[k]:e.target.value}}))} placeholder="24/7" style={{fontWeight:900,textAlign:"center"}} />
+                        <input value={siteConfig.specialUz[k+"label"]} onChange={e=>setSiteConfig(p=>({...p,specialUz:{...p.specialUz,[k+"label"]:e.target.value}}))} placeholder="Monitoring" style={{textAlign:"center",fontSize:12}} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="adm-special-lang-group">
+                  <strong>🇷🇺 RU versiyasi</strong>
+                  <label>Kicker (tepa yorliq)
+                    <input value={siteConfig.specialRu.kicker} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,kicker:e.target.value}}))} placeholder="Спецпроект" />
+                  </label>
+                  <label>Sarlavha
+                    <input value={siteConfig.specialRu.title} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,title:e.target.value}}))} placeholder="Заголовок..." />
+                  </label>
+                  <label>Tavsif
+                    <textarea rows="2" value={siteConfig.specialRu.text} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,text:e.target.value}}))} placeholder="Описание..." />
+                  </label>
+                  <label>Rasm badji matni
+                    <input value={siteConfig.specialRu.badge} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,badge:e.target.value}}))} placeholder="Живая редакция" />
+                  </label>
+                  <label>Rasm URL
+                    <input value={siteConfig.specialRu.image} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,image:e.target.value}}))} placeholder="https://..." />
+                  </label>
+                  <label>Xususiyatlar (vergul bilan)
+                    <input value={siteConfig.specialRu.features} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,features:e.target.value}}))} placeholder="Быстрые новости, Независимый анализ, ..." />
+                  </label>
+                  <div className="adm-form-row" style={{gap:8}}>
+                    {["stat1","stat2","stat3","stat4"].map(k=>(
+                      <div key={k} style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:80}}>
+                        <input value={siteConfig.specialRu[k]} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,[k]:e.target.value}}))} placeholder="24/7" style={{fontWeight:900,textAlign:"center"}} />
+                        <input value={siteConfig.specialRu[k+"label"]} onChange={e=>setSiteConfig(p=>({...p,specialRu:{...p.specialRu,[k+"label"]:e.target.value}}))} placeholder="Мониторинг" style={{textAlign:"center",fontSize:12}} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button className="adm-btn primary" type="button" onClick={()=>notify("✓ Maxsus loyiha saqlandi.","success")}>Saqlash</button>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>🎨 Brand rangi</h3>
+              <p>Saytning asosiy rang sxemasi</p>
+              <div className="brand-color-row">
+                {["#c31932","#1d4ed8","#0f766e","#7c3aed","#b45309","#0369a1","#dc2626","#16a34a"].map(color => (
+                  <button
+                    key={color}
+                    className={`brand-color-swatch ${(siteConfig.brandColor || "#c31932") === color ? "active" : ""}`}
+                    style={{background: color}}
+                    onClick={() => {
+                      setSiteConfig(p => ({...p, brandColor: color}));
+                      document.documentElement.style.setProperty("--brand", color);
+                    }}
+                    title={color}
+                  />
+                ))}
+                <input
+                  type="color"
+                  className="brand-color-input"
+                  value={siteConfig.brandColor || "#c31932"}
+                  onChange={e => {
+                    setSiteConfig(p => ({...p, brandColor: e.target.value}));
+                    document.documentElement.style.setProperty("--brand", e.target.value);
+                  }}
+                  title="Maxsus rang"
+                />
+              </div>
+              <small style={{color:"var(--muted)",fontSize:12,marginTop:6,display:"block"}}>
+                Sahifani yangilash asl rangni tiklaydi. Rang sozlamalarni serverda saqlanmaydi.
+              </small>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>📌 Hero maqola tanlash</h3>
+              <p>Bosh sahifaning eng katta (chap) maqolasini qo'lda belgilang. Tanlov saqlanadi.</p>
+
+              {pinnedHeroId ? (
+                <div className="adm-hero-current">
+                  <img src={stories.find(s=>s.id===pinnedHeroId)?.image} alt="" />
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:11,fontWeight:800,color:"var(--brand)",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>📌 Hozirgi Hero</div>
+                    <strong style={{fontSize:14,display:"block",marginBottom:2}}>{stories.find(s=>s.id===pinnedHeroId)?.title || "—"}</strong>
+                    <small style={{color:"var(--muted)"}}>{stories.find(s=>s.id===pinnedHeroId)?.category}</small>
+                  </div>
+                  <button className="adm-btn danger" style={{fontSize:12,padding:"6px 12px",flexShrink:0}} onClick={()=>setPinnedHeroId("")}>✕ Bekor qilish</button>
+                </div>
+              ) : (
+                <div style={{padding:"10px 14px",background:"var(--paper)",borderRadius:8,fontSize:13,color:"var(--muted)",marginBottom:12}}>
+                  ℹ️ Hozir avtomatik rejim — eng so'nggi maqola ko'rsatiladi
+                </div>
+              )}
+
+              <input
+                className="comment-input"
+                placeholder="🔍 Maqola qidirish..."
+                id="hero-search"
+                style={{marginBottom:10}}
+                onChange={e => {
+                  const q = e.target.value.toLowerCase();
+                  document.querySelectorAll(".hero-pick-item").forEach(el => {
+                    el.style.display = el.dataset.title.toLowerCase().includes(q) ? "" : "none";
+                  });
+                }}
+              />
+
+              <div style={{maxHeight:360,overflowY:"auto",display:"flex",flexDirection:"column",gap:8,paddingRight:4}}>
+                {stories.filter(s=>s.status==="published").map(s => (
+                  <div
+                    key={s.id}
+                    data-title={s.title}
+                    className={`adm-dash-recent-item hero-pick-item ${pinnedHeroId===s.id?"adm-hero-pick":""}`}
+                    style={{cursor:"pointer",padding:"8px 10px",borderRadius:8,border:`1.5px solid ${pinnedHeroId===s.id?"var(--brand)":"var(--line)"}`,background:"var(--surface)",transition:"border-color 150ms"}}
+                    onClick={()=>{ const isNew = pinnedHeroId !== s.id; setPinnedHeroId(isNew ? s.id : ""); notify(isNew ? "✓ Hero maqola belgilandi va saqlandi!" : "Hero bekor qilindi", isNew ? "success" : "info"); }}
+                  >
+                    <img src={s.image} alt="" style={{width:60,height:44,objectFit:"cover",borderRadius:6,flexShrink:0}} loading="lazy" />
+                    <div style={{flex:1,minWidth:0}}>
+                      <span style={{fontSize:10,fontWeight:800,color:"var(--brand)",textTransform:"uppercase",letterSpacing:"0.06em"}}>{s.category}</span>
+                      <p style={{margin:"2px 0 0",fontSize:13,fontWeight:700,lineHeight:1.3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{s.title}</p>
+                      <small style={{color:"var(--muted)",fontSize:11}}>{s.time} · {s.read}</small>
+                    </div>
+                    {pinnedHeroId===s.id
+                      ? <span className="adm-hero-pick-label">📌 Hero</span>
+                      : <span style={{fontSize:11,color:"var(--muted)",flexShrink:0}}>Tanlash</span>
+                    }
+                  </div>
+                ))}
+                {stories.filter(s=>s.status==="published").length === 0 && (
+                  <div style={{color:"var(--muted)",fontSize:13,padding:"20px",textAlign:"center"}}>Chop etilgan maqolalar yo'q</div>
+                )}
+              </div>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>🗂️ O'ng tomon kartalar (2 ta)</h3>
+              <p>Hero bo'limining o'ng tomonidagi 2 ta kichik kartani belgilang. Saqlanadi.</p>
+
+              {pinnedSideIds.length > 0 && (
+                <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+                  {pinnedSideIds.map((id, idx) => {
+                    const s = stories.find(x => x.id === id);
+                    if (!s) return null;
+                    return (
+                      <div key={id} className="adm-hero-current" style={{marginBottom:0}}>
+                        <img src={s.image} alt="" />
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:11,fontWeight:800,color:"var(--brand)",marginBottom:4}}>
+                            {idx === 0 ? "🔼 Yuqori karta" : "🔽 Quyi karta"}
+                          </div>
+                          <strong style={{fontSize:13,display:"block"}}>{s.title}</strong>
+                          <small style={{color:"var(--muted)"}}>{s.category}</small>
+                        </div>
+                        <button className="adm-btn ghost" style={{fontSize:12,padding:"4px 10px",flexShrink:0}}
+                          onClick={()=>setPinnedSideIds(prev=>prev.filter(x=>x!==id))}>✕</button>
+                      </div>
+                    );
+                  })}
+                  {pinnedSideIds.length > 0 && (
+                    <button className="adm-btn ghost" style={{fontSize:12,alignSelf:"flex-start"}}
+                      onClick={()=>{ setPinnedSideIds([]); notify("Side kartalar bekor qilindi","info"); }}>
+                      ✕ Hammasini bekor qilish
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {pinnedSideIds.length < 4 && (
+                <div style={{padding:"8px 12px",background:"var(--paper)",borderRadius:8,fontSize:13,color:"var(--muted)",marginBottom:12}}>
+                  📌 {4 - pinnedSideIds.length} ta karta tanlang
+                </div>
+              )}
+
+              <div style={{maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:8,paddingRight:4}}>
+                {stories.filter(s=>s.status==="published" && s.id !== pinnedHeroId).map(s => {
+                  const sideIdx = pinnedSideIds.indexOf(s.id);
+                  const isSelected = sideIdx !== -1;
+                  return (
+                    <div
+                      key={s.id}
+                      style={{cursor:"pointer",padding:"8px 10px",borderRadius:8,
+                        border:`1.5px solid ${isSelected?"var(--brand)":"var(--line)"}`,
+                        background:"var(--surface)",transition:"border-color 150ms",
+                        opacity: pinnedSideIds.length >= 4 && !isSelected ? 0.45 : 1}}
+                      onClick={()=>{
+                        if (isSelected) {
+                          setPinnedSideIds(prev => prev.filter(x=>x!==s.id));
+                          notify("Karta olib tashlandi","info");
+                        } else if (pinnedSideIds.length < 4) {
+                          setPinnedSideIds(prev => [...prev, s.id]);
+                          notify("✓ Karta belgilandi va saqlandi!","success");
+                        }
+                      }}
+                    >
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <img src={s.image} alt="" style={{width:56,height:40,objectFit:"cover",borderRadius:6,flexShrink:0}} loading="lazy" />
+                        <div style={{flex:1,minWidth:0}}>
+                          <span style={{fontSize:10,fontWeight:800,color:"var(--brand)",textTransform:"uppercase"}}>{s.category}</span>
+                          <p style={{margin:"2px 0 0",fontSize:13,fontWeight:700,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{s.title}</p>
+                        </div>
+                        {isSelected
+                          ? <span className="adm-hero-pick-label">{sideIdx + 1}</span>
+                          : <span style={{fontSize:11,color:"var(--muted)",flexShrink:0}}>Tanlash</span>
+                        }
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>🌐 Sayt sozlamalari</h3>
+              <p>Saytning umumiy ma'lumotlari</p>
+              <div className="adm-form-row">
+                <label style={{display:"flex",flexDirection:"column",gap:6}}>
+                  Sayt nomi
+                  <input value={siteConfig.siteName} onChange={e => setSiteConfig(p=>({...p,siteName:e.target.value}))} placeholder="Yangi Kun" />
+                </label>
+                <label style={{display:"flex",flexDirection:"column",gap:6}}>
+                  Email
+                  <input value={siteConfig.email} onChange={e => setSiteConfig(p=>({...p,email:e.target.value}))} placeholder="news@yangikun.uz" />
+                </label>
+              </div>
+              <div className="adm-form-row">
+                <label style={{display:"flex",flexDirection:"column",gap:6}}>
+                  Telegram havolasi
+                  <input value={siteConfig.telegram} onChange={e => setSiteConfig(p=>({...p,telegram:e.target.value}))} placeholder="https://t.me/..." />
+                </label>
+                <label style={{display:"flex",flexDirection:"column",gap:6}}>
+                  Logo URL
+                  <input value={siteConfig.logoUrl} onChange={e => setSiteConfig(p=>({...p,logoUrl:e.target.value}))} placeholder="https://..." />
+                </label>
+              </div>
+              <button className="adm-btn primary" type="button" onClick={() => notify("✓ Sayt sozlamalari saqlandi.","success")}>Saqlash</button>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>📢 Yuqori banner</h3>
+              <p>Sayt yuqorisida ko'rinadigan e'lon matni</p>
+              <label style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,fontWeight:700,fontSize:13}}>
+                <input type="checkbox" checked={siteConfig.bannerActive} onChange={e => setSiteConfig(p=>({...p,bannerActive:e.target.checked}))} />
+                Bannerni faollashtirish
+              </label>
+              <input
+                value={siteConfig.bannerText}
+                onChange={e => setSiteConfig(p=>({...p,bannerText:e.target.value}))}
+                placeholder="E'lon matni..."
+                style={{width:"100%",border:"1.5px solid var(--line)",borderRadius:7,padding:"10px 12px",fontSize:14,fontFamily:"inherit",boxSizing:"border-box",marginBottom:12}}
+              />
+              <button className="adm-btn primary" type="button" onClick={() => notify("✓ Banner saqlandi.","success")}>Saqlash</button>
+            </div>
+
+            <div className="adm-settings-card">
+              <h3>🔒 Parolni o'zgartirish</h3>
+              <p>Yangi parol kamida 6 belgidan iborat bo'lsin.</p>
+              <form onSubmit={changePassword} style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Yangi parol..."
+                  style={{flex:1,minWidth:200}}
+                />
+                <button className="adm-btn primary" type="submit">Saqlash</button>
+              </form>
+            </div>
+            <div className="adm-settings-card danger-zone">
+              <h3>⚠️ Xavfli zona</h3>
+              <p>Demo maqolalarni tiklash barcha mavjud maqolalarni o'chiradi.</p>
+              <button className="adm-btn danger" onClick={resetContent}>↺ Demo maqolalarni tiklash</button>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+function AdBanner({ ads, position }) {
+  const active = (ads || []).filter(a => a.active && a.position === position);
+  if (!active.length) return null;
+  const ad = active[Math.floor(Date.now() / 30000) % active.length];
+  if (!ad) return null;
+
+  const sizes = {
+    top:     { height: 90, label: "728×90 Leaderboard" },
+    bottom:  { height: 90, label: "728×90 Leaderboard" },
+    sidebar: { height: 250, label: "300×250 Rectangle" },
+    inline:  { height: 100, label: "468×100 Banner" },
+  };
+  const sz = sizes[position] || sizes.inline;
+
+  return (
+    <div className={`ad-banner ad-banner-${position}`}>
+      <span className="ad-label">Reklama</span>
+      {ad.link ? (
+        <a href={ad.link} target="_blank" rel="noopener noreferrer" className="ad-inner" style={{minHeight: sz.height}}>
+          {ad.image ? (
+            <img src={ad.image} alt={ad.title || "Reklama"} />
+          ) : (
+            <div className="ad-text-banner">
+              {ad.title && <strong>{ad.title}</strong>}
+              {ad.subtitle && <span>{ad.subtitle}</span>}
+            </div>
+          )}
+        </a>
+      ) : (
+        <div className="ad-inner" style={{minHeight: sz.height}}>
+          {ad.image ? (
+            <img src={ad.image} alt={ad.title || "Reklama"} />
+          ) : (
+            <div className="ad-text-banner">
+              {ad.title && <strong>{ad.title}</strong>}
+              {ad.subtitle && <span>{ad.subtitle}</span>}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Footer({ t, pages, setPage, openAdmin }) {
+  const year = new Date().getFullYear();
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span className="brand-mark">YK</span>
+            <strong style={{ fontSize: "22px", color: "#fff" }}>Yangi Kun</strong>
+          </div>
+          <p>{t.portal}. O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.</p>
+          <div className="footer-socials">
+            <a href="https://t.me/yangikun" target="_blank" rel="noopener" title="Telegram">✈</a>
+            <a href="https://instagram.com/yangikun" target="_blank" rel="noopener" title="Instagram">📷</a>
+            <a href="https://youtube.com/@yangikun" target="_blank" rel="noopener" title="YouTube">▶</a>
+            <a href="https://facebook.com/yangikun" target="_blank" rel="noopener" title="Facebook">f</a>
+          </div>
+        </div>
+        <div className="footer-nav">
+          <div className="footer-links">
+            {pages.map((item) => (
+              <button key={item} onClick={() => setPage(item)}>
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="footer-copy">
+          <span>© {year} Yangi Kun. Barcha huquqlar himoyalangan.</span>
+          <span>news@yangikun.uz</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+
+
+

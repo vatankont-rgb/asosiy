@@ -1,0 +1,1292 @@
+function AdminPanel({ 
+  lang, 
+  setLang, 
+  allStories, 
+  stories, 
+  setAllStories, 
+  refreshPublicStories, 
+  siteConfig, 
+  setSiteConfig, 
+  pinnedHeroId, 
+  setPinnedHeroId, 
+  pinnedSideIds, 
+  setPinnedSideIds, 
+  ads, 
+  setAds,
+  languages,
+  categories,
+  setLanguages,
+  setCategories,
+  staticPages,
+  setStaticPages
+}) {
+  const isUz = lang !== "en";
+  
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [dashboardLogs, setDashboardLogs] = useState([]);
+  const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = window.Recharts || {};
+
+  useEffect(() => {
+    if (activeTab === "dashboard") {
+      fetch('/api/admin/dashboard/stats', {
+        headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.stats) setDashboardStats(data);
+      }).catch(console.error);
+
+      fetch('/api/admin/dashboard/logs', {
+        headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.logs) setDashboardLogs(data.logs);
+      }).catch(console.error);
+    }
+  }, [activeTab]);
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7'];
+
+const [activeTab, setActiveTab] = useState("dashboard");
+  const [adminTags, setAdminTags] = useState([]);
+  useEffect(() => { fetch("/api/tags").then(r=>r.json()).then(d=>{if(d&&d.data) setAdminTags(d.data)}).catch(console.error) }, []);
+  const [translations, setTranslations] = useState({ uz: {}, en: {} });
+  const [translationsLoading, setTranslationsLoading] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/translations')
+      .then(res => res.json())
+      .then(data => {
+        if (data.translations) setTranslations(data.translations);
+      });
+  }, []);
+
+  const saveTranslations = async () => {
+    setTranslationsLoading(true);
+    try {
+      const res = await fetch('/api/translations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` },
+        body: JSON.stringify({ translations })
+      });
+      if (res.ok) {
+        alert("Tarjimalar saqlandi!");
+        window.location.reload();
+      }
+    } catch(err) {
+      alert("Xatolik yuz berdi");
+    }
+    setTranslationsLoading(false);
+  };
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  // Authentication state
+  const [authenticated, setAuthenticated] = useState(false);
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("");
+  const [loginStep, setLoginStep] = useState("password");
+  const [loginPin, setLoginPin] = useState("");
+  const [loginTempToken, setLoginTempToken] = useState("");
+  const [authError, setAuthError] = useState("");
+  
+  // Articles state
+  const [editingStory, setEditingStory] = useState(null);
+  const [tagInput, setTagInput] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageUpload = (file) => {
+    if (!file) return;
+    setImageUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dataUrl: e.target.result })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setForm(prev => ({ ...prev, image: data.url }));
+        }
+      } catch (err) {
+        alert("Rasm yuklashda xatolik yuz berdi.");
+      } finally {
+        setImageUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddTag = (e) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      const currentTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+      if (!currentTags.includes(tagInput.trim())) {
+        const newTags = [...currentTags, tagInput.trim()].join(", ");
+        setForm(prev => ({ ...prev, tags: newTags }));
+      }
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    const currentTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+    const newTags = currentTags.filter(t => t !== tagToRemove).join(", ");
+    setForm(prev => ({ ...prev, tags: newTags }));
+  };
+
+  const [form, setForm] = useState({
+    articleLang: lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz",
+    title: "",
+    category: isUz ? "Siyosat" : "Politics",
+    summary: "",
+    body: "",
+    image: "",
+    author: "Tahririyat",
+    status: "draft",
+    time: "Bugun",
+    read: "4 daqiqa",
+    tags: "",
+    seoTitle: "",
+    seoDescription: "",
+    seoKeywords: "",
+    focusKeyword: "",
+    videoUrl: ""
+  });
+
+  // Backup & Import
+  const [backupLogs, setBackupLogs] = useState([]);
+  const importFileRef = useRef(null);
+
+  // SEO scoring helper
+  const [seoScore, setSeoScore] = useState(0);
+  const [seoSuggestions, setSeoSuggestions] = useState([]);
+
+  // Auto-save logic (runs every 5 seconds)
+  useEffect(() => {
+    if (activeTab !== "editor" || !form.title) return;
+    const interval = setInterval(() => {
+      localStorage.setItem("yk-cms-draft", JSON.stringify(form));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeTab, form]);
+
+  // Load draft if exists
+  const loadDraft = () => {
+    const draft = localStorage.getItem("yk-cms-draft");
+    if (draft) {
+      setForm(JSON.parse(draft));
+      alert("Qoralama muvaffaqiyatli tiklandi.");
+    }
+  };
+
+  // SEO Live score calculator
+  useEffect(() => {
+    let score = 0;
+    const suggestions = [];
+
+    if (form.title.length > 10) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Sarlavha juda qisqa (kamida 10 ta belgi bo'lishi kerak)" : "Title is too short");
+    }
+
+    if (form.summary.length > 30) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Tavsif (summary) juda qisqa" : "Summary is too short");
+    }
+
+    if (form.focusKeyword && form.title.toLowerCase().includes(form.focusKeyword.toLowerCase())) {
+      score += 25;
+    } else if (form.focusKeyword) {
+      suggestions.push(isUz ? "Klit so'zni sarlavhaga kiriting" : "Add a keyword to the title");
+    }
+
+    if (form.body.length > 200) {
+      score += 25;
+    } else {
+      suggestions.push(isUz ? "Maqola matni juda qisqa (kamida 200 ta belgi)" : "Article text is too short");
+    }
+
+    setSeoScore(score);
+    setSeoSuggestions(suggestions);
+  }, [form.title, form.summary, form.body, form.focusKeyword]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (loginStep === "password") {
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.requiresPin) {
+            setLoginStep("pin");
+            setLoginTempToken(data.tempToken);
+            setAuthError("");
+          } else {
+            setAuthenticated(true);
+            setAuthError("");
+          }
+        } else {
+          setAuthError(data.message || (isUz ? "Parol noto'g'ri" : "Incorrect password"));
+        }
+      } catch (err) {
+        setAuthError("Server connection error.");
+      }
+    } else {
+      try {
+        const res = await fetch("/api/login/pin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tempToken: loginTempToken, pin: loginPin })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setAuthenticated(true);
+          setAuthError("");
+        } else {
+          setAuthError(data.message || "Xato PIN-kod");
+        }
+      } catch (err) {
+        setAuthError("Server connection error.");
+      }
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      const langKey = form.articleLang || (lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz");
+      let res;
+      if (editingStory) {
+        res = await fetch(`/api/admin/stories/${langKey}/${editingStory.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ story: form })
+        });
+      } else {
+        res = await fetch("/api/admin/stories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang: langKey, story: form })
+        });
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setAllStories(data.stories);
+        alert(isUz ? "Maqola muvaffaqiyatli saqlandi!" : "Article saved successfully!");
+        setActiveTab("articles");
+        setEditingStory(null);
+        setForm({
+          articleLang: lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz",
+          title: "",
+          category: isUz ? "Siyosat" : "Politics",
+          summary: "",
+          body: "",
+          image: "",
+          author: "Tahririyat",
+          status: "draft",
+          time: "Bugun",
+          read: "4 daqiqa",
+          tags: "",
+          seoTitle: "",
+          seoDescription: "",
+          seoKeywords: "",
+          focusKeyword: "",
+          videoUrl: "",
+          publishAt: ""
+        });
+        localStorage.removeItem("yk-cms-draft");
+      }
+    } catch (err) {
+      alert("Error saving story.");
+    }
+  };
+
+  const handleEdit = (story) => {
+    setEditingStory(story);
+    setForm(story);
+    setActiveTab("editor");
+  };
+
+  const handleDelete = async (story) => {
+    if (!confirm(isUz ? "Maqolani o'chirishni tasdiqlaysizmi?" : "Confirm deletion?")) return;
+    try {
+      const langKey = form.articleLang || (lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz");
+      const res = await fetch(`/api/admin/stories/${langKey}/${story.id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAllStories(data.stories);
+      }
+    } catch (err) {
+      alert("Error deleting story.");
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      const res = await fetch("/api/admin/backup/export");
+      if (res.ok) {
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data.data.content, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `vatanuz-backup-${Date.now()}.json`;
+        a.click();
+      }
+    } catch (e) {
+      alert("Export failed.");
+    }
+  };
+
+  const importData = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const parsed = JSON.parse(evt.target.result);
+        const res = await fetch("/api/admin/backup/import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parsed)
+        });
+        if (res.ok) {
+          alert(isUz ? "Zaxira muvaffaqiyatli yuklandi!" : "Backup restored successfully!");
+          window.location.reload();
+        } else {
+          alert("Import failed.");
+        }
+      } catch (err) {
+        alert("Invalid file format.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  if (!authenticated) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", background: "var(--fill)", padding: "24px" }}>
+        <form onSubmit={handleLogin} style={{ background: "var(--surface)", padding: "40px", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <h2 style={{ textAlign: "center", color: "var(--brand)", fontSize: "24px", fontWeight: "800" }}>🔑 VATAN.UZ CMS</h2>
+          <p style={{ textAlign: "center", color: "var(--muted)", fontSize: "14px" }}>
+            {loginStep === "password" ? (isUz ? "Tahririyat paneliga kirish uchun parolni kiriting:" : "Enter password to access the panel:") : "4 xonali himoya PIN-kodini kiriting:"}
+          </p>
+          
+          {loginStep === "password" ? (
+            <>
+              <input 
+                type="text" 
+                placeholder="Login" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", outline: "none", fontSize: "16px" }}
+              />
+              <input 
+                type="password" 
+                placeholder="••••••••" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", outline: "none", fontSize: "16px" }}
+              />
+            </>
+          ) : (
+            <input 
+              type="password" 
+              placeholder="••••" 
+              maxLength={4}
+              value={loginPin}
+              onChange={(e) => setLoginPin(e.target.value)}
+              style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", outline: "none", fontSize: "16px", textAlign: "center", letterSpacing: "8px" }}
+              autoFocus
+            />
+          )}
+          
+          {authError && <div style={{ color: "var(--brand)", fontSize: "14px", fontWeight: "600", textAlign: "center" }}>{authError}</div>}
+          
+          <button type="submit" className="more-news-btn" style={{ padding: "14px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>
+            {loginStep === "password" ? (isUz ? "Kirish" : "Login") : "Tasdiqlash"}
+          </button>
+          
+          {loginStep === "pin" && (
+            <button type="button" onClick={() => { setLoginStep("password"); setLoginPin(""); setAuthError(""); }} style={{ padding: "10px", background: "transparent", color: "var(--muted)", border: "none", cursor: "pointer", fontSize: "14px" }}>
+              Ortga qaytish
+            </button>
+          )}
+        </form>
+      </div>
+    );
+  }
+
+  // Flatten stories list
+  const langKey = form.articleLang || (lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz");
+  const storiesList = allStories[langKey] || [];
+  
+  // Filter lists
+  const filteredStories = storiesList.filter(story => {
+    const matchesSearch = story.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          story.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || story.category === selectedCategory;
+    const matchesStatus = selectedStatus === "all" || story.status === selectedStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "85vh", background: "var(--fill)", fontFamily: "inherit" }}>
+      
+      {/* Sidebar Navigation */}
+      <aside style={{ background: "var(--surface)", borderRight: "1px solid var(--line)", padding: "24px 16px", display: "flex", flexDirection: "column", gap: "8px", position: "sticky", top: 0, height: "100vh", overflowY: "auto" }}>
+        <h3 style={{ fontSize: "14px", fontWeight: "800", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px", paddingLeft: "12px" }}>📂 CMS Menu</h3>
+        
+        <button 
+          onClick={() => setActiveTab("dashboard")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "dashboard" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "dashboard" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >📊 Dashboard</button>
+        
+        <button 
+          onClick={() => setActiveTab("articles")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "articles" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "articles" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >📝 Maqolalar</button>
+
+
+        <button 
+          onClick={() => {
+            setEditingStory(null);
+            setForm({
+              title: "",
+              category: isUz ? "Siyosat" : "Politics",
+              summary: "",
+              body: "",
+              image: "",
+              author: "Tahririyat",
+              status: "draft",
+              time: "Bugun",
+              read: "4 daqiqa",
+              tags: "",
+              seoTitle: "",
+              seoDescription: "",
+              seoKeywords: "",
+              focusKeyword: "",
+              videoUrl: "",
+              publishAt: ""
+            });
+            setActiveTab("editor");
+          }} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "editor" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "editor" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >✍️ Yangi Maqola</button>
+
+
+        <button 
+          onClick={() => setActiveTab("categories")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "categories" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "categories" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >📁 Ruknlar</button>
+
+        <button 
+          onClick={() => setActiveTab("languages")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "languages" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "languages" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >🌐 Tillar</button>
+
+        <button 
+          onClick={() => setActiveTab("tags")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "tags" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "tags" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "tags" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+        >🏷️ Теглар</button>
+        <button 
+          onClick={() => setActiveTab("pages")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "pages" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "pages" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "pages" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+        >📄 Sahifalar</button>
+        <button 
+          onClick={() => setActiveTab("comments")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "comments" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "comments" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >💬 Izohlar</button>
+
+        <button 
+          onClick={() => setActiveTab("translations")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "translations" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "translations" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >🌐 Matnlar</button>
+
+        <button 
+          onClick={() => setActiveTab("media")} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "media" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "media" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >🖼️ Media Kutubxona</button>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <button 
+            onClick={() => setActiveTab("settings")} 
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "settings" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "settings" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          >⚙️ Sozlamalar</button>
+
+          <div style={{ paddingLeft: "16px", paddingRight: "4px" }}>
+            <button 
+              onClick={() => setActiveTab("security")} 
+              style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: activeTab === "security" ? "1.5px solid #111" : "1.5px solid transparent", background: activeTab === "security" ? "#fce7ea" : "transparent", color: activeTab === "security" ? "var(--brand)" : "var(--muted)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", transition: "all 0.2s", marginBottom: "4px" }}
+            >
+              <span style={{ color: "#3b82f6" }}>🛡️</span> Xavfsizlik
+            </button>
+            <button 
+              onClick={() => setActiveTab("users")} 
+              style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: activeTab === "users" ? "1.5px solid #111" : "1.5px solid transparent", background: activeTab === "users" ? "#fce7ea" : "transparent", color: activeTab === "users" ? "var(--brand)" : "var(--muted)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", transition: "all 0.2s", marginBottom: "4px" }}
+            >
+              <span style={{ color: "#8b5cf6" }}>👥</span> Foydalanuvchilar
+            </button>
+            <button 
+              onClick={() => setActiveTab("logs")} 
+              style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: activeTab === "logs" ? "1.5px solid #111" : "1.5px solid transparent", background: activeTab === "logs" ? "#fce7ea" : "transparent", color: activeTab === "logs" ? "var(--brand)" : "var(--muted)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", transition: "all 0.2s" }}
+            >
+              <span style={{ color: "#f59e0b" }}>📋</span> Tizim tarixi
+            </button>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => setAuthenticated(false)} 
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: "transparent", color: "var(--brand)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+        >🚪 Chiqish</button>
+      </aside>
+
+      {/* Main Content Area */}
+      <main style={{ padding: "40px" }}>
+        
+        {/* Tab 1: Dashboard */}
+                {activeTab === "languages" && <AdminLanguages languages={languages} setLanguages={setLanguages} />}
+        {activeTab === "categories" && <AdminCategories categories={categories} setCategories={setCategories} languages={languages} />}
+
+        {activeTab === "dashboard" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>Dashboard</h2>
+              <button onClick={() => window.location.reload()} style={{ background: "var(--brand)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}>↻ Yangilash</button>
+            </div>
+            
+            {dashboardStats ? (
+              <>
+                {/* Stats Cards */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Umumiy Maqolalar</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "var(--ink)", marginTop: "8px" }}>{dashboardStats.stats.totalArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Chop etilganlar</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#10b981", marginTop: "8px" }}>{dashboardStats.stats.publishedArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Qoralamalar (Draft)</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#f59e0b", marginTop: "8px" }}>{dashboardStats.stats.draftArticles}</h3>
+                  </div>
+                  <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Rejalashtirilgan</span>
+                    <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#a855f7", marginTop: "8px" }}>{dashboardStats.stats.scheduledArticles}</h3>
+                  </div>
+                </div>
+
+                {/* Charts Area */}
+                {window.Recharts && (
+                  <div style={{ display: "grid", gridTemplateColumns: "2fr 2fr", gap: "24px" }}>
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📈 Haftalik Ko'rishlar (LineChart)</h4>
+                      <div style={{ width: "100%", height: 300 }}>
+                        <ResponsiveContainer>
+                          <LineChart data={dashboardStats.weeklyViews} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                            <Line type="monotone" dataKey="views" stroke="#3b82f6" strokeWidth={3} />
+                            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false} />
+                            <XAxis dataKey="name" tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <YAxis tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <Tooltip contentStyle={{ background: "var(--surface)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                    
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📊 Maqolalar (BarChart)</h4>
+                      <div style={{ width: "100%", height: 300 }}>
+                        <ResponsiveContainer>
+                          <BarChart data={dashboardStats.weeklyViews} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false} />
+                            <XAxis dataKey="name" tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <YAxis tick={{fill: "var(--muted)", fontSize: 12}} />
+                            <Tooltip contentStyle={{ background: "var(--surface)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+                            <Bar dataKey="views" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Widgets */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "24px" }}>
+                  {/* Category Pie Chart */}
+                  {window.Recharts && (
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>🔘 Ruknlar Bo'yicha</h4>
+                      <div style={{ width: "100%", height: 250 }}>
+                        <ResponsiveContainer>
+                          <PieChart>
+                            <Pie
+                              data={dashboardStats.categoryData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              paddingAngle={5}
+                              dataKey="value"
+                            >
+                              {dashboardStats.categoryData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend verticalAlign="bottom" height={36} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Logs & Memory Status */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>⚡ Server Holati (Xotira)</h4>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)" }}>RAM Yuklanishi: {dashboardStats.serverStatus.memUsagePercent}%</span>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>{dashboardStats.serverStatus.usedMemGB} GB / {dashboardStats.serverStatus.totalMemGB} GB</span>
+                      </div>
+                      <div style={{ width: "100%", height: "8px", background: "var(--line)", borderRadius: "4px", overflow: "hidden" }}>
+                        <div style={{ width: `${dashboardStats.serverStatus.memUsagePercent}%`, height: "100%", background: dashboardStats.serverStatus.memUsagePercent > 80 ? "#ef4444" : "var(--brand)", transition: "width 0.5s ease" }} />
+                      </div>
+                      <div style={{ marginTop: "16px", fontSize: "13px", color: "var(--muted)" }}>
+                        CPU: {dashboardStats.serverStatus.cpuModel}
+                      </div>
+                    </div>
+
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)", flex: 1, maxHeight: "200px", overflowY: "auto" }}>
+                      <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>📜 Server Loglari</h4>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {dashboardLogs.slice(0, 10).map((log, i) => (
+                          <div key={i} style={{ fontSize: "12px", color: "var(--ink)", padding: "8px", background: "var(--fill)", borderRadius: "4px", fontFamily: "monospace" }}>
+                            {log}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: "40px", textAlign: "center", color: "var(--muted)" }}>Yuklanmoqda...</div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: Articles Management */}
+        {activeTab === "articles" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>📝 Maqolalar Ro'yxati</h2>
+              <button 
+                onClick={() => { setEditingStory(null); setForm({ title: "", category: isUz ? "Siyosat" : "Politics", summary: "", body: "", image: "", author: "Tahririyat", status: "draft", time: "Bugun", read: "4 daqiqa", tags: "", seoTitle: "", seoDescription: "", seoKeywords: "", focusKeyword: "", videoUrl: "", publishAt: "" }); setActiveTab("editor"); }} 
+                className="more-news-btn" 
+                style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700" }}
+              >+ Yangi Maqola</button>
+            </div>
+
+            {/* Filter Bar */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px" }}>
+              <input 
+                type="text" 
+                placeholder="Mavzu bo'yicha qidiruv..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              />
+              <select 
+                value={selectedCategory} 
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">{isUz ? "Barcha ruknlar" : "All Categories"}</option>
+                {categories.map(c => {
+                   const catName = c.names[lang] || c.names["en"] || c.slug;
+                   return <option key={c.id} value={catName}>{catName}</option>;
+                })}
+              </select>
+              <select 
+                value={selectedStatus} 
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">Barcha statuslar</option>
+                <option value="published">Chop etilgan</option>
+                <option value="draft">Qoralama</option>
+              </select>
+            </div>
+
+            {/* Articles Table Grid */}
+            <div style={{ background: "var(--surface)", borderRadius: "12px", border: "1px solid var(--line)", overflow: "hidden" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "var(--fill)", borderBottom: "1px solid var(--line)" }}>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Mavzu / Sarlavha</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Kategoriya</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Status</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)", textAlign: "right" }}>Amallar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStories.map(story => (
+                    <tr key={story.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "16px 24px", fontSize: "15px", fontWeight: "700", color: "var(--ink)" }}>{story.title}</td>
+                      <td style={{ padding: "16px 24px", fontSize: "14px", color: "var(--muted)" }}>{story.category}</td>
+                      <td style={{ padding: "16px 24px" }}>
+                        <span style={{ padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "700", background: story.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)", color: story.status === "published" ? "#10b981" : "#f59e0b" }}>
+                          {story.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px 24px", textAlign: "right", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                        <button onClick={() => handleEdit(story)} style={{ padding: "6px 12px", background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>Tahrirlash</button>
+                        <button onClick={() => handleDelete(story)} style={{ padding: "6px 12px", background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>O'chirish</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredStories.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ padding: "32px", textAlign: "center", color: "var(--muted)" }}>Maqolalar topilmadi.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Text Editor and Live SEO Optimizer */}
+        {activeTab === "editor" && (
+          <form onSubmit={handleSave} style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "32px" }}>
+            
+            {/* Editor Side */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>✍️ {editingStory ? "Maqolani Tahrirlash" : "Yangi Maqola Qo'shish"}</h2>
+                <button type="button" onClick={loadDraft} style={{ padding: "6px 12px", background: "var(--fill)", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}>
+                  💾 Qoralamani tiklash
+                </button>
+              </div>
+
+              {/* Language selection */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "700" }}>Maqola tili (Language)</label>
+                <select 
+                  value={form.articleLang || "uz"} 
+                  onChange={(e) => {
+                    const newLang = e.target.value;
+                    let newCat = "";
+                    if(categories && categories.length > 0) {
+                       newCat = categories[0].names[newLang] || categories[0].names["en"] || categories[0].slug;
+                    }
+                    setForm({ ...form, articleLang: newLang, category: newCat });
+                  }}
+                  style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: "16px", fontWeight: "700" }}
+                >
+                  {languages.map(l => (
+                     <option key={l.id} value={l.id}>{l.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Title input */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "700" }}>Sarlavha (Title)</label>
+                <input 
+                  type="text" 
+                  value={form.title} 
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="Maqola sarlavhasi..."
+                  required
+                  style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: "16px", fontWeight: "700" }}
+                />
+              </div>
+
+              {/* Summary / Lead */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "700" }}>Qisqacha mazmun (Summary)</label>
+                <textarea 
+                  rows="3" 
+                  value={form.summary}
+                  onChange={(e) => setForm({ ...form, summary: e.target.value })}
+                  placeholder="Maqolaning qisqacha tavsifi..."
+                  style={{ padding: "14px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontFamily: "inherit" }}
+                />
+              </div>
+
+              {/* Main Body Editor */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "700" }}>Maqola matni (Editor)</label>
+                
+                <RichEditor 
+                  value={form.body}
+                  onChange={(html) => setForm({ ...form, body: html })}
+                />
+                <div style={{ display: "flex", gap: "16px", fontSize: "13px", color: "var(--muted)", marginTop: "4px", fontWeight: "600" }}>
+                  <span>📝 ${form.body ? form.body.trim().split(/\s+/).filter(Boolean).length : 0} ta so'z</span>
+                  <span>🔤 ${form.body ? form.body.length : 0} ta belgi</span>
+                  <span>⏱️ ~${Math.ceil((form.body ? form.body.trim().split(/\s+/).filter(Boolean).length : 0) / 200) || 1} daqiqa o'qish vaqti</span>
+                </div>
+              </div>
+
+              {/* Inline properties */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <label style={{ fontSize: "14px", fontWeight: "700" }}>Kategoriya</label>
+                  <select 
+                    value={form.category} 
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+                  >
+                    {form.articleLang === "en" ? (
+                      <>
+                        <option value="Politics">Politics</option>
+                        <option value="Economy">Economy</option>
+                        <option value="History">History</option>
+                        <option value="Philosophy">Philosophy</option>
+                        <option value="Literature">Literature</option>
+                      </>
+                    ) : form.articleLang === "uzk" ? (
+                      <>
+                        <option value="Сиёсат">Сиёсат</option>
+                        <option value="Иқтисодиёт">Иқтисодиёт</option>
+                        <option value="Тарих">Тарих</option>
+                        <option value="Фалсафа">Фалсафа</option>
+                        <option value="Адабиёт">Адабиёт</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Siyosat">Siyosat</option>
+                        <option value="Iqtisodiyot">Iqtisodiyot</option>
+                        <option value="Tarix">Tarix</option>
+                        <option value="Falsafa">Falsafa</option>
+                        <option value="Adabiyot">Adabiyot</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <label style={{ fontSize: "14px", fontWeight: "700" }}>Rasm Muqovasi (Cover Image)</label>
+                  <div 
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        handleImageUpload(e.dataTransfer.files[0]);
+                      }
+                    }}
+                    style={{ border: "2px dashed var(--line)", padding: "20px", borderRadius: "8px", textAlign: "center", background: "var(--fill)", cursor: "pointer", position: "relative" }}
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = "image/*";
+                      input.onchange = (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleImageUpload(e.target.files[0]);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    {imageUploading ? (
+                      <div style={{ color: "var(--brand)", fontWeight: "700" }}>Rasm yuklanmoqda...</div>
+                    ) : form.image ? (
+                      <div>
+                        <img src={form.image} alt="Cover preview" style={{ maxHeight: "80px", borderRadius: "4px", display: "block", margin: "0 auto 8px" }} />
+                        <span style={{ fontSize: "12px", color: "var(--muted)" }}>O'zgartirish uchun bosing yoki boshqa rasmni sudrab tashlang</span>
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600" }}>
+                        📂 Rasmni sudrab tashlang yoki yuklash uchun bosing (WebP-ga o'tkaziladi)
+                      </span>
+                    )}
+                  </div>
+                  <input 
+                    type="text" 
+                    value={form.image} 
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    placeholder="Yoki rasm URL manzilini bu yerga yozing..."
+                    style={{ padding: "10px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: "13px" }}
+                  />
+                </div>
+              </div>
+
+              {/* Interactive Tag Chips Block */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", background: "var(--surface)", padding: "16px", borderRadius: "8px", border: "1px solid var(--line)" }}>
+                <label style={{ fontSize: "14px", fontWeight: "700" }}>Kalit so'zlar (Tags)</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+                  {(form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : []).map((tag, i) => (
+                    <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 8px", background: "var(--brand)", color: "#fff", borderRadius: "4px", fontSize: "13px", fontWeight: "700" }}>
+                      {tag}
+                      <button type="button" onClick={() => handleRemoveTag(tag)} style={{ background: "transparent", border: "none", color: "#fff", cursor: "pointer", fontWeight: "bold", padding: 0 }}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <input 
+                  type="text" 
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  placeholder="Yangi kalit so'z yozib Enter bosing..."
+                  style={{ padding: "10px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)" }}
+                />
+
+                <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                  <button type="button" onClick={() => {
+                    const textToAnalyze = (form.title + " " + form.body).toLowerCase();
+                    let suggestedTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+                    let added = 0;
+                    adminTags.forEach(t => {
+                      if (textToAnalyze.includes(t.name.toLowerCase()) && !suggestedTags.includes(t.name)) {
+                        suggestedTags.push(t.name);
+                        added++;
+                      }
+                    });
+                    if(added > 0) {
+                      setForm({...form, tags: suggestedTags.join(", ")});
+                    } else {
+                      alert("Mos tag topilmadi!");
+                    }
+                  }} style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--brand)", background: "rgba(195, 25, 50, 0.1)", color: "var(--brand)", cursor: "pointer", fontWeight: "bold", fontSize: "13px" }}>
+                    ✨ Mavzuga qarab teg qo'yish
+                  </button>
+                  {adminTags.length > 0 && adminTags.map(tag => {
+                    const currentTags = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+                    const isSelected = currentTags.includes(tag.name);
+                    if(isSelected) return null;
+                    return (
+                      <button type="button" key={tag.id} onClick={() => {
+                        const newTags = [...currentTags, tag.name].join(", ");
+                        setForm({...form, tags: newTags});
+                      }} style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--text)", cursor: "pointer", fontSize: "13px" }}>
+                        + {tag.name}
+                      </button>
+                    )
+                  })}
+                </div>
+
+              </div>
+
+              {/* Publishing Options */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", background: "var(--surface)", padding: "20px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: "800", color: "var(--ink)", margin: 0 }}>⚙️ Nashr qilish sozlamalari</h3>
+                
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "200px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: "700", display: "block", marginBottom: "8px" }}>Status</label>
+                    <select 
+                      value={form.status || "published"} 
+                      onChange={(e) => setForm({ ...form, status: e.target.value })}
+                      style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", width: "100%", fontSize: "14px" }}
+                    >
+                      <option value="published">🟢 Darhol nashr qilish</option>
+                      <option value="draft">🟡 Qoralama sifatida saqlash</option>
+                    </select>
+                  </div>
+                  
+                  <div style={{ flex: 1, minWidth: "200px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: "700", display: "block", marginBottom: "8px" }}>Kechiktirilgan nashr vaqti</label>
+                    <input 
+                      type="datetime-local" 
+                      value={form.scheduledAt ? form.scheduledAt.slice(0, 16) : ""}
+                      onChange={(e) => setForm({ ...form, scheduledAt: e.target.value ? new Date(e.target.value).toISOString() : "" })}
+                      style={{ padding: "10px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)", width: "100%", fontSize: "14px" }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <input 
+                    type="checkbox" 
+                    id="sendToTelegram"
+                    checked={form.sendToTelegram || false}
+                    onChange={(e) => setForm({ ...form, sendToTelegram: e.target.checked })}
+                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                  />
+                  <label htmlFor="sendToTelegram" style={{ fontSize: "14px", fontWeight: "600", cursor: "pointer", userSelect: "none" }}>
+                    Telegram kanalga yuborilsinmi?
+                  </label>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "16px" }}>
+                <button type="submit" className="more-news-btn" style={{ padding: "14px 28px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>
+                  💾 Maqolani saqlash
+                </button>
+                <button type="button" onClick={() => setActiveTab("articles")} style={{ padding: "14px 28px", background: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>
+                  Bekor qilish
+                </button>
+              </div>
+            </div>
+
+            {/* Live SEO Side */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>🎯 Live SEO Optimizer</h3>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+                  <label style={{ fontSize: "13px", fontWeight: "700" }}>Focus Keyword (Klit so'z)</label>
+                  <input 
+                    type="text" 
+                    value={form.focusKeyword}
+                    onChange={(e) => setForm({ ...form, focusKeyword: e.target.value })}
+                    placeholder="Masalan: eksport"
+                    style={{ padding: "10px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)" }}
+                  />
+                </div>
+
+                {/* Score Dial */}
+                <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
+                  <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: seoScore > 70 ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", display: "flex", justifyContent: "center", alignItems: "center", border: `3px solid ${seoScore > 70 ? "#10b981" : "#ef4444"}` }}>
+                    <strong style={{ fontSize: "16px", color: seoScore > 70 ? "#10b981" : "#ef4444" }}>{seoScore}</strong>
+                  </div>
+                  <div>
+                    <h4 style={{ fontWeight: "800", fontSize: "14px", color: "var(--ink)" }}>SEO Sifat darajasi</h4>
+                    <p style={{ fontSize: "12px", color: "var(--muted)" }}>Real-vaqt hisob-kitobi</p>
+                  </div>
+                </div>
+
+                {/* Suggestions List */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <h4 style={{ fontSize: "13px", fontWeight: "800", color: "var(--ink)" }}>Tavsiyalar:</h4>
+                  {seoSuggestions.map((sug, idx) => (
+                    <div key={idx} style={{ fontSize: "12px", color: "#ef4444", display: "flex", gap: "6px" }}>
+                      <span>⚠️</span> <span>{sug}</span>
+                    </div>
+                  ))}
+                  {seoSuggestions.length === 0 && (
+                    <div style={{ fontSize: "12px", color: "#10b981", fontWeight: "700" }}>✓ Barcha SEO qoidalari bajarildi!</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Status block */}
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: "12px" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: "800" }}>📌 Maqola holati</h3>
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "14px" }}>
+                    <input 
+                      type="radio" 
+                      name="status" 
+                      value="published" 
+                      checked={form.status === "published"} 
+                      onChange={() => setForm({ ...form, status: "published" })} 
+                    /> Chop etish
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "14px" }}>
+                    <input 
+                      type="radio" 
+                      name="status" 
+                      value="draft" 
+                      checked={form.status === "draft"} 
+                      onChange={() => setForm({ ...form, status: "draft" })} 
+                    /> Qoralama (Draft)
+                  </label>
+                </div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "12px" }}>
+                  <label style={{ fontSize: "14px", fontWeight: "700" }}>Rejalashtirish (ixtiyoriy)</label>
+                  <input 
+                    type="datetime-local" 
+                    value={form.publishAt || ""}
+                    onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
+                    style={{ padding: "10px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)" }}
+                  />
+                  {form.publishAt && <span style={{ fontSize: "12px", color: "var(--muted)" }}>Ushbu maqola belgilangan vaqtda chop etiladi.</span>}
+                </div>
+
+                {editingStory && editingStory.history && editingStory.history.length > 0 && (
+                  <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--line)" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "700" }}>⏳ Tarixni ortga qaytarish</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "8px" }}>
+                      {editingStory.history.map((hist, idx) => (
+                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px", background: "var(--fill)", borderRadius: "6px" }}>
+                          <span style={{ fontSize: "12px", color: "var(--muted)" }}>{new Date(hist.updatedAt).toLocaleString("uz-UZ")}</span>
+                          <button 
+                            type="button" 
+                            onClick={() => {
+                              if (confirm("Rostdan ham ushbu versiyaga qaytishni xohlaysizmi?")) {
+                                setForm({ ...form, title: hist.title, summary: hist.summary, body: hist.body, image: hist.image, tags: hist.tags });
+                              }
+                            }}
+                            style={{ padding: "4px 8px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "4px", cursor: "pointer", fontSize: "11px", fontWeight: "bold" }}
+                          >
+                            Qaytarish
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </form>
+        )}
+
+        {/* Tab 5: Media Library */}
+        {activeTab === "media" && (
+          <MediaLibrary />
+        )}
+        
+        {/* Tab: Comments */}
+        {activeTab === "comments" && <AdminComments />}
+
+        {activeTab === "tags" && <AdminTags />}
+        
+        {activeTab === "pages" && <AdminPages staticPages={staticPages} setStaticPages={setStaticPages} />}
+
+        {/* Tab 6: Translations */}
+        {activeTab === "translations" && (
+          <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>🌍 Tillar va Tarjimalar</h2>
+              <button onClick={saveTranslations} disabled={translationsLoading} style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>
+                {translationsLoading ? "Saqlanmoqda..." : "💾 O'zgarishlarni saqlash"}
+              </button>
+            </div>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px" }}>
+              {['uz', 'uzk', 'en'].map(langKey => (
+                <div key={langKey}>
+                  <h3 style={{ marginBottom: "16px", textTransform: "uppercase" }}>{langKey === 'uz' ? "O'zbek tili (UZ)" : (langKey === 'uzk' ? "Ўзбек (Кирилл)" : "English (EN)")}</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {Object.keys(translations.uz || {}).map(key => (
+                      <div key={key} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--muted)", fontWeight: "bold" }}>Key: {key}</label>
+                        <input 
+                          type="text"
+                          value={translations[langKey] ? translations[langKey][key] : ''}
+                          onChange={(e) => {
+                            const updated = { ...translations };
+                            if (!updated[langKey]) updated[langKey] = {};
+                            updated[langKey][key] = e.target.value;
+                            setTranslations(updated);
+                          }}
+                          style={{ padding: "10px", borderRadius: "6px", border: "1px solid var(--line)", background: "var(--fill)", color: "var(--ink)" }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "settings" && <AdminSettings />}
+        {activeTab === "security" && <AdminSecurity isUz={isUz} />}
+        {activeTab === "users" && <AdminUsers isUz={isUz} />}
+        {activeTab === "logs" && <AdminLogs isUz={isUz} />}
+        {activeTab === "media" && <AdminMedia isUz={isUz} />}
+      </main>
+    </div>
+  );
+};
+
+
+
+function AdBanner({ ads, position }) {
+  const active = (ads || []).filter(a => a.active && a.position === position);
+  if (!active.length) return null;
+  const ad = active[Math.floor(Date.now() / 30000) % active.length];
+  if (!ad) return null;
+
+  const sizes = {
+    top:     { height: 90, label: "728×90 Leaderboard" },
+    bottom:  { height: 90, label: "728×90 Leaderboard" },
+    sidebar: { height: 250, label: "300×250 Rectangle" },
+    inline:  { height: 100, label: "468×100 Banner" },
+  };
+  const sz = sizes[position] || sizes.inline;
+
+  return (
+    <div className={`ad-banner ad-banner-${position}`}>
+      <span className="ad-label">Reklama</span>
+      {ad.link ? (
+        <a href={ad.link} target="_blank" rel="noopener noreferrer" className="ad-inner" style={{minHeight: sz.height}}>
+          {ad.image ? (
+            <img src={ad.image} alt={ad.title || "Reklama"} />
+          ) : (
+            <div className="ad-text-banner">
+              {ad.title && <strong>{ad.title}</strong>}
+              {ad.subtitle && <span>{ad.subtitle}</span>}
+            </div>
+          )}
+        </a>
+      ) : (
+        <div className="ad-inner" style={{minHeight: sz.height}}>
+          {ad.image ? (
+            <img src={ad.image} alt={ad.title || "Reklama"} />
+          ) : (
+            <div className="ad-text-banner">
+              {ad.title && <strong>{ad.title}</strong>}
+              {ad.subtitle && <span>{ad.subtitle}</span>}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Footer({ t, pages, setPage, openAdmin }) {
+  const year = new Date().getFullYear();
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span className="brand-mark">YK</span>
+            <strong style={{ fontSize: "22px", color: "#fff" }}>Vatan.uz</strong>
+          </div>
+          <p>{t.portal}. O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.</p>
+          <div className="footer-socials">
+            <a href="https://t.me/yangikun" target="_blank" rel="noopener" title="Telegram">✈</a>
+            <a href="https://instagram.com/yangikun" target="_blank" rel="noopener" title="Instagram">📷</a>
+            <a href="https://youtube.com/@yangikun" target="_blank" rel="noopener" title="YouTube">▶</a>
+            <a href="https://facebook.com/yangikun" target="_blank" rel="noopener" title="Facebook">f</a>
+          </div>
+        </div>
+        <div className="footer-nav">
+          <div className="footer-links">
+            {pages.map((item) => (
+              <button key={item.slug} onClick={() => setPage(item)}>
+                {item.name}
+            </button>
+          ))}
+          </div>
+        </div>
+        <div className="footer-copy">
+          <span>© {year} Vatan.uz. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
+          <span>news@yangikun.uz</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+
+
+

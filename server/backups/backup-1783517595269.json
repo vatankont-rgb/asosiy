@@ -1,0 +1,200 @@
+{
+  "articles": {
+    "uz": [
+      {
+        "id": "a38467c0-46c0-4564-b9ce-c31355121a7c",
+        "category": "Siyosat",
+        "title": "Hududlarda ochiq budjet muhokamalari yangi tartibda o'tkaziladi",
+        "summary": "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi.",
+        "image": "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80",
+        "author": "Dilnoza Karimova",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "7eab3ae2-7121-4a12-8546-4a45a8e7f1b1",
+        "category": "Iqtisod",
+        "title": "Kichik biznes uchun eksport maslahat markazlari ishga tushmoqda",
+        "summary": "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi.",
+        "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+        "author": "Akmal Saidov",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "5a33051f-6f11-4d43-9d88-51a7bfc52087",
+        "category": "Texnologiya",
+        "title": "Universitet laboratoriyasida mahalliy AI yordamchisi sinovdan o'tkazildi",
+        "summary": "Loyiha o'zbek tilidagi savol-javob, hujjat tahlili va ta'lim jarayoniga moslashishga qaratilgan.",
+        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "author": "Shahlo Nazarova",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Loyiha o'zbek tilidagi savol-javob, hujjat tahlili va ta'lim jarayoniga moslashishga qaratilgan. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "dc2f86b2-7226-4641-8bf2-4c2a843735e9",
+        "category": "Sport",
+        "title": "Milliy chempionatning bahorgi bosqichi kutilmagan natijalar bilan boshlandi",
+        "summary": "Yosh futbolchilar asosiy tarkibda ko'proq maydonga tushmoqda, murabbiylar rotatsiyani oshirdi.",
+        "image": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+        "author": "Jasur Tursunov",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Yosh futbolchilar asosiy tarkibda ko'proq maydonga tushmoqda, murabbiylar rotatsiyani oshirdi. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "4f631708-47ad-43c5-80e4-c5b16d9393b6",
+        "category": "Madaniyat",
+        "title": "Shahar teatrlarida yosh rejissyorlar haftaligi ochildi",
+        "summary": "Dasturda eksperimental sahna asarlari, ochiq suhbatlar va mahorat darslari bor.",
+        "image": "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1200&q=80",
+        "author": "Malika Qodirova",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Dasturda eksperimental sahna asarlari, ochiq suhbatlar va mahorat darslari bor. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "5ad9c5d7-342a-48a5-86cc-b9b18291dbfe",
+        "category": "Tahlil",
+        "title": "Shahar transportida raqamli to'lovlar nega tez ommalashmoqda?",
+        "summary": "Mutaxassislar qulaylik, monitoring va tarif siyosati o'rtasidagi bog'liqlikni izohlaydi.",
+        "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80",
+        "author": "Zafar Jo'rayev",
+        "time": "Bugun",
+        "read": "4 daqiqa",
+        "body": "Mutaxassislar qulaylik, monitoring va tarif siyosati o'rtasidagi bog'liqlikni izohlaydi. Tahririyat ushbu mavzuni kuzatishda davom etadi va yangi tafsilotlar paydo bo'lishi bilan materialni yangilaydi.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      }
+    ],
+    "en": [
+      {
+        "id": "22db8b78-56b2-4d73-829f-48db54c4c358",
+        "category": "Politics",
+        "title": "Open budget discussions in regions will be held under new rules",
+        "summary": "Local councils will publish a digital schedule for reviewing citizens' proposals.",
+        "image": "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80",
+        "author": "Dilnoza Karimova",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "Local councils will publish a digital schedule for reviewing citizens' proposals. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "04e3bd10-b6bf-4bc4-98f7-8e8f6873069b",
+        "category": "Economy",
+        "title": "Export consulting centers launched for small businesses",
+        "summary": "The new service will assist with product certification, logistics, and foreign market requirements.",
+        "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+        "author": "Akmal Saidov",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "The new service will assist with product certification, logistics, and foreign market requirements. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "990a824e-222d-4455-a021-45a5162a40fe",
+        "category": "Technology",
+        "title": "Local AI assistant tested in university laboratory",
+        "summary": "The project focuses on Q&A in Uzbek, document analysis, and adapting to the educational process.",
+        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "author": "Shahlo Nazarova",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "The project focuses on Q&A in Uzbek, document analysis, and adapting to the educational process. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "1f9cac18-13b4-4d3f-bdb4-416c60165f28",
+        "category": "Sport",
+        "title": "Spring stage of the national championship begins with unexpected results",
+        "summary": "Young players are entering the starting lineup more frequently, and coaches are increasing rotation.",
+        "image": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+        "author": "Jasur Tursunov",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "Young players are entering the starting lineup more frequently, and coaches are increasing rotation. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "c29558fe-5f4e-4bbd-8c02-56c166a13bce",
+        "category": "Culture",
+        "title": "Week of young directors opens in city theaters",
+        "summary": "The program includes experimental stage works, open discussions, and master classes.",
+        "image": "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1200&q=80",
+        "author": "Malika Qodirova",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "The program includes experimental stage works, open discussions, and master classes. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      },
+      {
+        "id": "23a15215-e15b-48df-905e-73707787f8de",
+        "category": "Analysis",
+        "title": "Why digital payments are rapidly gaining popularity in city transport",
+        "summary": "Experts explain the connection between convenience, monitoring, and tariff policy.",
+        "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80",
+        "author": "Zafar Jo'rayev",
+        "time": "Today",
+        "read": "4 minutes",
+        "body": "Experts explain the connection between convenience, monitoring, and tariff policy. The editorial team will continue to monitor this topic and update the material as new details emerge.",
+        "status": "published",
+        "createdAt": "2026-07-07T10:54:10.852Z",
+        "updatedAt": "2026-07-07T10:54:10.852Z"
+      }
+    ]
+  },
+  "settings": {
+    "id": "global-settings",
+    "siteName": "Vatan.uz",
+    "maintenanceMode": false,
+    "theme": "light",
+    "language": "uz",
+    "socialLinks": {
+      "telegram": "https://t.me/vatanuz",
+      "facebook": "https://facebook.com/vatanuz",
+      "instagram": "https://instagram.com/vatanuz",
+      "youtube": ""
+    },
+    "createdAt": "2026-07-07T10:54:11.106Z",
+    "updatedAt": "2026-07-08T13:19:23.601Z",
+    "tagline": "",
+    "mainColor": "#ec1842",
+    "logoUrl": "",
+    "contact": {
+      "phone": "",
+      "email": "",
+      "address": ""
+    }
+  },
+  "exportedAt": "2026-07-08T13:33:15.268Z"
+}

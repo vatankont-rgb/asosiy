@@ -1,0 +1,153 @@
+{activeTab === "dashboard" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>📊 Tizim Monitoringi</h2>
+            
+            {/* Stats Cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Umumiy Maqolalar</span>
+                <h3 style={{ fontSize: "32px", fontWeight: "900", color: "var(--ink)", marginTop: "8px" }}>{storiesList.length} ta</h3>
+              </div>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Chop etilganlar</span>
+                <h3 style={{ fontSize: "32px", fontWeight: "900", color: "var(--ink)", marginTop: "8px" }}>{storiesList.filter(s => s.status === "published").length} ta</h3>
+              </div>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Qoralamalar (Draft)</span>
+                <h3 style={{ fontSize: "32px", fontWeight: "900", color: "var(--ink)", marginTop: "8px" }}>{storiesList.filter(s => s.status === "draft").length} ta</h3>
+              </div>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <span style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>Server Status</span>
+                <h3 style={{ fontSize: "32px", fontWeight: "900", color: "#10b981", marginTop: "8px" }}>ONLINE</h3>
+              </div>
+            </div>
+
+            {/* Performance Monitoring Widget */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: "16px" }}>
+                <h4 style={{ fontWeight: "800", color: "var(--ink)" }}>📈 Server Resurslari</h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--muted)" }}>
+                    <span>CPU Yuklanishi</span>
+                    <strong>12%</strong>
+                  </div>
+                  <div style={{ width: "100%", height: "6px", background: "var(--line)", borderRadius: "3px", overflow: "hidden" }}>
+                    <div style={{ width: "12%", height: "100%", background: "var(--brand)" }} />
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--muted)" }}>
+                    <span>RAM (Tezkor Xotira)</span>
+                    <strong>34% (1.2 GB / 4 GB)</strong>
+                  </div>
+                  <div style={{ width: "100%", height: "6px", background: "var(--line)", borderRadius: "3px", overflow: "hidden" }}>
+                    <div style={{ width: "34%", height: "100%", background: "var(--brand)" }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Audit Log Activities */}
+              <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+                <h4 style={{ fontWeight: "800", color: "var(--ink)", marginBottom: "16px" }}>🔒 Oxirgi Amallar (Audit Logs)</h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "160px", overflowY: "auto" }}>
+                  <div style={{ fontSize: "13px", display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid var(--line)" }}>
+                    <span>Admin login security authentication verified</span>
+                    <span style={{ color: "var(--muted)" }}>Hozir</span>
+                  </div>
+                  <div style={{ fontSize: "13px", display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid var(--line)" }}>
+                    <span>JSON database backup logs generated</span>
+                    <span style={{ color: "var(--muted)" }}>5 daq oldin</span>
+                  </div>
+                  <div style={{ fontSize: "13px", display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid var(--line)" }}>
+                    <span>Article categories cached</span>
+                    <span style={{ color: "var(--muted)" }}>1 soat oldin</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Articles Management */}
+        {activeTab === "articles" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>📝 Maqolalar Ro'yxati</h2>
+              <button 
+                onClick={() => { setEditingStory(null); setForm({ title: "", category: "Siyosat", summary: "", body: "", status: "draft", author: "Tahririyat" }); setActiveTab("editor"); }} 
+                className="more-news-btn" 
+                style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700" }}
+              >+ Yangi Maqola</button>
+            </div>
+
+            {/* Filter Bar */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px" }}>
+              <input 
+                type="text" 
+                placeholder="Mavzu bo'yicha qidiruv..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              />
+              <select 
+                value={selectedCategory} 
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">Barcha ruknlar</option>
+                <option value="Siyosat">Siyosat</option>
+                <option value="Iqtisodiyot">Iqtisodiyot</option>
+                <option value="Texnologiya">Texnologiya</option>
+                <option value="Sport">Sport</option>
+              </select>
+              <select 
+                value={selectedStatus} 
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)" }}
+              >
+                <option value="all">Barcha statuslar</option>
+                <option value="published">Chop etilgan</option>
+                <option value="draft">Qoralama</option>
+              </select>
+            </div>
+
+            {/* Articles Table Grid */}
+            <div style={{ background: "var(--surface)", borderRadius: "12px", border: "1px solid var(--line)", overflow: "hidden" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "var(--fill)", borderBottom: "1px solid var(--line)" }}>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Mavzu / Sarlavha</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Kategoriya</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)" }}>Status</th>
+                    <th style={{ padding: "16px 24px", fontSize: "14px", fontWeight: "800", color: "var(--ink)", textAlign: "right" }}>Amallar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStories.map(story => (
+                    <tr key={story.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "16px 24px", fontSize: "15px", fontWeight: "700", color: "var(--ink)" }}>{story.title}</td>
+                      <td style={{ padding: "16px 24px", fontSize: "14px", color: "var(--muted)" }}>{story.category}</td>
+                      <td style={{ padding: "16px 24px" }}>
+                        <span style={{ padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "700", background: story.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)", color: story.status === "published" ? "#10b981" : "#f59e0b" }}>
+                          {story.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px 24px", textAlign: "right", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                        <button onClick={() => handleEdit(story)} style={{ padding: "6px 12px", background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>Tahrirlash</button>
+                        <button onClick={() => handleDelete(story)} style={{ padding: "6px 12px", background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>O'chirish</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredStories.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ padding: "32px", textAlign: "center", color: "var(--muted)" }}>Maqolalar topilmadi.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Text Editor and Live SEO Optimizer */}
+        
