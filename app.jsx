@@ -4409,6 +4409,10 @@ function SystemHealthPanel({ isUz }) {
           <div style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600", marginBottom: "4px" }}>{isUz ? "Server Uptime" : "Uptime"}</div>
           <div style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)" }}>{health?.os.uptimeHours} {isUz ? "soat" : "hours"}</div>
         </div>
+        <div style={{ background: "var(--surface)", padding: "20px", borderRadius: "12px", border: "1px solid var(--line)" }}>
+          <div style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600", marginBottom: "4px" }}>{isUz ? "Doimiy Xotira (Disk)" : "Disk Space"}</div>
+          <div style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)" }}>{health?.os.diskFreeGB} GB / {health?.os.diskTotalGB} GB</div>
+        </div>
       </div>
 
       {/* Database Files Status */}
@@ -6392,9 +6396,22 @@ const [activeTab, setActiveTab] = useState("dashboard");
                         <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)" }}>RAM Yuklanishi: {dashboardStats.serverStatus.memUsagePercent}%</span>
                         <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>{dashboardStats.serverStatus.usedMemGB} GB / {dashboardStats.serverStatus.totalMemGB} GB</span>
                       </div>
-                      <div style={{ width: "100%", height: "8px", background: "var(--line)", borderRadius: "4px", overflow: "hidden" }}>
+                      <div style={{ width: "100%", height: "8px", background: "var(--line)", borderRadius: "4px", overflow: "hidden", marginBottom: "16px" }}>
                         <div style={{ width: `${dashboardStats.serverStatus.memUsagePercent}%`, height: "100%", background: dashboardStats.serverStatus.memUsagePercent > 80 ? "#ef4444" : "var(--brand)", transition: "width 0.5s ease" }} />
                       </div>
+
+                      {dashboardStats.serverStatus.diskTotalGB && (
+                        <>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)" }}>Disk (Doimiy xotira): {dashboardStats.serverStatus.diskUsagePercent}%</span>
+                            <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>{dashboardStats.serverStatus.diskUsedGB} GB / {dashboardStats.serverStatus.diskTotalGB} GB</span>
+                          </div>
+                          <div style={{ width: "100%", height: "8px", background: "var(--line)", borderRadius: "4px", overflow: "hidden" }}>
+                            <div style={{ width: `${dashboardStats.serverStatus.diskUsagePercent}%`, height: "100%", background: dashboardStats.serverStatus.diskUsagePercent > 80 ? "#ef4444" : "var(--brand)", transition: "width 0.5s ease" }} />
+                          </div>
+                        </>
+                      )}
+
                       <div style={{ marginTop: "16px", fontSize: "13px", color: "var(--muted)" }}>
                         CPU: {dashboardStats.serverStatus.cpuModel}
                       </div>

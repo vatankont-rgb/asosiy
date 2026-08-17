@@ -91,12 +91,33 @@ class SettingController {
       const cpuModel = cpus[0] ? cpus[0].model : 'Unknown';
       const uptime = os.uptime();
 
+      let diskTotalGB = "0.00";
+      let diskFreeGB = "0.00";
+      let diskUsagePercent = "0.00";
+      let diskUsedGB = "0.00";
+      try {
+        const stats = fs.statfsSync(__dirname);
+        const totalBytes = stats.blocks * stats.bsize;
+        const freeBytes = stats.bavail * stats.bsize;
+        const usedBytes = totalBytes - freeBytes;
+        diskTotalGB = (totalBytes / 1024 / 1024 / 1024).toFixed(2);
+        diskFreeGB = (freeBytes / 1024 / 1024 / 1024).toFixed(2);
+        diskUsedGB = (usedBytes / 1024 / 1024 / 1024).toFixed(2);
+        if (totalBytes > 0) {
+          diskUsagePercent = ((usedBytes / totalBytes) * 100).toFixed(2);
+        }
+      } catch (e) {}
+
       const serverStatus = {
         memUsagePercent: memUsage,
         totalMemGB: (totalMem / 1024 / 1024 / 1024).toFixed(2),
         usedMemGB: (usedMem / 1024 / 1024 / 1024).toFixed(2),
         cpuModel,
-        uptimeSeconds: uptime
+        uptimeSeconds: uptime,
+        diskTotalGB,
+        diskFreeGB,
+        diskUsedGB,
+        diskUsagePercent
       };
 
       const weeklyViews = [
@@ -181,6 +202,16 @@ class SettingController {
         fileStatus.push(status);
       });
 
+      let diskTotalGB = "0.00";
+      let diskFreeGB = "0.00";
+      try {
+        const stats = fs.statfsSync(__dirname);
+        const totalBytes = stats.blocks * stats.bsize;
+        const freeBytes = stats.bavail * stats.bsize;
+        diskTotalGB = (totalBytes / 1024 / 1024 / 1024).toFixed(2);
+        diskFreeGB = (freeBytes / 1024 / 1024 / 1024).toFixed(2);
+      } catch (e) {}
+
       const health = {
         status: corruptCount === 0 ? 'HEALTHY' : 'DEGRADED',
         os: {
@@ -189,7 +220,9 @@ class SettingController {
           freeMemoryGB: (os.freemem() / 1024 / 1024 / 1024).toFixed(2),
           totalMemoryGB: (os.totalmem() / 1024 / 1024 / 1024).toFixed(2),
           cpuCount: os.cpus().length,
-          uptimeHours: (os.uptime() / 3600).toFixed(2)
+          uptimeHours: (os.uptime() / 3600).toFixed(2),
+          diskFreeGB,
+          diskTotalGB
         },
         storage: {
           totalFilesChecked: filesToCheck.length,
