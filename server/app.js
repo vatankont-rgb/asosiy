@@ -99,15 +99,17 @@ app.use(async (req, res, next) => {
     const indexPath = path.join(rootDir, 'index.html');
     let html = fs.readFileSync(indexPath, 'utf8');
 
-    const host = req.get('host') || 'vatanuz.uz';
-    const proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const rawHost = req.get('x-forwarded-host') || req.get('host') || '189.74.97.12';
+    const host = rawHost.replace(/[^a-zA-Z0-9.\-:]/g, '');
+    const rawProto = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const proto = rawProto.replace(/[^a-zA-Z]/g, '');
     const baseUrl = `${proto}://${host}`;
 
     const storyId = req.query.story || req.query.id;
 
     // If there is a ?story=ID query parameter, inject dynamic OpenGraph SEO tags
     if (storyId) {
-      const db = await articleRepository.getAll();
+      const db = await articleRepository.getAll(true);
       const allStories = Object.values(db).flat().filter(Boolean);
       const story = allStories.find(s => String(s.id) === String(storyId) || String(s.slug) === String(storyId));
       
@@ -119,7 +121,8 @@ app.use(async (req, res, next) => {
         }
 
         const pageTitle = `${esc(story.title)} - Vatan.uz`;
-        const pageDesc = esc(story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 200) : '') || 'Vatanuz.uz yangiliklari');
+        const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
+        const pageDesc = esc(rawSummary);
         const pageUrl = `${baseUrl}/?story=${encodeURIComponent(story.id)}`;
 
         const ogTags = `

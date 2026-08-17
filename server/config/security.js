@@ -50,7 +50,8 @@ const loginLimiter = rateLimit({
 module.exports = {
   helmetConfig: helmet({
     contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
   }),
   corsConfig: cors(corsOptions),
   rateLimiter: limiter,
