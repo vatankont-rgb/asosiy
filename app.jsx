@@ -1017,7 +1017,7 @@ function VideosPage({ lang, t, mediaItems, onOpen, setPage }) {
               >
                 <div style={{position: "relative", width: "100%", paddingTop: "56.25%", background: "#000"}}>
                   <img src={getVideoThumb(image)} style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover"}} alt="" />
-                  <span className="media-list-icon video" style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "44px", height: "44px", background: "rgba(195, 25, 50, 0.85)", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px"}}>▶</span>
+                  <span className="media-list-icon video" style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "44px", height: "44px", background: "rgba(0, 51, 160, 0.85)", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px"}}>▶</span>
                 </div>
                 <div style={{padding: "16px", display: "flex", flexDirection: "column", gap: "8px"}}>
                   <span style={{fontSize: "12px", color: "var(--muted)", fontWeight: "600"}}>{meta}</span>
@@ -1365,7 +1365,7 @@ function App() {
     return c ? (c.names[lang] || c.names["en"] || cat) : cat;
   };
 
-  const filterCategories = useMemo(() => [t.all, ...new Set(stories.map((story) => story.category))], [stories, t.all]);
+  const filterCategories = useMemo(() => [t.all, ...categories.map(c => c.names[lang] || c.names["uz"] || c.slug)], [categories, lang, t.all]);
 
   const visibleStories = stories.filter((story) => {
     if (query) {
@@ -1373,7 +1373,7 @@ function App() {
       return text.includes(query.toLowerCase());
     }
     const matchesPage = !selectedCategory || story.category === selectedCategory;
-    const matchesFilter = filter === "all" || story.category === filter || filter === t.all;
+    const matchesFilter = filter === "all" || story.category === filter || getDisplayCat(story.category) === filter || filter === t.all;
     const isEditor = true;
     return matchesPage && matchesFilter && isEditor;
   });
@@ -1924,7 +1924,7 @@ function MediaSection({ lang, items, onOpen, setPage }) {
           {type === "photo" ? (
             <button 
               className="media-block-icon-label photo"
-              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(195, 25, 50, 0.1)" }}
+              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(0, 51, 160, 0.1)" }}
               onClick={() => {
                 const targetPage = lang === "uz" ? "Fotolar" : (lang === "uzk" ? "Фотолар" : "Photo");
                 if (setPage) {
@@ -1938,7 +1938,7 @@ function MediaSection({ lang, items, onOpen, setPage }) {
           ) : (
             <button 
               className="media-block-icon-label video"
-              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(195, 25, 50, 0.1)" }}
+              style={{ cursor: "pointer", border: 0, outline: "none", display: "inline-flex", fontFamily: "inherit", background: "rgba(0, 51, 160, 0.1)" }}
               onClick={() => {
                 const targetPage = lang === "uz" ? "Videolar" : (lang === "uzk" ? "Видеолар" : "Video");
                 if (setPage) {
@@ -3019,7 +3019,7 @@ function MediaLibrary() {
       <div 
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleUpload(e.dataTransfer.files); }}
-        style={{ padding: "40px", border: "2px dashed var(--brand)", borderRadius: "12px", background: "rgba(195, 25, 50, 0.03)", textAlign: "center", cursor: "pointer" }}
+        style={{ padding: "40px", border: "2px dashed var(--brand)", borderRadius: "12px", background: "rgba(0, 51, 160, 0.03)", textAlign: "center", cursor: "pointer" }}
         onClick={() => {
           const input = document.createElement("input");
           input.type = "file";
@@ -3882,7 +3882,7 @@ function AdminSettings({ setSiteConfig, isUz }) {
           <h2 style={{ fontSize: "32px", fontWeight: "800", color: "var(--ink)", margin: "0 0 8px 0", letterSpacing: "-0.5px" }}>Созламалар</h2>
           <p style={{ color: "var(--muted)", margin: 0, fontSize: "15px" }}>Сайтнинг глобал параметрлари ва хавфсизлик бошқаруви</p>
         </div>
-        <button onClick={saveSettings} style={{ padding: "12px 32px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer", fontSize: "14px", boxShadow: "0 4px 12px rgba(195, 25, 50, 0.3)", transition: "all 0.2s", transform: "translateY(0)" }}
+        <button onClick={saveSettings} style={{ padding: "12px 32px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer", fontSize: "14px", boxShadow: "0 4px 12px rgba(0, 51, 160, 0.3)", transition: "all 0.2s", transform: "translateY(0)" }}
           onMouseOver={(e) => e.target.style.transform = "translateY(-2px)"}
           onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
         >
@@ -5231,7 +5231,7 @@ function AdminTrash({ isUz, onRestore, onHardDelete }) {
                 <td style={{ padding: "12px" }}>{new Date(s.deletedAt).toLocaleString()}</td>
                 <td style={{ padding: "12px", display: "flex", gap: "8px" }}>
                   <button onClick={() => handleRestore(s.id, s.lang)} style={{ padding: "6px 12px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Tiklash</button>
-                  <button onClick={() => handleHardDelete(s.id, s.lang)} style={{ padding: "6px 12px", background: "rgba(195, 25, 50, 0.1)", color: "var(--brand)", border: "none", borderRadius: "6px", cursor: "pointer" }}>Butunlay o'chirish</button>
+                  <button onClick={() => handleHardDelete(s.id, s.lang)} style={{ padding: "6px 12px", background: "rgba(0, 51, 160, 0.1)", color: "var(--brand)", border: "none", borderRadius: "6px", cursor: "pointer" }}>Butunlay o'chirish</button>
                 </td>
               </tr>
             ))}
@@ -6126,30 +6126,30 @@ const [activeTab, setActiveTab] = useState("dashboard");
         
         <button 
           onClick={() => setActiveTab("dashboard")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "dashboard" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "dashboard" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "dashboard" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "dashboard" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >📊 Dashboard</button>
         
         <button 
           onClick={() => setActiveTab("articles")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "articles" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "articles" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "articles" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "articles" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >📝 Maqolalar</button>
         <button 
           onClick={() => setActiveTab("videos")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "videos" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "videos" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "videos" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "videos" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >🎥 Videolar</button>
         <button 
           onClick={() => setActiveTab("photos")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "photos" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "photos" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "photos" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "photos" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >📸 Fotolar</button>
 
         <button 
           onClick={() => setActiveTab("kpi")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "kpi" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "kpi" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "kpi" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "kpi" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >📊 Mualliflar KPI</button>
 
         <button 
           onClick={() => setActiveTab("trash")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "trash" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "trash" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "trash" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "trash" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >🗑️ Savat</button>
 
 
@@ -6176,64 +6176,64 @@ const [activeTab, setActiveTab] = useState("dashboard");
             });
             setActiveTab("editor");
           }} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "editor" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "editor" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "editor" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "editor" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >✍️ Yangi Maqola</button>
 
 
         <button 
           onClick={() => setActiveTab("categories")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "categories" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "categories" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "categories" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "categories" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >📁 Ruknlar</button>
 
         <button 
           onClick={() => setActiveTab("languages")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "languages" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "languages" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "languages" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "languages" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >🌐 Tillar</button>
 
         <button 
           onClick={() => setActiveTab("tags")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "tags" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "tags" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "tags" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "tags" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "tags" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "tags" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
         >🏷️ Теглар</button>
         <button 
           onClick={() => setActiveTab("pages")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "pages" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "pages" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "pages" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "pages" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "pages" ? "var(--primary)" : "var(--text)", textAlign: "left", fontWeight: activeTab === "pages" ? "600" : "500", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
         >📄 Sahifalar</button>
         <button 
           onClick={() => setActiveTab("comments")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "comments" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "comments" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "comments" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "comments" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >💬 Izohlar</button>
 
         <button 
           onClick={() => setActiveTab("translations")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "translations" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "translations" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "translations" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "translations" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >🌐 Matnlar</button>
 
         <button 
           onClick={() => setActiveTab("media")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "media" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "media" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "media" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "media" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
         >🖼️ Media Kutubxona</button>
 
         {userRole === 'Super Admin' && (
           <button 
             onClick={() => setActiveTab("ads")} 
-            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "ads" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "ads" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "ads" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "ads" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
           >💰 Reklamalar</button>
         )}
 
         <button 
           onClick={() => setActiveTab("seo-audit")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "seo-audit" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "seo-audit" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "seo-audit" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "seo-audit" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
         >📈 SEO Audit</button>
 
         <button 
           onClick={() => setActiveTab("special")} 
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "special" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "special" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "special" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "special" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}
         >⭐ Maxsus loyiha</button>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <button 
             onClick={() => setActiveTab("settings")} 
-            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "settings" ? "rgba(195, 25, 50, 0.08)" : "transparent", color: activeTab === "settings" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", background: activeTab === "settings" ? "rgba(0, 51, 160, 0.08)" : "transparent", color: activeTab === "settings" ? "var(--brand)" : "var(--ink)", fontWeight: "700", textAlign: "left", cursor: "pointer" }}
           >⚙️ Sozlamalar</button>
 
           <div style={{ paddingLeft: "16px", paddingRight: "4px" }}>
