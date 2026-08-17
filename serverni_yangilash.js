@@ -6,7 +6,7 @@ console.log('🚀 Sayt serverda yangilanmoqda. Iltimos, kuting...');
 console.log('----------------------------------------------------');
 
 const commands = [
-  'cd /var/www/vatanuz && git pull origin main',
+  'cd /var/www/vatanuz && git fetch origin && git reset --hard origin/main && git clean -fd',
   'cd /var/www/vatanuz && npm install',
   'pm2 restart vatanuz'
 ];
