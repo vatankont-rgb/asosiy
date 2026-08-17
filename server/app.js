@@ -85,16 +85,13 @@ app.use('/uploads', express.static(config.uploadsDir));
 const rootDir = path.join(__dirname, '..');
 app.use(express.static(rootDir, {
   dotfiles: 'deny',
-  maxAge: '7d', // Cache for 7 days
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'public, max-age=0'); // Don't cache HTML files
-    }
-  }
+  maxAge: '7d',
+  index: false // Disable serving index.html automatically so dynamic SSR / OG tag handler processes all HTML routes
 }));
 
 const fs = require('fs');
 const articleRepository = require('./repositories/articleRepository');
+const settingRepository = require('./repositories/settingRepository');
 
 // Fallback wild-card handler for Single Page Application routing (with SSR SEO meta injection)
 app.use(async (req, res, next) => {
@@ -102,27 +99,76 @@ app.use(async (req, res, next) => {
     const indexPath = path.join(rootDir, 'index.html');
     let html = fs.readFileSync(indexPath, 'utf8');
 
+    const host = req.get('host') || 'vatanuz.uz';
+    const proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const baseUrl = `${proto}://${host}`;
+
+    const storyId = req.query.story || req.query.id;
+
     // If there is a ?story=ID query parameter, inject dynamic OpenGraph SEO tags
-    if (req.query.story) {
+    if (storyId) {
       const db = await articleRepository.getAll();
-      const allStories = [...(db.uz || []), ...(db.en || [])];
-      const story = allStories.find(s => s.id === req.query.story);
+      const allStories = Object.values(db).flat().filter(Boolean);
+      const story = allStories.find(s => String(s.id) === String(storyId) || String(s.slug) === String(storyId));
       
       if (story) {
         const esc = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const imageUrl = story.image ? (story.image.startsWith('http') ? story.image : `${baseUrl}${story.image.startsWith('/') ? '' : '/'}${story.image}`) : '';
+        let imageUrl = story.image ? String(story.image).trim() : '';
+        if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+        }
+
+        const pageTitle = `${esc(story.title)} - Vatan.uz`;
+        const pageDesc = esc(story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 200) : '') || 'Vatanuz.uz yangiliklari');
+        const pageUrl = `${baseUrl}/?story=${encodeURIComponent(story.id)}`;
+
         const ogTags = `
-          <meta property="og:title" content="${esc(story.title)}" />
-          <meta property="og:description" content="${esc(story.summary)}" />
-          <meta property="og:image" content="${esc(imageUrl)}" />
-          <meta property="og:type" content="article" />
-          <meta property="og:url" content="${baseUrl}/?story=${story.id}" />
-          <meta name="twitter:card" content="summary_large_image" />
-        `;
+    <!-- Dynamic Open Graph / Telegram / Social Preview -->
+    <meta property="og:site_name" content="Vatan.uz" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="${esc(pageUrl)}" />
+    <meta property="og:title" content="${esc(story.title)}" />
+    <meta property="og:description" content="${pageDesc}" />
+    ${imageUrl ? `
+    <meta property="og:image" content="${esc(imageUrl)}" />
+    <meta property="og:image:secure_url" content="${esc(imageUrl)}" />
+    <meta property="og:image:alt" content="${esc(story.title)}" />` : ''}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${esc(pageUrl)}" />
+    <meta name="twitter:title" content="${esc(story.title)}" />
+    <meta name="twitter:description" content="${pageDesc}" />
+    ${imageUrl ? `<meta name="twitter:image" content="${esc(imageUrl)}" />` : ''}
+`;
         html = html.replace('</head>', ogTags + '</head>');
-        html = html.replace(/<title>.*?<\/title>/, `<title>${esc(story.title)} - Vatan.uz</title>`);
+        html = html.replace(/<title>.*?<\/title>/i, `<title>${pageTitle}</title>`);
       }
+    } else {
+      // Default website OpenGraph preview tags
+      try {
+        const settings = await settingRepository.getSettings();
+        const siteName = settings?.siteName || 'Vatan.uz';
+        let ogImage = settings?.ogImage || settings?.logoUrl || '';
+        if (ogImage && !ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
+          ogImage = `${baseUrl}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
+        }
+        const defaultDesc = "Vatanuz.uz — O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.";
+        const ogTags = `
+    <!-- Default Open Graph / Telegram Preview -->
+    <meta property="og:site_name" content="${siteName}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${baseUrl}/" />
+    <meta property="og:title" content="${siteName} — Milliy axborot portali" />
+    <meta property="og:description" content="${defaultDesc}" />
+    ${ogImage ? `
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:image:secure_url" content="${ogImage}" />` : ''}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${siteName} — Milliy axborot portali" />
+    <meta name="twitter:description" content="${defaultDesc}" />
+    ${ogImage ? `<meta name="twitter:image" content="${ogImage}" />` : ''}
+`;
+        html = html.replace('</head>', ogTags + '</head>');
+      } catch (_) {}
     }
 
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
