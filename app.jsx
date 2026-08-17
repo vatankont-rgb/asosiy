@@ -1333,7 +1333,7 @@ function App() {
     return story;
   });
   const adminStories = allStories[dataLang] || [];
-  const pages = [{ slug: 'home', name: t.home || 'Bosh sahifa' }, ...categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }))];
+  const pages = categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }));
   const selectedCategory = page === 'home' || page === 'admin' || page === 'barcha-yangiliklar' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
 
   function changeLang(nextLang) {
@@ -1476,6 +1476,23 @@ function App() {
               </div>
             )}
           </button>
+
+          <div className="nav-links">
+            {pages.map((item) => (
+              <button
+                key={item.slug}
+                className={`nav-link ${page === item.slug ? "active" : ""}`}
+                onClick={() => {
+                  setPage(item.slug);
+                  setActiveStory(null);
+                  setSearchOpen(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
 
           <div className="actions">
             <div className="desktop-search" style={{ display: "flex", alignItems: "center" }}>
