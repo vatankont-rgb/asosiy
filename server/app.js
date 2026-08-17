@@ -114,35 +114,41 @@ app.use(async (req, res, next) => {
       const story = allStories.find(s => String(s.id) === String(storyId) || String(s.slug) === String(storyId));
       
       if (story) {
-        const esc = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const escText = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const escUrl = (str) => String(str || '').trim().replace(/"/g,'%22').replace(/'/g,'%27').replace(/</g,'%3C').replace(/>/g,'%3E');
+
         let imageUrl = story.image ? String(story.image).trim() : '';
         if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
           imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
 
-        const pageTitle = `${esc(story.title)} - Vatan.uz`;
+        const pageTitle = `${escText(story.title)} - Vatan.uz`;
         const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
-        const pageDesc = esc(rawSummary);
+        const pageDesc = escText(rawSummary);
         const pageUrl = `${baseUrl}/?story=${encodeURIComponent(story.id)}`;
+        const cleanImageUrl = escUrl(imageUrl);
+        const cleanPageUrl = escUrl(pageUrl);
 
         const ogTags = `
     <!-- Dynamic Open Graph / Telegram / Social Preview -->
     <meta property="og:site_name" content="Vatan.uz" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="${esc(pageUrl)}" />
-    <meta property="og:title" content="${esc(story.title)}" />
+    <meta property="og:url" content="${cleanPageUrl}" />
+    <meta property="og:title" content="${escText(story.title)}" />
     <meta property="og:description" content="${pageDesc}" />
-    ${imageUrl ? `
-    <meta property="og:image" content="${esc(imageUrl)}" />
-    <meta property="og:image:secure_url" content="${esc(imageUrl)}" />
-    <meta property="og:image:alt" content="${esc(story.title)}" />` : ''}
+    ${cleanImageUrl ? `
+    <meta property="og:image" content="${cleanImageUrl}" />
+    <meta property="og:image:secure_url" content="${cleanImageUrl}" />
+    <meta property="og:image:alt" content="${escText(story.title)}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="${esc(pageUrl)}" />
-    <meta name="twitter:title" content="${esc(story.title)}" />
+    <meta name="twitter:url" content="${cleanPageUrl}" />
+    <meta name="twitter:title" content="${escText(story.title)}" />
     <meta name="twitter:description" content="${pageDesc}" />
-    ${imageUrl ? `<meta name="twitter:image" content="${esc(imageUrl)}" />` : ''}
+    ${cleanImageUrl ? `<meta name="twitter:image" content="${cleanImageUrl}" />` : ''}
 `;
-        html = html.replace('</head>', ogTags + '</head>');
+        html = html.replace(/<head>/i, '<head>\n' + ogTags);
         html = html.replace(/<title>.*?<\/title>/i, `<title>${pageTitle}</title>`);
       }
     } else {
@@ -154,23 +160,29 @@ app.use(async (req, res, next) => {
         if (ogImage && !ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
           ogImage = `${baseUrl}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
         }
+        const escText = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const escUrl = (str) => String(str || '').trim().replace(/"/g,'%22').replace(/'/g,'%27').replace(/</g,'%3C').replace(/>/g,'%3E');
         const defaultDesc = "Vatanuz.uz — O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.";
+        const cleanOgImage = escUrl(ogImage);
+        const cleanBaseUrl = escUrl(baseUrl);
         const ogTags = `
     <!-- Default Open Graph / Telegram Preview -->
-    <meta property="og:site_name" content="${siteName}" />
+    <meta property="og:site_name" content="${escText(siteName)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${baseUrl}/" />
-    <meta property="og:title" content="${siteName} — Milliy axborot portali" />
-    <meta property="og:description" content="${defaultDesc}" />
-    ${ogImage ? `
-    <meta property="og:image" content="${ogImage}" />
-    <meta property="og:image:secure_url" content="${ogImage}" />` : ''}
+    <meta property="og:url" content="${cleanBaseUrl}/" />
+    <meta property="og:title" content="${escText(siteName)} — Milliy axborot portali" />
+    <meta property="og:description" content="${escText(defaultDesc)}" />
+    ${cleanOgImage ? `
+    <meta property="og:image" content="${cleanOgImage}" />
+    <meta property="og:image:secure_url" content="${cleanOgImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${siteName} — Milliy axborot portali" />
-    <meta name="twitter:description" content="${defaultDesc}" />
-    ${ogImage ? `<meta name="twitter:image" content="${ogImage}" />` : ''}
+    <meta name="twitter:title" content="${escText(siteName)} — Milliy axborot portali" />
+    <meta name="twitter:description" content="${escText(defaultDesc)}" />
+    ${cleanOgImage ? `<meta name="twitter:image" content="${cleanOgImage}" />` : ''}
 `;
-        html = html.replace('</head>', ogTags + '</head>');
+        html = html.replace(/<head>/i, '<head>\n' + ogTags);
       } catch (_) {}
     }
 
