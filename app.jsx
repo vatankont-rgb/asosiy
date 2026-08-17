@@ -1464,18 +1464,23 @@ function App() {
             {siteConfig.logoUrl ? (
               <img src={siteConfig.logoUrl} alt="Logo" height="44" style={{ objectFit: "contain", borderRadius: "4px" }} />
             ) : (
-              <>
-                <svg width="34" height="34" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g transform="translate(1, 0)">
-                    <path d="M17 0L32 8.66V26L17 34.64L2 26V8.66L17 0Z" fill="var(--brand)"/>
-                    <path d="M17 0L32 8.66V26L17 34.64V17.32H2L17 0Z" fill="var(--brand-dark)"/>
-                    <path d="M9 10H15L20 21L25 10H31L20 30L9 10Z" fill="#FFFFFF"/>
-                  </g>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <svg width="44" height="44" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="100" rx="22" fill="var(--brand)" />
+                  <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke="#ffffff" strokeWidth="8" />
+                  <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" fontFamily="Georgia, serif" fontWeight="bold" fontSize="42">V</text>
                 </svg>
-                <span style={{ fontFamily: "Georgia, serif", fontSize: "28px", fontWeight: "bold", letterSpacing: "1px", color: "var(--brand)" }}>
-                  {siteConfig.siteName || "VATAN"}
-                </span>
-              </>
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                  <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "32px", fontWeight: "900", letterSpacing: "1px", color: "var(--brand)", lineHeight: "1", textTransform: "uppercase" }}>
+                    VATAN
+                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
+                    <div style={{ height: "2px", background: "var(--brand)", flex: 1, minWidth: "20px" }}></div>
+                    <span style={{ fontFamily: "Arial, sans-serif", fontSize: "10px", fontWeight: "800", color: "var(--brand)", letterSpacing: "0.5px" }}>MILLIY KONTENTI</span>
+                    <div style={{ height: "2px", background: "var(--brand)", flex: 1, minWidth: "20px" }}></div>
+                  </div>
+                </div>
+              </div>
             )}
           </button>
           <nav className="nav-links" aria-label="Main navigation">
@@ -1565,7 +1570,16 @@ function App() {
       <div className={`mobile-drawer-overlay ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen(false)} />
       <div className={`mobile-drawer ${menuOpen ? "open" : ""}`}>
         <div className="drawer-header">
-          <span className="drawer-logo">{siteConfig.siteName || "VATAN"}</span>
+          <div className="drawer-logo" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" rx="22" fill="var(--brand)" />
+              <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke="#ffffff" strokeWidth="8" />
+              <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" fontFamily="Georgia, serif" fontWeight="bold" fontSize="42">V</text>
+            </svg>
+            <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "22px", fontWeight: "900", letterSpacing: "1px", color: "var(--brand)", textTransform: "uppercase" }}>
+              VATAN
+            </span>
+          </div>
           <button className="drawer-close" onClick={() => setMenuOpen(false)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
