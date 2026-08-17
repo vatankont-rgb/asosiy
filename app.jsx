@@ -4411,7 +4411,7 @@ function SystemHealthPanel({ isUz }) {
         </div>
         <div style={{ background: "var(--surface)", padding: "20px", borderRadius: "12px", border: "1px solid var(--line)" }}>
           <div style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600", marginBottom: "4px" }}>{isUz ? "Doimiy Xotira (Disk)" : "Disk Space"}</div>
-          <div style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)" }}>{health?.os.diskFreeGB} GB / {health?.os.diskTotalGB} GB</div>
+          <div style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)" }}>{health?.os ? (parseFloat(health.os.diskTotalGB) - parseFloat(health.os.diskFreeGB)).toFixed(2) : 0} GB / {health?.os?.diskTotalGB} GB (Band)</div>
         </div>
       </div>
 
