@@ -2836,7 +2836,22 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
                     <button
                       className={`share-btn ${copiedShare ? "copied" : ""}`}
                       onClick={() => {
-                        navigator.clipboard.writeText(shareUrl);
+                        const copyText = (text) => {
+                          if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(text);
+                          } else {
+                            const textArea = document.createElement("textarea");
+                            textArea.value = text;
+                            textArea.style.position = "fixed";
+                            textArea.style.left = "-999999px";
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try { document.execCommand('copy'); } catch(e) {}
+                            textArea.remove();
+                          }
+                        };
+                        copyText(shareUrl);
                         setCopiedShare(true);
                         setTimeout(() => setCopiedShare(false), 2000);
                       }}
@@ -4731,7 +4746,19 @@ function AdminMedia({ isUz }) {
   };
 
   const copyToClipboard = (url) => {
-    navigator.clipboard.writeText(url);
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url);
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      textArea.remove();
+    }
     alert("URL nusxalandi: " + url);
   };
 
