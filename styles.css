@@ -960,7 +960,7 @@ body {
 }
 
 .nav-links {
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .nav-link {
