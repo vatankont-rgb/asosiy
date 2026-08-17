@@ -1794,10 +1794,10 @@ function App() {
             </main>
           )}
 
-          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && <AdBanner ads={ads} position="bottom" />}
-          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && <BreakingBanner t={t} lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
-          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && <MediaSection lang={lang} items={[...(videos[lang] || []), ...(photos[lang] || [])]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
-          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && <Special t={t} dial={false} siteConfig={siteConfig} />}
+          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <AdBanner ads={ads} position="bottom" />}
+          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <BreakingBanner t={t} lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <MediaSection lang={lang} items={[...(videos[lang] || []), ...(photos[lang] || [])]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
+          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <Special t={t} dial={false} siteConfig={siteConfig} />}
         </>
       )}
 
