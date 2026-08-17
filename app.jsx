@@ -1345,7 +1345,7 @@ function App() {
   });
   const adminStories = allStories[dataLang] || [];
   const pages = [{ slug: 'home', name: t.home || 'Bosh sahifa' }, ...categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }))];
-  const selectedCategory = page === 'home' || page === 'admin' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
+  const selectedCategory = page === 'home' || page === 'admin' || page === 'barcha-yangiliklar' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
 
   function changeLang(nextLang) {
     try {
