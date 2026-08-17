@@ -51,7 +51,8 @@ module.exports = {
   helmetConfig: helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" }
   }),
   corsConfig: cors(corsOptions),
   rateLimiter: limiter,
