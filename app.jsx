@@ -75,7 +75,7 @@ const copy = {
       Aloqa: "Tahririyat bilan bog'lanish, reklama va hamkorlik uchun ma'lumotlar.",
     },
     contact: [
-      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: news@yangikun.uz"],
+      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: vatankont@gmail.com"],
       ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@yangikun.uz"],
       ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
     ],
@@ -146,7 +146,7 @@ copy["uzk"] = {
     "Адабиёт": "Шеърият, наср, китобхонлик ва адабий танқид.",
   },
   contact: [
-    ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: news@yangikun.uz"],
+    ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: vatankont@gmail.com"],
     ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@yangikun.uz"],
     ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
   ],
@@ -508,7 +508,7 @@ const emptyStory = {
 const DEFAULT_SITE_CONFIG = {
   siteName: "Vatan.uz",
   logoUrl: "",
-  email: "news@yangikun.uz",
+  email: "vatankont@gmail.com",
   telegram: "https://t.me/yangikun",
   bannerText: "",
   bannerActive: false,
@@ -7014,7 +7014,7 @@ function Footer({ t, pages, setPage, openAdmin }) {
         </div>
         <div className="footer-copy">
           <span>© {year} Vatan.uz. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
-          <span>news@yangikun.uz</span>
+          <span>vatankont@gmail.com</span>
         </div>
       </div>
     </footer>
