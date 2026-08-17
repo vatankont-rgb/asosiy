@@ -105,9 +105,13 @@ app.use(async (req, res, next) => {
     const proto = rawProto.replace(/[^a-zA-Z]/g, '');
     const baseUrl = `${proto}://${host}`;
 
-    const storyId = req.query.story || req.query.id;
+    let storyId = req.query.story || req.query.id;
+    if (!storyId) {
+      const m = req.path.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+      if (m) storyId = m[1];
+    }
 
-    // If there is a ?story=ID query parameter, inject dynamic OpenGraph SEO tags
+    // If there is a storyId, inject dynamic OpenGraph SEO tags
     if (storyId) {
       const db = await articleRepository.getAll(true);
       const allStories = Object.values(db).flat().filter(Boolean);
@@ -125,7 +129,7 @@ app.use(async (req, res, next) => {
         const pageTitle = `${escText(story.title)} - Vatan.uz`;
         const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
         const pageDesc = escText(rawSummary);
-        const pageUrl = `${baseUrl}/?story=${encodeURIComponent(story.id)}`;
+        const pageUrl = `${baseUrl}/news/${encodeURIComponent(story.id)}`;
         const cleanImageUrl = escUrl(imageUrl);
         const cleanPageUrl = escUrl(pageUrl);
 

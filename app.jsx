@@ -1417,11 +1417,15 @@ function App() {
         };
         setTimeout(() => {
           const url = new URL(window.location);
-          const storyId = url.searchParams.get("story");
+          let storyId = url.searchParams.get("story") || url.searchParams.get("id");
+          if (!storyId) {
+            const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+            if (m) storyId = m[1];
+          }
           if (storyId) {
             let found = null;
             for (const langKey of Object.keys(next)) {
-              found = next[langKey].find(s => s.id === storyId);
+              found = next[langKey].find(s => s.id === storyId || s.slug === storyId);
               if (found) break;
             }
             if (found) {
@@ -2819,23 +2823,30 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
 
             <div className="article-share">
               <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Share:")}</span>
-              <a
-                className="share-btn telegram"
-                href={`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(story.title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >✈️ Telegram</a>
-              <button
-                className={`share-btn ${copiedShare ? "copied" : ""}`}
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setCopiedShare(true);
-                  setTimeout(() => setCopiedShare(false), 2000);
-                }}
-              >{copiedShare 
-                ? (lang === "uz" ? "✓ Nusxalandi" : (lang === "uzk" ? "✓ Нусхаланди" : "✓ Copied")) 
-                : (lang === "uz" ? "🔗 Havola" : (lang === "uzk" ? "🔗 Ҳавола" : "🔗 Link"))
-              }</button>
+              {(() => {
+                const shareUrl = `${window.location.origin}/news/${story.id}`;
+                return (
+                  <>
+                    <a
+                      className="share-btn telegram"
+                      href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(story.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >✈️ Telegram</a>
+                    <button
+                      className={`share-btn ${copiedShare ? "copied" : ""}`}
+                      onClick={() => {
+                        navigator.clipboard.writeText(shareUrl);
+                        setCopiedShare(true);
+                        setTimeout(() => setCopiedShare(false), 2000);
+                      }}
+                    >{copiedShare 
+                      ? (lang === "uz" ? "✓ Nusxalandi" : (lang === "uzk" ? "✓ Нусхаланди" : "✓ Copied")) 
+                      : (lang === "uz" ? "🔗 Havola" : (lang === "uzk" ? "🔗 Ҳавола" : "🔗 Link"))
+                    }</button>
+                  </>
+                );
+              })()}
               <button
                 className={`bookmark-btn ${savedIds.includes(story.id) ? "saved" : ""}`}
                 onClick={() => onToggleSave && onToggleSave(story.id)}
