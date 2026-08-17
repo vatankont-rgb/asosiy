@@ -1459,18 +1459,18 @@ function App() {
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <svg width="44" height="44" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="100" height="100" rx="22" fill="var(--brand)" />
-                  <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke="#ffffff" strokeWidth="8" />
-                  <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" fontFamily="Georgia, serif" fontWeight="bold" fontSize="42">V</text>
+                  <rect width="100" height="100" rx="22" fill={darkMode ? "#ffffff" : "var(--brand)"} />
+                  <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke={darkMode ? "var(--brand)" : "#ffffff"} strokeWidth="8" />
+                  <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fill={darkMode ? "var(--brand)" : "#ffffff"} fontFamily="Georgia, serif" fontWeight="bold" fontSize="42">V</text>
                 </svg>
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "32px", fontWeight: "900", letterSpacing: "1px", color: "var(--brand)", lineHeight: "1", textTransform: "uppercase" }}>
+                  <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "32px", fontWeight: "900", letterSpacing: "1px", color: darkMode ? "#ffffff" : "var(--brand)", lineHeight: "1", textTransform: "uppercase" }}>
                     VATAN
                   </span>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
-                    <div style={{ height: "2px", background: "var(--brand)", flex: 1, minWidth: "20px" }}></div>
-                    <span style={{ fontFamily: "Arial, sans-serif", fontSize: "10px", fontWeight: "800", color: "var(--brand)", letterSpacing: "0.5px" }}>MILLIY KONTENTI</span>
-                    <div style={{ height: "2px", background: "var(--brand)", flex: 1, minWidth: "20px" }}></div>
+                    <div style={{ height: "2px", background: darkMode ? "#ffffff" : "var(--brand)", flex: 1, minWidth: "20px" }}></div>
+                    <span style={{ fontFamily: "Arial, sans-serif", fontSize: "10px", fontWeight: "800", color: darkMode ? "#ffffff" : "var(--brand)", letterSpacing: "0.5px" }}>MILLIY KONTENTI</span>
+                    <div style={{ height: "2px", background: darkMode ? "#ffffff" : "var(--brand)", flex: 1, minWidth: "20px" }}></div>
                   </div>
                 </div>
               </div>

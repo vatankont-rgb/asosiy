@@ -444,6 +444,10 @@ button {
   text-transform: uppercase;
 }
 
+[data-theme="dark"] .category {
+  color: #ffffff;
+}
+
 .story-card h3 {
   margin: 8px 0;
   font-size: 19px;
