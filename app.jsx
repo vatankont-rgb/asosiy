@@ -2702,7 +2702,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
             <div style={{ display: "flex", alignItems: "center", gap: "24px", marginLeft: "auto" }}>
               <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                {(story.views || 0) > 0 ? story.views : 27583}
+                {story.views || 1}
               </span>
               <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -2810,12 +2810,6 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
 
 
 
-
-            <div className="article-meta-row" style={{ marginBottom: "20px" }}>
-              <span className="article-views" style={{ fontSize: "13px", color: "var(--muted)", fontWeight: "600" }}>
-                👁 {(story.views || 0) > 0 ? story.views : 1} {lang === "uz" ? "marta o'qilgan" : (lang === "uzk" ? "марта ўқилган" : "views")}
-              </span>
-            </div>
 
             {addReaction && (() => {
               const storyReactions = reactions[story.id] || {};
