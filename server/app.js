@@ -110,11 +110,14 @@ app.use(async (req, res, next) => {
       
       if (story) {
         const esc = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const imageUrl = story.image ? (story.image.startsWith('http') ? story.image : `${baseUrl}${story.image.startsWith('/') ? '' : '/'}${story.image}`) : '';
         const ogTags = `
           <meta property="og:title" content="${esc(story.title)}" />
           <meta property="og:description" content="${esc(story.summary)}" />
-          <meta property="og:image" content="${esc(story.image)}" />
+          <meta property="og:image" content="${esc(imageUrl)}" />
           <meta property="og:type" content="article" />
+          <meta property="og:url" content="${baseUrl}/?story=${story.id}" />
           <meta name="twitter:card" content="summary_large_image" />
         `;
         html = html.replace('</head>', ogTags + '</head>');
