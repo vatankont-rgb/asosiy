@@ -76,7 +76,7 @@ const copy = {
     },
     contact: [
       ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: "],
-      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@vatanuz.uz"],
+      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: vatankont@gmail.com"],
       ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
     ],
     close: "Yopish",
@@ -111,8 +111,8 @@ const copy = {
       "Contacts": "Contact the editorial team, advertising, and partnership projects.",
     },
     contact: [
-      ["Editorial", "News, press releases, and photo materials: news@vatanuz.uz"],
-      ["Advertising", "Brand projects, banners, and special pages: ads@vatanuz.uz"],
+      ["Editorial", "News, press releases, and photo materials: vatankont@gmail.com"],
+      ["Advertising", "Brand projects, banners, and special pages: vatankont@gmail.com"],
       ["Address", "Tashkent, Media Center, 4th floor. Monday-Friday 09:00-18:00."],
     ],
     close: "Close",
@@ -147,7 +147,7 @@ copy["uzk"] = {
   },
   contact: [
     ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: vatankont@gmail.com"],
-    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@vatanuz.uz"],
+    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: vatankont@gmail.com"],
     ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
   ],
   close: "\u0401\u043f\u0438\u0448",
@@ -2421,7 +2421,7 @@ function Special({ t, siteConfig }) {
 }
 
 function ContactPage({ t, page, siteConfig }) {
-  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatanuz.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "vatankont@gmail.com";
   return (
     <main className="section">
       <div className="section-inner">
@@ -4033,7 +4033,7 @@ function AdminSettings({ setSiteConfig, isUz }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Электрон почта</label>
-                  <input type="email" value={settings.contact?.email || ""} onChange={e => setSettings({...settings, contact: {...settings.contact, email: e.target.value}})} placeholder="info@vatanuz.uz" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
+                  <input type="email" value={settings.contact?.email || ""} onChange={e => setSettings({...settings, contact: {...settings.contact, email: e.target.value}})} placeholder="vatankont@gmail.com" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: "span 2" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Манзил</label>
@@ -7052,7 +7052,7 @@ function AdBanner({ ads, position }) {
 
 function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
   const year = new Date().getFullYear();
-  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatanuz.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "vatankont@gmail.com";
   return (
     <footer className="footer">
       <div className="footer-inner">
