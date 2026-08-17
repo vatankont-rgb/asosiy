@@ -75,7 +75,7 @@ const copy = {
       Aloqa: "Tahririyat bilan bog'lanish, reklama va hamkorlik uchun ma'lumotlar.",
     },
     contact: [
-      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: vatankont@gmail.com"],
+      ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: "],
       ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@yangikun.uz"],
       ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
     ],
@@ -1713,7 +1713,7 @@ function App() {
               </div>
             </main>
           ) : page === "Aloqa" ? (
-            <ContactPage t={t} page={page} />
+            <ContactPage t={t} page={page} siteConfig={siteConfig} />
           ) : typeof page === "string" && page.startsWith("page_") ? (
             <StaticPageView pageSlug={page.replace("page_", "")} staticPages={staticPages} lang={lang} />
           ) : (page === "Videolar" || page === "Видеолар" || page === "Video") ? (
@@ -1802,7 +1802,7 @@ function App() {
       )}
 
       {page !== "admin" && (<>
-      <Footer t={t} pages={staticPages.map(p => ({ slug: `page_${p.slug}`, name: p.title[lang] || p.title["uzk"] }))} setPage={(p) => { setPage(p.slug); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
+      <Footer t={t} siteConfig={siteConfig} pages={staticPages.map(p => ({ slug: `page_${p.slug}`, name: p.title[lang] || p.title["uzk"] }))} setPage={(p) => { setPage(p.slug); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
 
       <button
         className={`scroll-top-btn ${scrollVisible ? "visible" : ""}`}
@@ -2407,7 +2407,8 @@ function Special({ t, siteConfig }) {
   );
 }
 
-function ContactPage({ t, page }) {
+function ContactPage({ t, page, siteConfig }) {
+  const contactEmail = siteConfig?.contact?.email || "info@vatan.uz";
   return (
     <main className="section">
       <div className="section-inner">
@@ -2418,10 +2419,10 @@ function ContactPage({ t, page }) {
           </div>
         </div>
         <div className="contact-grid">
-          {t.contact.map(([title, text]) => (
+          {t.contact.map(([title, text], i) => (
             <div className="contact-card" key={title}>
               <strong>{title}</strong>
-              <p>{text}</p>
+              <p>{text}{i === 0 ? contactEmail : ""}</p>
             </div>
           ))}
         </div>
@@ -6985,15 +6986,16 @@ function AdBanner({ ads, position }) {
   );
 }
 
-function Footer({ t, pages, setPage, openAdmin }) {
+function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
   const year = new Date().getFullYear();
+  const contactEmail = siteConfig?.contact?.email || "info@vatan.uz";
   return (
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span className="brand-mark">YK</span>
-            <strong style={{ fontSize: "22px", color: "#fff" }}>Vatan.uz</strong>
+            <strong style={{ fontSize: "22px", color: "#fff" }}>{siteConfig?.siteName || "Vatan.uz"}</strong>
           </div>
           <p>{t.portal}. O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.</p>
           <div className="footer-socials">
@@ -7013,8 +7015,8 @@ function Footer({ t, pages, setPage, openAdmin }) {
           </div>
         </div>
         <div className="footer-copy">
-          <span>© {year} Vatan.uz. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
-          <span>vatankont@gmail.com</span>
+          <span>© {year} {siteConfig?.siteName || "Vatan.uz"}. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
+          <span>{contactEmail}</span>
         </div>
       </div>
     </footer>
