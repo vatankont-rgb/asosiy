@@ -2704,10 +2704,12 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 {story.views || 1}
               </span>
-              <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                {lang === "uz" ? "3 daqiqada o'qiladi" : (lang === "uzk" ? "3 дақиқада ўқилади" : "3 min read")}
-              </span>
+              {(!story.category || (!story.category.toLowerCase().includes("video") && !story.category.toLowerCase().includes("видео"))) && !story.videoUrl && (
+                <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  {lang === "uz" ? "3 daqiqada o'qiladi" : (lang === "uzk" ? "3 дақиқада ўқилади" : "3 min read")}
+                </span>
+              )}
             </div>
           </div>
 
