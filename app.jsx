@@ -2707,7 +2707,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
               {(!story.category || (!story.category.toLowerCase().includes("video") && !story.category.toLowerCase().includes("видео"))) && !story.videoUrl && (
                 <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                  {lang === "uz" ? "3 daqiqada o'qiladi" : (lang === "uzk" ? "3 дақиқада ўқилади" : "3 min read")}
+                  {lang === "uz" ? `${story.read || 3} daqiqada o'qiladi` : (lang === "uzk" ? `${story.read || 3} дақиқада ўқилади` : `${story.read || 3} min read`)}
                 </span>
               )}
             </div>
@@ -6808,6 +6808,17 @@ const [activeTab, setActiveTab] = useState("dashboard");
                       type="number" 
                       value={form.views || 0} 
                       onChange={(e) => setForm({ ...form, views: parseInt(e.target.value) || 0 })}
+                      className="adm-form-input"
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label className="adm-form-label">O'qish vaqti (daqiqa)</label>
+                    <input 
+                      type="number" 
+                      value={form.read || ""} 
+                      onChange={(e) => setForm({ ...form, read: e.target.value })}
+                      placeholder="Masalan: 5"
                       className="adm-form-input"
                     />
                   </div>
