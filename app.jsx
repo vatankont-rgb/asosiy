@@ -2526,6 +2526,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
   const tags = story.tags ? story.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
   const [readProgress, setReadProgress] = useState(0);
   const [comments, setComments] = useState([]);
+  const [localViews, setLocalViews] = useState(story.views || 0);
   
   useEffect(() => {
     fetch(`/api/comments/${story.id}`)
@@ -2539,7 +2540,11 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
       .catch(console.error);
       
     // Increment views
-    fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' }).catch(console.error);
+    fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' })
+      .then(res => {
+        if (res.ok) setLocalViews(prev => prev + 1);
+      })
+      .catch(console.error);
   }, [story.id, lang]);
 
   const [commentName, setCommentName] = useState("");
@@ -2702,7 +2707,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
             <div style={{ display: "flex", alignItems: "center", gap: "24px", marginLeft: "auto" }}>
               <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                {story.views || 1}
+                {localViews || 0}
               </span>
               {(!story.category || (!story.category.toLowerCase().includes("video") && !story.category.toLowerCase().includes("видео"))) && !story.videoUrl && (
                 <span style={{ fontSize: "14px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>

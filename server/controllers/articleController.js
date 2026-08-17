@@ -55,7 +55,9 @@ class ArticleController {
         isBreaking: !!story.isBreaking,
         scheduledAt: story.scheduledAt || null,
         createdAt: story.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        views: parseInt(story.views) || 0,
+        videoUrl: String(story.videoUrl || "").trim()
       };
 
       await articleRepository.addStory(targetLang, normalized);
