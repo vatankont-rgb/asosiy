@@ -978,26 +978,13 @@ function VideosPage({ lang, t, mediaItems, onOpen, setPage }) {
           </div>
         </div>
         
-        <div className="videos-grid-page" style={{display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", marginTop: "24px"}}>
+        <div className="videos-grid-page">
           {videos.map((item, idx) => {
             const { title: itemTitle, meta, url: image } = item;
             return (
               <button 
                 key={idx}
                 className="video-card-page"
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  padding: 0,
-                  borderBottom: "3px solid var(--brand)",
-                  transition: "transform 0.2s"
-                }}
                 onClick={() => {
                   onOpen({
                     id: `media-${Date.now()}-${Math.random()}`,
@@ -1015,13 +1002,15 @@ function VideosPage({ lang, t, mediaItems, onOpen, setPage }) {
                   });
                 }}
               >
-                <div style={{position: "relative", width: "100%", paddingTop: "56.25%", background: "#000"}}>
-                  <img src={getVideoThumb(image)} style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover"}} alt="" />
-                  <span className="media-list-icon video" style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "44px", height: "44px", background: "rgba(0, 51, 160, 0.85)", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px"}}>▶</span>
+                <div className="video-card-thumb">
+                  <img src={getVideoThumb(image)} alt="" />
+                  <span className="video-card-play">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+                  </span>
                 </div>
-                <div style={{padding: "16px", display: "flex", flexDirection: "column", gap: "8px"}}>
-                  <span style={{fontSize: "12px", color: "var(--muted)", fontWeight: "600"}}>{meta}</span>
-                  <strong style={{fontSize: "15px", fontWeight: "700", color: "var(--ink)", lineHeight: "1.4"}}>{itemTitle}</strong>
+                <div className="video-card-body">
+                  <strong className="video-card-title">{itemTitle}</strong>
+                  <span className="video-card-meta">{meta}</span>
                 </div>
               </button>
             );

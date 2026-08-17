@@ -7324,7 +7324,6 @@ textarea.field-error {
   transition: transform 0.2s, box-shadow 0.2s;
   padding: 0;
   text-align: left;
-  border-bottom: 3px solid var(--brand);
 }
 .video-card-page:hover {
   transform: translateY(-4px);
@@ -7347,11 +7346,11 @@ textarea.field-error {
 .video-card-play {
   position: absolute;
   bottom: 12px;
-  right: 12px;
+  left: 12px;
   width: 36px;
   height: 36px;
-  background: #1e40af;
-  color: #fff;
+  background: #fff;
+  color: #1e40af;
   border-radius: 50%;
   display: flex;
   align-items: center;
