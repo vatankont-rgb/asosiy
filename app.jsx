@@ -62,7 +62,7 @@ const copy = {
     special: "Maxsus loyiha",
     specialTitle: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
     specialText:
-      "Vatan.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+      "Vatanuz.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
     pages: ["Bosh sahifa", "Siyosat", "Iqtisodiyot", "Tarix", "Falsafa", "Adabiyot"],
     pageNotes: {
       "Bosh sahifa": "Asosiy xabarlar, trendlar va kunning eng muhim mavzulari.",
@@ -76,7 +76,7 @@ const copy = {
     },
     contact: [
       ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: "],
-      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@vatan.uz"],
+      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@vatanuz.uz"],
       ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
     ],
     close: "Yopish",
@@ -99,7 +99,7 @@ const copy = {
     special: "Special Project",
     specialTitle: "Data-driven journalism: separating events from noise",
     specialText:
-      "Vatan.uz editorial team explains important processes in politics, economy, technology, sports, and culture in plain language.",
+      "Vatanuz.uz editorial team explains important processes in politics, economy, technology, sports, and culture in plain language.",
     pages: ["Home", "Politics", "Economy", "Technology", "Sports", "Culture", "Contacts"],
     pageNotes: {
       "Home": "Top materials, trends, and key topics of the day.",
@@ -111,8 +111,8 @@ const copy = {
       "Contacts": "Contact the editorial team, advertising, and partnership projects.",
     },
     contact: [
-      ["Editorial", "News, press releases, and photo materials: news@vatan.uz"],
-      ["Advertising", "Brand projects, banners, and special pages: ads@vatan.uz"],
+      ["Editorial", "News, press releases, and photo materials: news@vatanuz.uz"],
+      ["Advertising", "Brand projects, banners, and special pages: ads@vatanuz.uz"],
       ["Address", "Tashkent, Media Center, 4th floor. Monday-Friday 09:00-18:00."],
     ],
     close: "Close",
@@ -147,7 +147,7 @@ copy["uzk"] = {
   },
   contact: [
     ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: vatankont@gmail.com"],
-    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@vatan.uz"],
+    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@vatanuz.uz"],
     ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
   ],
   close: "\u0401\u043f\u0438\u0448",
@@ -506,7 +506,7 @@ const emptyStory = {
 };
 
 const DEFAULT_SITE_CONFIG = {
-  siteName: "Vatan.uz",
+  siteName: "Vatanuz.uz",
   logoUrl: "",
   email: "vatankont@gmail.com",
   telegram: "https://t.me/vatanuz",
@@ -515,7 +515,7 @@ const DEFAULT_SITE_CONFIG = {
   specialUz: {
     kicker: "Maxsus loyiha",
     title: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
-    text: "Vatan.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
+    text: "Vatanuz.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi.",
     badge: "Jonli tahririyat",
     image: "",
     features: "Tezkor yangiliklar, Mustaqil tahlil, Ikki tilda, Ishonchli manba",
@@ -527,7 +527,7 @@ const DEFAULT_SITE_CONFIG = {
   specialEn: {
     kicker: "Special Project",
     title: "Data journalism: separating events from noise",
-    text: "Vatan.uz explains important processes in politics, economics, technology, sports and culture in clear language.",
+    text: "Vatanuz.uz explains important processes in politics, economics, technology, sports and culture in clear language.",
     badge: "Live Newsroom",
     image: "",
     features: "Fast news, Independent analysis, Bilingual, Reliable source",
@@ -543,7 +543,7 @@ const fallbackStory = {
   id: "fallback-story",
   title: "Yangi maqola qo'shing",
   summary: "Admin panel orqali birinchi yangilikni joylashtiring.",
-  author: "Vatan.uz",
+  author: "Vatanuz.uz",
   body: "Bu vaqtinchalik matn. Admin paneldan maqola qo'shilganda sayt lentasi yangilanadi.",
 };
 
@@ -861,7 +861,7 @@ const uiEn = {
   "☆ Saqlash": "☆ Save",
   "Izohlar": "Comments",
   "Hozircha izoh yo'q. Birinchi bo'ling!": "No comments yet. Be the first!",
-  "Vatan.uz tahririyati": "Vatan.uz Editorial",
+  "Vatanuz.uz tahririyati": "Vatanuz.uz Editorial",
   "Jonli tahririyat": "Live Newsroom"
 };
 
@@ -1313,7 +1313,7 @@ function App() {
        return {
          ...story,
          category: displayCat,
-         author: story.author === "Vatan.uz tahririyati" ? "Vatan.uz Editorial" : story.author,
+         author: story.author === "Vatanuz.uz tahririyati" ? "Vatanuz.uz Editorial" : story.author,
          read: story.read ? story.read.replace('daqiqa', 'minutes') : story.read
        };
     }
@@ -2362,7 +2362,7 @@ function Special({ t, siteConfig }) {
 
   const kicker   = sp.kicker || t.specialKicker || T(isUz ? "Maxsus loyiha" : "Special Project");
   const title    = sp.title || t.specialTitle || T(isUz ? "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz" : "Data journalism: separating events from noise");
-  const text     = sp.text || t.specialText || T(isUz ? "Vatan.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi." : "Vatan.uz explains important processes in clear language.");
+  const text     = sp.text || t.specialText || T(isUz ? "Vatanuz.uz tahririyati siyosat, iqtisod, texnologiya, sport va madaniyatdagi muhim jarayonlarni ravon tilda tushuntiradi." : "Vatanuz.uz explains important processes in clear language.");
   const badge    = sp.badge || t.specialBadge || T(isUz ? "Jonli tahririyat" : "Live Newsroom");
   const imgSrc   = sp.image || images.newsroom;
   
@@ -2421,7 +2421,7 @@ function Special({ t, siteConfig }) {
 }
 
 function ContactPage({ t, page, siteConfig }) {
-  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatan.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatanuz.uz";
   return (
     <main className="section">
       <div className="section-inner">
@@ -2459,7 +2459,7 @@ function SkeletonCard() {
 }
 
 function AuthorPage({ author, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
-  const authorStories = stories.filter(s => (s.author || "Vatan.uz tahririyati") === author);
+  const authorStories = stories.filter(s => (s.author || "Vatanuz.uz tahririyati") === author);
   const initials = author.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   const isUz = lang !== "en";
   return (
@@ -2581,7 +2581,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
   }, [story.id]);
 
   useEffect(() => {
-    document.title = `${story.title} — Vatan.uz`;
+    document.title = `${story.title} — Vatanuz.uz`;
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
     meta.content = story.summary || "";
@@ -2591,7 +2591,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
     let ogImg = document.querySelector('meta[property="og:image"]');
     if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
     ogImg.content = story.image || "";
-    return () => { document.title = "Vatan.uz"; };
+    return () => { document.title = "Vatanuz.uz"; };
   }, [story.id]);
 
   useEffect(() => {
@@ -4014,7 +4014,7 @@ function AdminSettings({ setSiteConfig, isUz }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Сайт номи</label>
-                  <input type="text" value={settings.siteName || ""} onChange={e => setSettings({...settings, siteName: e.target.value})} placeholder="Vatan.uz" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
+                  <input type="text" value={settings.siteName || ""} onChange={e => setSettings({...settings, siteName: e.target.value})} placeholder="Vatanuz.uz" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Сайт шиори (Tagline)</label>
@@ -4033,7 +4033,7 @@ function AdminSettings({ setSiteConfig, isUz }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Электрон почта</label>
-                  <input type="email" value={settings.contact?.email || ""} onChange={e => setSettings({...settings, contact: {...settings.contact, email: e.target.value}})} placeholder="info@vatan.uz" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
+                  <input type="email" value={settings.contact?.email || ""} onChange={e => setSettings({...settings, contact: {...settings.contact, email: e.target.value}})} placeholder="info@vatanuz.uz" style={{ padding: "14px 16px", border: "1px solid var(--line)", borderRadius: "8px", background: "var(--fill)", color: "var(--ink)", fontSize: "15px", transition: "all 0.2s", outline: "none" }} onFocus={(e)=>e.target.style.borderColor="var(--brand)"} onBlur={(e)=>e.target.style.borderColor="var(--line)"}/>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: "span 2" }}>
                   <label style={{ fontSize: "13px", fontWeight: "700", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Манзил</label>
@@ -5665,7 +5665,7 @@ function AdminSpecial({ setSiteConfig }) {
         <div>
           <label style={labelStyle}>Matn (Description)</label>
           <p style={{fontSize: '12px', color: 'var(--muted)', marginTop: '-4px', marginBottom: '6px'}}>Sarlavha ostidagi izoh va tushuntirish matni</p>
-          <textarea style={{...inputStyle, minHeight: '100px', resize: 'vertical'}} value={special.text || ""} onChange={e => handleUpdate("text", e.target.value)} rows={4} placeholder="Vatan.uz tahririyati..." />
+          <textarea style={{...inputStyle, minHeight: '100px', resize: 'vertical'}} value={special.text || ""} onChange={e => handleUpdate("text", e.target.value)} rows={4} placeholder="Vatanuz.uz tahririyati..." />
         </div>
         <div>
           <label style={labelStyle}>Belgi (Badge)</label>
@@ -6105,7 +6105,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", background: "var(--fill)", padding: "24px" }}>
         <form onSubmit={handleLogin} style={{ background: "var(--surface)", padding: "40px", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", display: "flex", flexDirection: "column", gap: "20px" }}>
-          <h2 style={{ textAlign: "center", color: "var(--brand)", fontSize: "24px", fontWeight: "800" }}>🔑 VATAN.UZ CMS</h2>
+          <h2 style={{ textAlign: "center", color: "var(--brand)", fontSize: "24px", fontWeight: "800" }}>🔑 VATANUZ.UZ CMS</h2>
           <p style={{ textAlign: "center", color: "var(--muted)", fontSize: "14px" }}>
             {loginStep === "password" ? (isUz ? "Tahririyat paneliga kirish uchun parolni kiriting:" : "Enter password to access the panel:") : "4 xonali himoya PIN-kodini kiriting:"}
           </p>
@@ -7052,14 +7052,14 @@ function AdBanner({ ads, position }) {
 
 function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
   const year = new Date().getFullYear();
-  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatan.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatanuz.uz";
   return (
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span className="brand-mark">V</span>
-            <strong style={{ fontSize: "22px", color: "#fff" }}>{siteConfig?.siteName || "Vatan.uz"}</strong>
+            <strong style={{ fontSize: "22px", color: "#fff" }}>{siteConfig?.siteName || "Vatanuz.uz"}</strong>
           </div>
           <p>{t.portal}. O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.</p>
           <div className="footer-socials">
@@ -7079,7 +7079,7 @@ function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
           </div>
         </div>
         <div className="footer-copy">
-          <span>© {year} {siteConfig?.siteName || "Vatan.uz"}. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
+          <span>© {year} {siteConfig?.siteName || "Vatanuz.uz"}. {window.__currentLang === "en" ? "All rights reserved." : (window.__currentLang === "uzk" ? "Барча ҳуқуқлар ҳимояланган." : "Barcha huquqlar himoyalangan.")}</span>
           <span>{contactEmail}</span>
         </div>
       </div>

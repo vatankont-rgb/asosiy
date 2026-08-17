@@ -6,7 +6,7 @@ const preferredPort = config.port;
 
 function listen(port, attemptsLeft = 20) {
   const server = app.listen(port, () => {
-    logger.info(`Vatan.uz Server is running at http://localhost:${port}`);
+    logger.info(`Vatanuz.uz Server is running at http://localhost:${port}`);
   });
 
   server.once('error', (error) => {

@@ -11,7 +11,7 @@ class SettingRepository extends BaseRepository {
     if (list.length === 0) {
       const defaults = {
         id: 'global-settings',
-        siteName: 'Vatan.uz',
+        siteName: 'Vatanuz.uz',
         maintenanceMode: false,
         theme: 'light',
         language: 'uz',

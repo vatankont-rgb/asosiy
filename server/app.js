@@ -126,7 +126,7 @@ app.use(async (req, res, next) => {
           imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
 
-        const pageTitle = `${escText(story.title)} - Vatan.uz`;
+        const pageTitle = `${escText(story.title)} - Vatanuz.uz`;
         const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
         const pageDesc = escText(rawSummary);
         const pageUrl = `${baseUrl}/news/${encodeURIComponent(story.id)}`;
@@ -135,7 +135,7 @@ app.use(async (req, res, next) => {
 
         const ogTags = `
     <!-- Dynamic Open Graph / Telegram / Social Preview -->
-    <meta property="og:site_name" content="Vatan.uz" />
+    <meta property="og:site_name" content="Vatanuz.uz" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${cleanPageUrl}" />
     <meta property="og:title" content="${escText(story.title)}" />
@@ -159,7 +159,7 @@ app.use(async (req, res, next) => {
       // Default website OpenGraph preview tags
       try {
         const settings = await settingRepository.getSettings();
-        const siteName = settings?.siteName || 'Vatan.uz';
+        const siteName = settings?.siteName || 'Vatanuz.uz';
         let ogImage = settings?.ogImage || settings?.logoUrl || '';
         if (ogImage && !ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
           ogImage = `${baseUrl}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
