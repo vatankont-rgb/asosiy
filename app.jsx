@@ -1802,7 +1802,7 @@ function App() {
       )}
 
       {page !== "admin" && (<>
-      <Footer t={t} siteConfig={siteConfig} pages={staticPages.map(p => ({ slug: `page_${p.slug}`, name: p.title[lang] || p.title["uzk"] }))} setPage={(p) => { setPage(p.slug); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
+      <Footer t={t} siteConfig={siteConfig} pages={staticPages.map(p => ({ slug: `page_${p.slug}`, name: p.title[lang] || p.title["uzk"] }))} setPage={(slug) => { setPage(slug); setActiveStory(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} openAdmin={() => { setPage("admin"); setActiveStory(null); }} />
 
       <button
         className={`scroll-top-btn ${scrollVisible ? "visible" : ""}`}
