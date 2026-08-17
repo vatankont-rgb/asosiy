@@ -1832,17 +1832,17 @@ function App() {
           <span>{lang === "uz" ? "Bosh" : (lang === "uzk" ? "Бош" : "Home")}</span>
         </button>
         <button className={`mob-nav-btn ${query ? "active" : ""}`}
-          onClick={() => document.querySelector(".search")?.focus()}>
+          onClick={() => { setMenuOpen(true); setTimeout(() => { const els = document.querySelectorAll(".search"); (els[1] || els[0])?.focus(); }, 100); }}>
           <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>{lang === "uz" ? "Qidirish" : (lang === "uzk" ? "Қидириш" : "Поиск")}</span>
         </button>
-        <button className={`mob-nav-btn ${page === "__saved__" ? "active" : ""}`}
-          onClick={() => { setPage("__saved__"); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
-          <div style={{position: "relative", display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-            {savedIds.length > 0 && <span className="mob-nav-badge-dot">{savedIds.length}</span>}
-          </div>
-          <span>{lang === "uz" ? "Saqlangan" : (lang === "uzk" ? "Сақланган" : "Закладки")}</span>
+        <button className={`mob-nav-btn ${["Videolar", "Видеолар", "Video"].includes(page) ? "active" : ""}`}
+          onClick={() => { setPage(lang === "uz" ? "Videolar" : (lang === "uzk" ? "Видеолар" : "Video")); setActiveStory(null); window.scrollTo({top:0,behavior:"smooth"}); }}>
+          <svg className="mob-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+          <span>{lang === "uz" ? "Video" : (lang === "uzk" ? "Видео" : "Видео")}</span>
         </button>
         <button className={`mob-nav-btn ${menuOpen ? "active" : ""}`}
           onClick={() => { setMenuOpen(true); }}>
