@@ -45,7 +45,7 @@ class ArticleController {
         title: String(story.title || "").trim(),
         summary: String(story.summary || "").trim(),
         image: String(story.image || "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80").trim(),
-        author: String(story.author || "Yangi Kun tahririyati").trim(),
+        author: String(story.author || "Vatan.uz tahririyati").trim(),
         time: String(story.time || "Hozir").trim(),
         read: String(story.read || "3 daqiqa").trim(),
         body: sanitizeHtml(String(story.body || "")),

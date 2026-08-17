@@ -76,7 +76,7 @@ const copy = {
     },
     contact: [
       ["Tahririyat", "Yangilik, press-reliz yoki foto material yuborish uchun: "],
-      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@yangikun.uz"],
+      ["Reklama", "Brend loyihalari, bannerlar va maxsus sahifalar: ads@vatan.uz"],
       ["Manzil", "Toshkent shahri, matbuot markazi, 4-qavat. Dushanba-juma 09:00-18:00."],
     ],
     close: "Yopish",
@@ -147,7 +147,7 @@ copy["uzk"] = {
   },
   contact: [
     ["\u0422\u0430\u04b3\u0440\u0438\u0440\u0438\u044f\u0442", "\u042f\u043d\u0433\u0438\u043b\u0438\u043a, \u043f\u0440\u0435\u0441\u0441-\u0440\u0435\u043b\u0438\u0437 \u0451\u043a\u0438 \u0444\u043e\u0442\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u044e\u0431\u043e\u0440\u0438\u0448 \u0443\u0447\u0443\u043d: vatankont@gmail.com"],
-    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@yangikun.uz"],
+    ["\u0420\u0435\u043a\u043b\u0430\u043c\u0430", "\u0411\u0440\u0435\u043d\u0434 \u043b\u043e\u0439\u0438\u04b3\u0430\u043b\u0430\u0440\u0438, \u0431\u0430\u043d\u043d\u0435\u0440\u043b\u0430\u0440 \u0432\u0430 \u043c\u0430\u0445\u0441\u0443\u0441 \u0441\u0430\u04b3\u0438\u0444\u0430\u043b\u0430\u0440: ads@vatan.uz"],
     ["\u041c\u0430\u043d\u0437\u0438\u043b", "\u0422\u043e\u0448\u043a\u0435\u043d\u0442 \u0448\u0430\u04b3\u0440\u0438, \u043c\u0430\u0442\u0431\u0443\u043e\u0442 \u043c\u0430\u0440\u043a\u0430\u0437\u0438, 4-\u049b\u0430\u0432\u0430\u0442. \u0414\u0443\u0448\u0430\u043d\u0431\u0430-\u0436\u0443\u043c\u0430 09:00-18:00."],
   ],
   close: "\u0401\u043f\u0438\u0448",
@@ -509,7 +509,7 @@ const DEFAULT_SITE_CONFIG = {
   siteName: "Vatan.uz",
   logoUrl: "",
   email: "vatankont@gmail.com",
-  telegram: "https://t.me/yangikun",
+  telegram: "https://t.me/vatanuz",
   bannerText: "",
   bannerActive: false,
   specialUz: {
@@ -1374,7 +1374,7 @@ function App() {
     }
     const matchesPage = !selectedCategory || story.category === selectedCategory;
     const matchesFilter = filter === "all" || story.category === filter || filter === t.all;
-    const isEditor = page === "home" ? !!story.isEditorChoice : true;
+    const isEditor = true;
     return matchesPage && matchesFilter && isEditor;
   });
 
@@ -6994,15 +6994,15 @@ function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
       <div className="footer-inner">
         <div className="footer-brand">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="brand-mark">YK</span>
+            <span className="brand-mark">V</span>
             <strong style={{ fontSize: "22px", color: "#fff" }}>{siteConfig?.siteName || "Vatan.uz"}</strong>
           </div>
           <p>{t.portal}. O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.</p>
           <div className="footer-socials">
-            <a href="https://t.me/yangikun" target="_blank" rel="noopener" title="Telegram">✈</a>
-            <a href="https://instagram.com/yangikun" target="_blank" rel="noopener" title="Instagram">📷</a>
-            <a href="https://youtube.com/@yangikun" target="_blank" rel="noopener" title="YouTube">▶</a>
-            <a href="https://facebook.com/yangikun" target="_blank" rel="noopener" title="Facebook">f</a>
+            <a href="https://t.me/vatanuz" target="_blank" rel="noopener" title="Telegram">✈</a>
+            <a href="https://instagram.com/vatanuz" target="_blank" rel="noopener" title="Instagram">📷</a>
+            <a href="https://youtube.com/@vatanuz" target="_blank" rel="noopener" title="YouTube">▶</a>
+            <a href="https://facebook.com/vatanuz" target="_blank" rel="noopener" title="Facebook">f</a>
           </div>
         </div>
         <div className="footer-nav">

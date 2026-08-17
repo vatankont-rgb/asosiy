@@ -4,8 +4,8 @@
   --line: #d9e0ea;
   --paper: #f7f8fb;
   --surface: #ffffff;
-  --brand: #c31932;
-  --brand-dark: #8f1022;
+  --brand: #0033a0;
+  --brand-dark: #002270;
   --accent: #0f766e;
   --blue: #1d4ed8;
   --gold: #b7791f;
@@ -18,8 +18,8 @@
   --line: #2a3344;
   --paper: #0f1623;
   --surface: #182030;
-  --brand: #e63950;
-  --brand-dark: #c31932;
+  --brand: #4d7fd4;
+  --brand-dark: #0033a0;
   --accent: #14b8a6;
   --blue: #60a5fa;
   --gold: #f6ad55;
@@ -4738,16 +4738,16 @@ textarea.field-error {
 }
 .special-design-light .special-bg-grid {
   background-image:
-    linear-gradient(rgba(195, 25, 50, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(195, 25, 50, 0.04) 1px, transparent 1px) !important;
+    linear-gradient(rgba(0, 51, 160, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 51, 160, 0.04) 1px, transparent 1px) !important;
 }
 .special-design-light::after {
-  background: radial-gradient(circle, rgba(195, 25, 50, 0.06) 0%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(0, 51, 160, 0.06) 0%, transparent 70%) !important;
 }
 .special-design-light .special-kicker {
-  background: rgba(195, 25, 50, 0.08);
-  border-color: rgba(195, 25, 50, 0.25);
-  color: #c31932;
+  background: rgba(0, 51, 160, 0.08);
+  border-color: rgba(0, 51, 160, 0.25);
+  color: #0033a0;
 }
 .special-design-light .special-title {
   color: #0f172a !important;
@@ -4762,12 +4762,12 @@ textarea.field-error {
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .special-design-light .special-feature-tag:hover {
-  background: rgba(195, 25, 50, 0.06);
-  border-color: rgba(195, 25, 50, 0.3);
-  color: #c31932;
+  background: rgba(0, 51, 160, 0.06);
+  border-color: rgba(0, 51, 160, 0.3);
+  color: #0033a0;
 }
 .special-design-light .special-dot {
-  background: #c31932;
+  background: #0033a0;
 }
 .special-design-light .special-stat {
   background: #fff;
@@ -4775,8 +4775,8 @@ textarea.field-error {
   box-shadow: 0 2px 12px rgba(0,0,0,0.05);
 }
 .special-design-light .special-stat:hover {
-  background: rgba(195, 25, 50, 0.04);
-  border-color: rgba(195, 25, 50, 0.2);
+  background: rgba(0, 51, 160, 0.04);
+  border-color: rgba(0, 51, 160, 0.2);
 }
 .special-design-light .special-stat strong {
   color: #0f172a !important;
