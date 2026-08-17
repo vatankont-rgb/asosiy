@@ -2408,7 +2408,7 @@ function Special({ t, siteConfig }) {
 }
 
 function ContactPage({ t, page, siteConfig }) {
-  const contactEmail = siteConfig?.contact?.email || "info@vatan.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatan.uz";
   return (
     <main className="section">
       <div className="section-inner">
@@ -6988,7 +6988,7 @@ function AdBanner({ ads, position }) {
 
 function Footer({ t, pages, setPage, openAdmin, siteConfig }) {
   const year = new Date().getFullYear();
-  const contactEmail = siteConfig?.contact?.email || "info@vatan.uz";
+  const contactEmail = siteConfig?.contact?.email || siteConfig?.email || "info@vatan.uz";
   return (
     <footer className="footer">
       <div className="footer-inner">
