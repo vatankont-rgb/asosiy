@@ -1472,22 +1472,7 @@ function App() {
               </div>
             )}
           </button>
-          <nav className="nav-links" aria-label="Main navigation">
-            {pages.slice(1).map((item) => (
-              <button
-                key={item.slug}
-                className={`nav-link ${page === item.slug ? "active" : ""}`}
-                onClick={() => {
-                  setPage(item.slug);
-                  setFilter("all");
-                  setActiveStory(null);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              >
-                {item.name}
-              </button>
-            ))}
-          </nav>
+
           <div className="actions">
             <div className="desktop-search" style={{ display: "flex", alignItems: "center" }}>
               {!searchOpen ? (
