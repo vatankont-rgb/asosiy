@@ -1271,11 +1271,15 @@ function App() {
   }
 
   function handleView(storyId) {
-    setAllStories(prev => ({
-      ...prev,
-      uz: prev.uz.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
-      en: prev.en.map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s),
-    }));
+    setAllStories(prev => {
+      const next = { ...prev };
+      Object.keys(next).forEach(l => {
+        if (next[l] && Array.isArray(next[l])) {
+          next[l] = next[l].map(s => s.id === storyId ? { ...s, views: (s.views || 0) + 1 } : s);
+        }
+      });
+      return next;
+    });
   }
 
   useEffect(() => {
@@ -2542,7 +2546,10 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
     // Increment views
     fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' })
       .then(res => {
-        if (res.ok) setLocalViews(prev => prev + 1);
+        if (res.ok) {
+          setLocalViews(prev => prev + 1);
+          if (typeof onView === 'function') onView(story.id);
+        }
       })
       .catch(console.error);
   }, [story.id, lang]);
