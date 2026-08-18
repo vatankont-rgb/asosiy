@@ -72,7 +72,8 @@ class SettingController {
       const articles = await articleRepository.getAll();
       const uzArticles = articles.uz || [];
       const enArticles = articles.en || [];
-      const allArticles = [...uzArticles, ...enArticles];
+      const uzkArticles = articles.uzk || [];
+      const allArticles = [...uzArticles, ...enArticles, ...uzkArticles];
 
       const stats = {
         totalArticles: allArticles.length,
@@ -120,15 +121,28 @@ class SettingController {
         diskUsagePercent
       };
 
-      const weeklyViews = [
-        { name: 'Dushanba', views: 4000 },
-        { name: 'Seshanba', views: 3000 },
-        { name: 'Chorshanba', views: 5000 },
-        { name: 'Payshanba', views: 2780 },
-        { name: 'Juma', views: 8900 },
-        { name: 'Shanba', views: 2390 },
-        { name: 'Yakshanba', views: 3490 },
-      ];
+      const daysStr = ['Yakshanba', 'Dush', 'Sesh', 'Chor', 'Pay', 'Juma', 'Shanba'];
+      const weeklyViews = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        const articlesOnDate = allArticles.filter(a => {
+           if (!a.createdAt) return false;
+           try {
+             return new Date(a.createdAt).toISOString().split('T')[0] === dateStr;
+           } catch(e) { return false; }
+        });
+
+        const dayViews = articlesOnDate.reduce((sum, a) => sum + (parseInt(a.views) || 0), 0);
+        
+        weeklyViews.push({
+          name: i === 0 ? 'Bugun' : daysStr[d.getDay()],
+          views: dayViews,
+          articles: articlesOnDate.length
+        });
+      }
 
       const catCount = {};
       allArticles.forEach(a => {

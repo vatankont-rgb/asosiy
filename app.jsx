@@ -6404,7 +6404,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                             <XAxis dataKey="name" tick={{fill: "var(--muted)", fontSize: 12}} />
                             <YAxis tick={{fill: "var(--muted)", fontSize: 12}} />
                             <Tooltip contentStyle={{ background: "var(--surface)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
-                            <Bar dataKey="views" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="articles" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
