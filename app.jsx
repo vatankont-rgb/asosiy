@@ -1407,7 +1407,9 @@ function App() {
   async function refreshPublicStories() {
     setLoading(true);
     try {
-      const response = await fetch("/api/stories");
+      const response = await fetch("/api/stories", {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
+      });
       if (!response.ok) throw new Error("API javob bermadi");
       const data = await response.json();
       const uzStories = data.stories.uz.length ? data.stories.uz : withIds(storyData).uz;
@@ -2547,7 +2549,10 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
     const viewedKey = `viewed_${story.id}`;
     if (!localStorage.getItem(viewedKey)) {
       localStorage.setItem(viewedKey, "true");
-      fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' })
+      fetch(`/api/${lang}/${story.id}/view`, { 
+        method: 'POST',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      })
         .then(res => {
           if (res.ok) {
             setLocalViews(prev => prev + 1);
