@@ -4276,6 +4276,41 @@ function AdminSettings({ setSiteConfig, isUz }) {
 
         {activeTab === "system" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+            {/* Cache Control */}
+            <div style={{ background: "var(--fill)", padding: "32px", borderRadius: "16px", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: "24px", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: "-20px", right: "-20px", fontSize: "120px", opacity: 0.03, pointerEvents: "none" }}>🧹</div>
+              <div>
+                <h4 style={{ fontSize: "20px", fontWeight: "800", color: "var(--ink)", margin: "0 0 8px 0" }}>Sayt Keshini Tozalash</h4>
+                <p style={{ fontSize: "15px", color: "var(--muted)", margin: 0, lineHeight: "1.5" }}>Brauzerda va tizimda qolib ketgan eskirgan ma'lumotlarni (keshni) tozalaydi. Yangilanishlar darhol ko'rinishi uchun buni ishlatishingiz mumkin.</p>
+              </div>
+              <div>
+                <button type="button" onClick={async () => {
+                  if (window.confirm("Barcha brauzer keshini tozalashni xohlaysizmi? Sayt qayta yuklanadi.")) {
+                    try {
+                      if ('serviceWorker' in navigator) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        for (let r of regs) { await r.unregister(); }
+                      }
+                      if ('caches' in window) {
+                        const names = await caches.keys();
+                        for (let name of names) { await caches.delete(name); }
+                      }
+                      const keys = Object.keys(localStorage);
+                      keys.forEach(k => {
+                        if(k !== 'yk_session' && k !== 'adminToken') localStorage.removeItem(k);
+                      });
+                      alert("Kesh muvaffaqiyatli tozalandi!");
+                      window.location.reload(true);
+                    } catch (err) {
+                      alert("Xatolik: " + err.message);
+                    }
+                  }
+                }} style={{ padding: "12px 24px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer", fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "8px", transition: "all 0.2s" }} onMouseOver={(e)=>e.target.style.opacity=0.9} onMouseOut={(e)=>e.target.style.opacity=1}>
+                  <span style={{ fontSize: "18px" }}>🧹</span> Keshni tozalash va yangilash
+                </button>
+              </div>
+            </div>
+
             {/* Backups Controls */}
             <div style={{ background: "var(--fill)", padding: "32px", borderRadius: "16px", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: "24px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: "-20px", right: "-20px", fontSize: "120px", opacity: 0.03, pointerEvents: "none" }}>💾</div>
