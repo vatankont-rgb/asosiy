@@ -2544,14 +2544,23 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
       .catch(console.error);
       
     // Increment views
-    fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' })
-      .then(res => {
-        if (res.ok) {
-          setLocalViews(prev => prev + 1);
-          if (typeof onView === 'function') onView(story.id);
-        }
-      })
-      .catch(console.error);
+    const viewedKey = `viewed_${story.id}`;
+    if (!localStorage.getItem(viewedKey)) {
+      localStorage.setItem(viewedKey, "true");
+      fetch(`/api/${lang}/${story.id}/view`, { method: 'POST' })
+        .then(res => {
+          if (res.ok) {
+            setLocalViews(prev => prev + 1);
+            if (typeof onView === 'function') onView(story.id);
+          } else {
+            localStorage.removeItem(viewedKey);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          localStorage.removeItem(viewedKey);
+        });
+    }
   }, [story.id, lang]);
 
   const [commentName, setCommentName] = useState("");
