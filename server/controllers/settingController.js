@@ -145,8 +145,28 @@ class SettingController {
       }
 
       const catCount = {};
+      let dbCategories = [];
+      try {
+        const catPath = require('path').join(__dirname, '../storage/categories.json');
+        dbCategories = JSON.parse(fs.readFileSync(catPath, 'utf8'));
+      } catch(e) {}
+      
+      const catMap = {};
+      dbCategories.forEach(c => {
+         const canon = c.names?.uz || c.slug;
+         if (c.names) {
+           Object.values(c.names).forEach(val => {
+             if (val) catMap[val.toLowerCase().trim()] = canon;
+           });
+         }
+      });
+
       allArticles.forEach(a => {
-        catCount[a.category] = (catCount[a.category] || 0) + 1;
+        if (!a.category) return;
+        const canonCat = catMap[a.category.toLowerCase().trim()];
+        if (canonCat) {
+          catCount[canonCat] = (catCount[canonCat] || 0) + 1;
+        }
       });
       const categoryData = Object.keys(catCount).map(c => ({ name: c, value: catCount[c] }));
 
