@@ -6703,7 +6703,9 @@ const [activeTab, setActiveTab] = useState("dashboard");
                       let newBody = form.body;
                       let newTags = form.tags;
                       
-                      if ((form.articleLang === "uzk" && newLang === "uz") || (form.articleLang === "uz" && newLang === "uzk")) {
+                      const currentLang = form.articleLang || "uzk";
+                      
+                      if ((currentLang === "uzk" && newLang === "uz") || (currentLang === "uz" && newLang === "uzk")) {
                         const toCyrillic = newLang === "uzk";
                         newTitle = convertText(form.title, toCyrillic);
                         newSummary = convertText(form.summary, toCyrillic);
