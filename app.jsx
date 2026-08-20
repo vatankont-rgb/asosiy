@@ -1795,13 +1795,7 @@ function App() {
                             onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
                         )) : <div className="empty-state">{T("Bu bo'limda hozircha maqola yo'q.")}</div>}
                     </div>
-                    {page === "home" && visibleStories.length > 8 && (
-                      <div style={{textAlign:"center", marginTop:24}}>
-                        <button className="load-more-btn" onClick={() => { setFilter("all"); setPage("barcha-yangiliklar"); window.scrollTo({top:0,behavior:"smooth"}); }}>
-                          {lang !== "en" ? `Ko'proq ko'rish (${visibleStories.length - 8} ta qoldi)` : `Show more (left ${visibleStories.length - 8})`}
-                        </button>
-                      </div>
-                    )}
+                    
                   </div>
                   <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} ads={ads} />
                 </div>
