@@ -1789,7 +1789,7 @@ function App() {
                     <div className="stories-grid">
                       {loading
                         ? Array.from({length: 6}).map((_, i) => <SkeletonCard key={i} />)
-                        : visibleStories.length ? (page === "home" ? [...visibleStories, ...visibleStories].slice(0, 8) : visibleStories).map((story, index) => (
+                        : visibleStories.length ? (page === "home" ? visibleStories.slice(0, 8) : visibleStories).map((story, index) => (
                           <StoryCard lang={lang} key={`${story.id}-${index}`} story={story} featured={page !== "home" && index === 0}
                             savedIds={savedIds} onToggleSave={toggleSave}
                             onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
