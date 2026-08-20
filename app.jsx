@@ -1385,7 +1385,8 @@ function App() {
     return { ...story, category: displayCat };
   });
   const adminStories = allStories[dataLang] || [];
-
+  const displayVideos = lang === "uz" ? (videos["uz"]?.length ? videos["uz"] : (videos["uzk"] || []).map(v => ({...v, title: convertText(v.title, false), meta: convertText(v.meta, false), body: convertText(v.body, false)}))) : (videos[lang] || []);
+  const displayPhotos = lang === "uz" ? (photos["uz"]?.length ? photos["uz"] : (photos["uzk"] || []).map(p => ({...p, title: convertText(p.title, false), meta: convertText(p.meta, false), body: convertText(p.body, false)}))) : (photos[lang] || []);
   // URL дан мақола юклаш ёки тил ўзгарганда activeStory ни янгилаш
   if (window.__pendingStoryId && stories.length > 0) {
     const pid = window.__pendingStoryId;
@@ -1794,7 +1795,7 @@ function App() {
             <VideosPage 
               lang={lang} 
               t={t} 
-              mediaItems={videos[lang] || []}
+              mediaItems={displayVideos}
               onOpen={(video) => {
                 setActiveStory(video);
                 window.scrollTo({ top: 0, behavior: "instant" });
@@ -1805,7 +1806,7 @@ function App() {
             <PhotosPage 
               lang={lang} 
               t={t} 
-              mediaItems={photos[lang] || []}
+              mediaItems={displayPhotos}
               onOpen={(photo) => {
                 setActiveStory(photo);
                 window.scrollTo({ top: 0, behavior: "instant" });
@@ -1864,7 +1865,7 @@ function App() {
 
           {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <AdBanner ads={ads} position="bottom" />}
           {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <BreakingBanner t={t} lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
-          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <MediaSection lang={lang} items={[...(videos[lang] || []), ...(photos[lang] || [])]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
+          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <MediaSection lang={lang} items={[...displayVideos, ...displayPhotos]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
           {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <Special t={t} dial={false} siteConfig={siteConfig} />}
         </>
       )}
