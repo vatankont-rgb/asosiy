@@ -5290,7 +5290,7 @@ textarea.field-error {
   color: var(--muted);
 }
 
-.article-body-text {
+.article-body-text { text-align: justify;
   font-family: 'Lora', Georgia, serif;
   font-size: 21px;
   line-height: 1.85;
@@ -5388,7 +5388,7 @@ textarea.field-error {
   .article-related-grid {
     grid-template-columns: 1fr;
   }
-  .article-body-text {
+  .article-body-text { text-align: justify;
     font-size: 19px;
   }
 }
@@ -7442,7 +7442,7 @@ textarea.field-error {
   background-color: #151515 !important;
   color: #e0e0e0 !important;
 }
-.clean-read-active .article-body-text {
+.clean-read-active .article-body-text { text-align: justify;
   font-family: 'Lora', Georgia, serif !important;
   font-size: 20px !important;
   line-height: 1.85 !important;
@@ -7568,4 +7568,7 @@ textarea.field-error {
     display: none !important;
   }
 }
+
+
+.article-body-text p, .article-body-text div { text-align: justify; hyphens: auto; -webkit-hyphens: auto; -moz-hyphens: auto; }
 
