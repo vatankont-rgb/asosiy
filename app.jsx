@@ -6697,7 +6697,29 @@ const [activeTab, setActiveTab] = useState("dashboard");
                       if(categories && categories.length > 0) {
                          newCat = categories[0].names[newLang] || categories[0].names["en"] || categories[0].slug;
                       }
-                      setForm({ ...form, articleLang: newLang, category: newCat });
+                      
+                      let newTitle = form.title;
+                      let newSummary = form.summary;
+                      let newBody = form.body;
+                      let newTags = form.tags;
+                      
+                      if ((form.articleLang === "uzk" && newLang === "uz") || (form.articleLang === "uz" && newLang === "uzk")) {
+                        const toCyrillic = newLang === "uzk";
+                        newTitle = convertText(form.title, toCyrillic);
+                        newSummary = convertText(form.summary, toCyrillic);
+                        newBody = convertText(form.body, toCyrillic);
+                        newTags = convertText(form.tags, toCyrillic);
+                      }
+                      
+                      setForm({ 
+                        ...form, 
+                        articleLang: newLang, 
+                        category: newCat,
+                        title: newTitle,
+                        summary: newSummary,
+                        body: newBody,
+                        tags: newTags
+                      });
                     }}
                     className="adm-form-input"
                   >
