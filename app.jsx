@@ -1294,12 +1294,49 @@ function App() {
   const t = { ...baseCopy, ...remoteCopy };
   const dataLang = lang;
   const now = new Date().toISOString();
-  const rawStories = (allStories[dataLang] || []).filter((story) => {
+  const isPublished = (story) => {
     if (story.status !== "published") return false;
-    // Rejalashtirish sanasi o'tganmi yoki yo'qmi
     if (story.publishAt && story.publishAt > now) return false;
     return true;
-  });
+  };
+  // UZ va UZK maqolalarini birlashtirish: kril maqolalari lotinda ham, lotin maqolalari krilda ham ko'rinadi
+  const rawStories = (() => {
+    if (lang === "uz") {
+      const native = (allStories["uz"] || []).filter(isPublished);
+      const nativeIds = new Set(native.map(s => s.id));
+      const fromCyrillic = (allStories["uzk"] || []).filter(isPublished).filter(s => !nativeIds.has(s.id)).map(s => ({
+        ...s,
+        title: convertText(s.title, false),
+        summary: convertText(s.summary, false),
+        body: convertText(s.body, false),
+        author: convertText(s.author, false),
+        category: convertText(s.category, false),
+        read: convertText(s.read, false),
+        time: convertText(s.time, false),
+        tags: convertText(s.tags, false),
+        _transliterated: true
+      }));
+      return [...native, ...fromCyrillic].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    if (lang === "uzk") {
+      const native = (allStories["uzk"] || []).filter(isPublished);
+      const nativeIds = new Set(native.map(s => s.id));
+      const fromLatin = (allStories["uz"] || []).filter(isPublished).filter(s => !nativeIds.has(s.id)).map(s => ({
+        ...s,
+        title: convertText(s.title, true),
+        summary: convertText(s.summary, true),
+        body: convertText(s.body, true),
+        author: convertText(s.author, true),
+        category: convertText(s.category, true),
+        read: convertText(s.read, true),
+        time: convertText(s.time, true),
+        tags: convertText(s.tags, true),
+        _transliterated: true
+      }));
+      return [...native, ...fromLatin].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    return (allStories[dataLang] || []).filter(isPublished);
+  })();
   // Крилл тилда кўрсатишда матнни автоматик ўгириш
   const stories = rawStories.map(story => {
     let catVal = story.category === "Iqtisod" ? "Iqtisodiyot" : story.category;
@@ -1322,6 +1359,9 @@ function App() {
        };
     }
     if (lang === "uzk") {
+       if (story._transliterated) {
+         return { ...story, category: displayCat };
+       }
        return {
          ...story,
          title: convertText(story.title, true),
@@ -1334,7 +1374,10 @@ function App() {
          tags: convertText(story.tags, true)
        };
     }
-    return story;
+    if (story._transliterated) {
+      return { ...story, category: displayCat };
+    }
+    return { ...story, category: displayCat };
   });
   const adminStories = allStories[dataLang] || [];
   const pages = categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }));
