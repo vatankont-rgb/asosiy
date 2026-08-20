@@ -1385,6 +1385,25 @@ function App() {
     return { ...story, category: displayCat };
   });
   const adminStories = allStories[dataLang] || [];
+
+  // URL дан мақола юклаш ёки тил ўзгарганда activeStory ни янгилаш
+  if (window.__pendingStoryId && stories.length > 0) {
+    const pid = window.__pendingStoryId;
+    const found = stories.find(s => s.id === pid || s.slug === pid);
+    if (found) {
+      window.__pendingStoryId = null;
+      setTimeout(() => setActiveStory(found), 0);
+    }
+  }
+
+  // Тил ўзгарганда очиқ мақолани транслитерация қилиш
+  if (activeStory && stories.length > 0) {
+    const updated = stories.find(s => s.id === activeStory.id);
+    if (updated && updated !== activeStory && (updated.title !== activeStory.title || updated.body !== activeStory.body)) {
+      setTimeout(() => setActiveStory(updated), 0);
+    }
+  }
+
   const pages = categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }));
   const selectedCategory = page === 'home' || page === 'admin' || page === 'barcha-yangiliklar' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
 
@@ -1393,7 +1412,6 @@ function App() {
       setLang(nextLang);
       setFilter("all");
       setQuery("");
-      setActiveStory(null);
     } catch(e) {
     }
   }
@@ -1477,14 +1495,7 @@ function App() {
             if (m) storyId = m[1];
           }
           if (storyId) {
-            let found = null;
-            for (const langKey of Object.keys(next)) {
-              found = next[langKey].find(s => s.id === storyId || s.slug === storyId);
-              if (found) break;
-            }
-            if (found) {
-              setActiveStory(found);
-            }
+            window.__pendingStoryId = storyId;
           }
         }, 100);
         return next;
