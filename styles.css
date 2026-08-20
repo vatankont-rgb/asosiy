@@ -7570,5 +7570,5 @@ textarea.field-error {
 }
 
 
-.article-body-text p, .article-body-text div { text-align: justify; hyphens: auto; -webkit-hyphens: auto; -moz-hyphens: auto; }
+.article-body-text p:not([style*="text-align"]):not([class*="align"]):not([class*="text-"]):not([align]), .article-body-text div:not([style*="text-align"]):not([class*="align"]):not([class*="text-"]):not([align]) { text-align: justify; hyphens: auto; -webkit-hyphens: auto; -moz-hyphens: auto; }
 
