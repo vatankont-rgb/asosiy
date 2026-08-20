@@ -564,7 +564,7 @@ function RichEditor({ value, onChange }) {
     if (el.innerHTML !== value) {
       el.innerHTML = value || "";
     }
-  }, []);
+  }, [value]);
 
   function exec(cmd, val = null) {
     editorRef.current.focus();
