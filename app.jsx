@@ -6761,6 +6761,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <label className="adm-form-label">Matn</label>
                   <RichEditor 
+                    key={form.articleLang || "uzk"}
                     value={form.body}
                     onChange={(html) => setForm({ ...form, body: html })}
                   />
