@@ -57,7 +57,8 @@ class ArticleController {
         createdAt: story.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         views: parseInt(story.views) || 0,
-        videoUrl: String(story.videoUrl || "").trim()
+        videoUrl: String(story.videoUrl || "").trim(),
+          tags: String(story.tags || "").trim()
       };
 
       await articleRepository.addStory(targetLang, normalized);

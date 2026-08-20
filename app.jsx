@@ -6053,13 +6053,13 @@ const [activeTab, setActiveTab] = useState("dashboard");
         res = await fetch(`/api/admin/stories/${langKey}/${editingStory.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ story: form })
+          body: JSON.stringify({ story: { ...form, tags: tagInput.trim() ? Array.from(new Set([...(form.tags ? form.tags.split(', ') : []), tagInput.trim()])).join(', ') : form.tags } })
         });
       } else {
         res = await fetch("/api/admin/stories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang: langKey, story: form })
+          body: JSON.stringify({ lang: langKey, story: { ...form, tags: tagInput.trim() ? Array.from(new Set([...(form.tags ? form.tags.split(', ') : []), tagInput.trim()])).join(', ') : form.tags } })
         });
       }
       if (res.ok) {
