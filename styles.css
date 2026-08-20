@@ -7572,3 +7572,7 @@ textarea.field-error {
 
 .article-body-text p:not([style*="text-align"]):not([class*="align"]):not([class*="text-"]):not([align]), .article-body-text div:not([style*="text-align"]):not([class*="align"]):not([class*="text-"]):not([align]) { text-align: justify; hyphens: auto; -webkit-hyphens: auto; -moz-hyphens: auto; }
 
+
+.article-tag-item { padding: 4px 12px; background: rgba(33, 150, 243, 0.1); color: var(--brand); border-radius: 20px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+.article-tag-item:hover { background: var(--brand); color: #fff; }
+

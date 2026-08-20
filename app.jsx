@@ -2860,7 +2860,7 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
               );
             })()}
 
-            <div className="article-share">
+            {tags && tags.length > 0 && (<div className="article-tags" style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}><span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)", marginRight: "8px", alignSelf: "center" }}>{lang === "uz" ? "Teglar:" : (lang === "uzk" ? "Теглар:" : "Tags:")}</span>{tags.map((tag, i) => (<a key={i} href={`/${lang}?q=${encodeURIComponent(tag)}`} className="article-tag-item">#{tag}</a>))}</div>)}<div className="article-share">
               <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Share:")}</span>
               {(() => {
                 const shareUrl = `${window.location.origin}/news/${story.id}`;
