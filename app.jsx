@@ -1993,6 +1993,7 @@ function MediaSection({ lang, items, onOpen, setPage }) {
     const rest = blockItems.slice(1);
     return (
       <div className="media-block">
+        {/* DEBUG: type={type}, blockItems={blockItems.length} */}
         <div className="media-block-head">
           {type === "photo" ? (
             <button 
