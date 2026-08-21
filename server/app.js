@@ -102,6 +102,17 @@ const fs = require('fs');
 const articleRepository = require('./repositories/articleRepository');
 const settingRepository = require('./repositories/settingRepository');
 
+// Google Site Verification file auto-handler (e.g. /google[code].html)
+app.get('/google:code.html', (req, res) => {
+  const code = req.params.code;
+  const fileName = `google${code}.html`;
+  const filePath = path.join(rootDir, fileName);
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  res.type('text/html').send(`google-site-verification: google${code}.html`);
+});
+
 // Fallback wild-card handler for Single Page Application routing (with SSR SEO meta injection)
 app.use(async (req, res, next) => {
   try {
