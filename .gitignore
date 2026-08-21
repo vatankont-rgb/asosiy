@@ -22,3 +22,7 @@ uploads/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Deploy scripts with credentials
+*deploy*.js
+update_server.js
