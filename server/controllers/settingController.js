@@ -299,7 +299,11 @@ class SettingController {
           const latestBackup = backups[backups.length - 1];
           try {
             const backupData = JSON.parse(fs.readFileSync(path.join(config.backupsDir, latestBackup), 'utf8'));
-            if (filename === 'articles.json' && backupData.articles) {
+            const key = filename.replace('.json', '');
+            if (backupData.data && backupData.data[key]) {
+              fs.writeFileSync(filePath, JSON.stringify(backupData.data[key], null, 2), 'utf8');
+              restoredFromBackup = true;
+            } else if (filename === 'articles.json' && backupData.articles) {
               fs.writeFileSync(filePath, JSON.stringify(backupData.articles, null, 2), 'utf8');
               restoredFromBackup = true;
             } else if (filename === 'settings.json' && backupData.settings) {

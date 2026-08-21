@@ -9,6 +9,67 @@ const filesToCheck = [
   'tags.json', 'users.json', 'vapid.json', 'videos.json'
 ];
 
+function performDailyBackup() {
+  try {
+    if (!fs.existsSync(config.backupsDir)) {
+      fs.mkdirSync(config.backupsDir, { recursive: true });
+    }
+
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const backupFilename = `backup-${dateStr}.json`;
+    const backupFilePath = path.join(config.backupsDir, backupFilename);
+
+    const snapshot = {
+      timestamp: now.toISOString(),
+      date: dateStr,
+      data: {}
+    };
+
+    filesToCheck.forEach(file => {
+      const key = file.replace('.json', '');
+      const filePath = path.join(config.storageDir, file);
+      if (fs.existsSync(filePath)) {
+        try {
+          const content = fs.readFileSync(filePath, 'utf8');
+          snapshot.data[key] = JSON.parse(content);
+        } catch (e) {
+          logger.warn(`Zaxiraga olishda faylni o'qishda ogohlantirish (${file}): ${e.message}`);
+        }
+      }
+    });
+
+    // Support direct backward compatibility with { articles, settings }
+    if (snapshot.data.articles) snapshot.articles = snapshot.data.articles;
+    if (snapshot.data.settings) snapshot.settings = snapshot.data.settings;
+
+    fs.writeFileSync(backupFilePath, JSON.stringify(snapshot, null, 2), 'utf8');
+    
+    // Also save latest pointer
+    fs.writeFileSync(path.join(config.backupsDir, 'backup-latest.json'), JSON.stringify(snapshot, null, 2), 'utf8');
+
+    const sizeKB = (fs.statSync(backupFilePath).size / 1024).toFixed(1);
+    logger.info(`💾 [ZAXIRA] Avtomatik kunlik zaxira muvaffaqiyatli saqlandi: ${backupFilename} (${sizeKB} KB)`);
+
+    // Clean up backups older than 30 days (Auto-rotation to save disk space)
+    const allBackups = fs.readdirSync(config.backupsDir)
+      .filter(f => f.startsWith('backup-') && f.endsWith('.json') && f !== 'backup-latest.json')
+      .sort();
+
+    if (allBackups.length > 30) {
+      const toDelete = allBackups.slice(0, allBackups.length - 30);
+      toDelete.forEach(oldFile => {
+        try {
+          fs.unlinkSync(path.join(config.backupsDir, oldFile));
+          logger.info(`🧹 [ROTATSIYA] Eski zaxira o'chirildi (30 kundan ortiq): ${oldFile}`);
+        } catch (_) {}
+      });
+    }
+  } catch (err) {
+    logger.error(`❌ Kunlik zaxira yaratishda xatolik: ${err.message}`);
+  }
+}
+
 function performAutoRepair() {
   logger.info('Avtomatik tizim salomatligi tekshiruvi boshlandi...');
   let repairedCount = 0;
@@ -48,7 +109,12 @@ function performAutoRepair() {
           if (backups.length > 0) {
             const latestBackup = backups[backups.length - 1];
             const backupData = JSON.parse(fs.readFileSync(path.join(config.backupsDir, latestBackup), 'utf8'));
-            if (file === 'articles.json' && backupData.articles) {
+            const key = file.replace('.json', '');
+            
+            if (backupData.data && backupData.data[key]) {
+              fs.writeFileSync(filePath, JSON.stringify(backupData.data[key], null, 2), 'utf8');
+              restored = true;
+            } else if (file === 'articles.json' && backupData.articles) {
               fs.writeFileSync(filePath, JSON.stringify(backupData.articles, null, 2), 'utf8');
               restored = true;
             } else if (file === 'settings.json' && backupData.settings) {
@@ -78,11 +144,17 @@ function performAutoRepair() {
 }
 
 function startScheduler() {
-  // Run immediately on server start
-  setTimeout(performAutoRepair, 5000);
+  // Run check & initial daily backup on server start
+  setTimeout(() => {
+    performAutoRepair();
+    performDailyBackup();
+  }, 5000);
 
-  // Run every 24 hours (86400000 ms)
-  setInterval(performAutoRepair, 24 * 60 * 60 * 1000);
+  // Run auto repair and backup every 24 hours (86400000 ms)
+  setInterval(() => {
+    performAutoRepair();
+    performDailyBackup();
+  }, 24 * 60 * 60 * 1000);
 }
 
-module.exports = { startScheduler, performAutoRepair };
+module.exports = { startScheduler, performAutoRepair, performDailyBackup };
