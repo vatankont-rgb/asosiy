@@ -11,24 +11,7 @@ class ArticleRepository {
 
   ensureFile() {
     if (!fs.existsSync(this.filePath)) {
-      const seed = {
-        uz: [
-          this.createSeed("Siyosat", "Hududlarda ochiq budjet muhokamalari yangi tartibda o'tkaziladi", "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi.", "Dilnoza Karimova", "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Iqtisod", "Kichik biznes uchun eksport maslahat markazlari ishga tushmoqda", "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi.", "Akmal Saidov", "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Texnologiya", "Universitet laboratoriyasida mahalliy AI yordamchisi sinovdan o'tkazildi", "Loyiha o'zbek tilidagi savol-javob, hujjat tahlili va ta'lim jarayoniga moslashishga qaratilgan.", "Shahlo Nazarova", "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Sport", "Milliy chempionatning bahorgi bosqichi kutilmagan natijalar bilan boshlandi", "Yosh futbolchilar asosiy tarkibda ko'proq maydonga tushmoqda, murabbiylar rotatsiyani oshirdi.", "Jasur Tursunov", "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Madaniyat", "Shahar teatrlarida yosh rejissyorlar haftaligi ochildi", "Dasturda eksperimental sahna asarlari, ochiq suhbatlar va mahorat darslari bor.", "Malika Qodirova", "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Tahlil", "Shahar transportida raqamli to'lovlar nega tez ommalashmoqda?", "Mutaxassislar qulaylik, monitoring va tarif siyosati o'rtasidagi bog'liqlikni izohlaydi.", "Zafar Jo'rayev", "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80"),
-        ],
-        en: [
-          this.createSeed("Politics", "Open budget discussions in regions will be held under new rules", "Local councils will publish a digital schedule for reviewing citizens' proposals.", "Dilnoza Karimova", "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Economy", "Export consulting centers launched for small businesses", "The new service will assist with product certification, logistics, and foreign market requirements.", "Akmal Saidov", "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Technology", "Local AI assistant tested in university laboratory", "The project focuses on Q&A in Uzbek, document analysis, and adapting to the educational process.", "Shahlo Nazarova", "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Sport", "Spring stage of the national championship begins with unexpected results", "Young players are entering the starting lineup more frequently, and coaches are increasing rotation.", "Jasur Tursunov", "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Culture", "Week of young directors opens in city theaters", "The program includes experimental stage works, open discussions, and master classes.", "Malika Qodirova", "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1200&q=80"),
-          this.createSeed("Analysis", "Why digital payments are rapidly gaining popularity in city transport", "Experts explain the connection between convenience, monitoring, and tariff policy.", "Zafar Jo'rayev", "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80"),
-        ]
-      };
+      const seed = { uz: [], uzk: [], en: [] };
       fs.writeFileSync(this.filePath, JSON.stringify(seed, null, 2), 'utf8');
     }
   }

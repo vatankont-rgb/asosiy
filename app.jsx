@@ -153,55 +153,7 @@ copy["uzk"] = {
   close: "\u0401\u043f\u0438\u0448",
 };
 
-const storyData = {
-  uz: [
-    {
-      category: "Siyosat",
-      title: "Hududlarda ochiq budjet muhokamalari yangi tartibda o'tkaziladi",
-      summary: "Mahalliy kengashlar fuqarolar takliflarini ko'rib chiqish uchun raqamli jadval e'lon qiladi.",
-      image: images.newsroom,
-      author: "Ali Valiyev",
-      time: "Bugun, 10:30",
-      read: "3 daqiqa",
-      body: "Maqola matni...",
-      status: "published",
-      tags: "byudjet, islohot",
-      views: 120,
-    },
-    {
-      category: "Iqtisodiyot",
-      title: "Kichik biznes uchun eksport maslahat markazlari ishga tushmoqda",
-      summary: "Yangi xizmat mahsulot sertifikati, logistika va xorijiy bozor talablari bo'yicha yordam beradi.",
-      image: images.newsroom,
-      author: "Nodir Rahimov",
-      time: "Kecha, 15:45",
-      read: "5 daqiqa",
-      body: "Iqtisodiy tahlil...",
-      status: "published",
-      tags: "biznes, eksport",
-      views: 340,
-    }
-  ],
-  en: [
-    { type: "video", title: "How many nuclear power plants in the world and where was the first built?", meta: "World | 09:38", url: "https://picsum.photos/800/450?v1" },
-    { type: "video", title: "New tourism complex and average salary in Margilan", meta: "Uzbekistan | 19:50", url: "https://picsum.photos/800/450?v2" },
-    { type: "video", title: "Shareholder debt and compensation", meta: "Uzbekistan | 19:00", url: "https://picsum.photos/800/450?v3" },
-    { type: "video", title: "LIVE: Shooting in Washington and Araqchi in Moscow", meta: "World | 15:07", url: "https://picsum.photos/800/450?v4" },
-    { type: "video", title: "Putin-Araqchi meeting, Iran's proposal and daily digest", meta: "World | 14:48", url: "https://picsum.photos/800/450?v5" },
-    { type: "video", title: "New agreement in Black Sea: will export routes change?", meta: "World | 12:15", url: "https://picsum.photos/800/450?v6" },
-    { type: "photo", title: "Deceiving people using an inspector's uniform", meta: "Uzbekistan | 17:00", url: "https://picsum.photos/800/600?p1" },
-    { type: "photo", title: "Graveyard of Empires: why wasn't Afghanistan conquered?", meta: "World | 11:34", url: "https://picsum.photos/800/600?p2" },
-    { type: "photo", title: "International cultural festival in Samarkand", meta: "Culture | 13:20", url: "https://picsum.photos/800/600?p3" },
-    { type: "photo", title: "New look of Tashkent: photo report", meta: "Uzbekistan | 10:45", url: "https://picsum.photos/800/600?p4" },
-    { type: "photo", title: "Mountains and nature: landscapes of Uzbekistan", meta: "Nature | 08:30", url: "https://picsum.photos/800/600?p5" },
-    { type: "photo", title: "Youth forum: participants and ideas", meta: "Society | 16:00", url: "https://picsum.photos/800/600?p6" },
-    { type: "photo", title: "Charity event: helping families", meta: "Society | 11:00", url: "https://picsum.photos/800/600?p7" },
-    { type: "photo", title: "National dress day: fashion show", meta: "Culture | 09:15", url: "https://picsum.photos/800/600?p8" },
-    { type: "photo", title: "Ancient streets of Bukhara: historical photo report", meta: "Uzbekistan | 15:40", url: "https://picsum.photos/800/600?p9" },
-    { type: "photo", title: "Uzbek national food festival", meta: "Culture | 12:00", url: "https://picsum.photos/800/600?p10" },
-    { type: "photo", title: "Presentation of the New Tashkent project", meta: "Uzbekistan | 09:30", url: "https://picsum.photos/800/600?p11" }
-  ]
-};
+const storyData = { uz: [], uzk: [], en: [] };
 
 const mediaItems = {
   "uzk": [
