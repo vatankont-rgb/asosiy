@@ -1220,12 +1220,71 @@ function App() {
     }
   }
 
+  const isCategoryMatch = (storyCat, target) => {
+    if (!storyCat || !target) return false;
+    if (target === "all" || target === t.all) return true;
+    const sNorm = String(storyCat).trim().toLowerCase();
+    const tNorm = String(target).trim().toLowerCase();
+    if (sNorm === tNorm) return true;
+
+    // Direct match against categories collection
+    const matched = categories.find(c => {
+      const slug = String(c.slug || '').toLowerCase();
+      const uz = String(c.names?.uz || '').toLowerCase();
+      const uzk = String(c.names?.uzk || '').toLowerCase();
+      const en = String(c.names?.en || '').toLowerCase();
+      return slug === tNorm || uz === tNorm || uzk === tNorm || en === tNorm;
+    });
+
+    if (matched) {
+      const slug = String(matched.slug || '').toLowerCase();
+      const uz = String(matched.names?.uz || '').toLowerCase();
+      const uzk = String(matched.names?.uzk || '').toLowerCase();
+      const en = String(matched.names?.en || '').toLowerCase();
+      if (sNorm === slug || sNorm === uz || sNorm === uzk || sNorm === en) return true;
+    }
+
+    // Direct match if story category is a defined category
+    const storyMatched = categories.find(c => {
+      const slug = String(c.slug || '').toLowerCase();
+      const uz = String(c.names?.uz || '').toLowerCase();
+      const uzk = String(c.names?.uzk || '').toLowerCase();
+      const en = String(c.names?.en || '').toLowerCase();
+      return slug === sNorm || uz === sNorm || uzk === sNorm || en === sNorm;
+    });
+
+    if (storyMatched) {
+      const slug = String(storyMatched.slug || '').toLowerCase();
+      const uz = String(storyMatched.names?.uz || '').toLowerCase();
+      const uzk = String(storyMatched.names?.uzk || '').toLowerCase();
+      const en = String(storyMatched.names?.en || '').toLowerCase();
+      if (tNorm === slug || tNorm === uz || tNorm === uzk || tNorm === en) return true;
+    }
+
+    // Transliteration match
+    const sLat = typeof convertText === 'function' ? convertText(storyCat, false).toLowerCase() : '';
+    const sCyr = typeof convertText === 'function' ? convertText(storyCat, true).toLowerCase() : '';
+    const tLat = typeof convertText === 'function' ? convertText(target, false).toLowerCase() : '';
+    const tCyr = typeof convertText === 'function' ? convertText(target, true).toLowerCase() : '';
+
+    return sNorm === tLat || sNorm === tCyr || sLat === tNorm || sCyr === tNorm || sLat === tLat || sCyr === tCyr;
+  };
+
   const getDisplayCat = (cat) => {
     if (!cat) return cat;
-    if (cat === 'photo') return T('Foto');
-    if (cat === 'video') return T('Video');
-    const c = categories.find(x => x.slug === cat);
-    return c ? (c.names[lang] || c.names["en"] || cat) : cat;
+    if (String(cat).toLowerCase() === 'photo' || String(cat).toLowerCase() === 'foto') return T('Foto');
+    if (String(cat).toLowerCase() === 'video') return T('Video');
+    const catNorm = String(cat).trim().toLowerCase();
+    const c = categories.find(x => 
+      String(x.slug || '').toLowerCase() === catNorm || 
+      String(x.names?.uz || '').toLowerCase() === catNorm || 
+      String(x.names?.uzk || '').toLowerCase() === catNorm || 
+      String(x.names?.en || '').toLowerCase() === catNorm
+    );
+    if (c) {
+      return c.names[lang] || c.names["uzk"] || c.names["uz"] || cat;
+    }
+    return (typeof convertText === 'function' && lang === 'uzk') ? convertText(cat, true) : cat;
   };
 
   const filterCategories = useMemo(() => [t.all, ...categories.map(c => c.names[lang] || c.names["uz"] || c.slug)], [categories, lang, t.all]);
@@ -1235,10 +1294,10 @@ function App() {
       const text = `${story.title} ${story.summary} ${story.category}`.toLowerCase();
       return text.includes(query.toLowerCase());
     }
-    const matchesPage = !selectedCategory || story.category === selectedCategory;
-    const matchesFilter = filter === "all" || story.category === filter || getDisplayCat(story.category) === filter || filter === t.all;
-    const isEditor = true;
-    return matchesPage && matchesFilter && isEditor;
+    const isCategoryPage = page !== 'home' && page !== 'admin' && page !== 'barcha-yangiliklar' && page !== '__saved__';
+    const matchesPage = !isCategoryPage || isCategoryMatch(story.category, page);
+    const matchesFilter = filter === "all" || filter === t.all || isCategoryMatch(story.category, filter);
+    return matchesPage && matchesFilter;
   });
 
   const pinnedStory = pinnedHeroId ? stories.find(s => s && s.id === pinnedHeroId) : null;
@@ -1359,6 +1418,7 @@ function App() {
                 className={`nav-link ${page === item.slug ? "active" : ""}`}
                 onClick={() => {
                   setPage(item.slug);
+                  setFilter("all");
                   setActiveStory(null);
                   setSearchOpen(false);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1628,21 +1688,82 @@ function App() {
               }}
               setPage={setPage}
             />
+          ) : page !== "home" ? (
+            <main className="section category-section" style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px 16px 60px 16px" }}>
+              <div className="section-inner" style={{ padding: 0 }}>
+                <h1 className="cat-page-title" style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink, #0f172a)", margin: "0 0 28px 0", letterSpacing: "-0.3px" }}>
+                  {getDisplayCat(page)} {lang === "en" ? "news" : (lang === "uz" ? "yangiliklari" : "янгиликлари")}
+                </h1>
+
+                <div className="category-news-feed">
+                  {loading ? (
+                    <div className="stories-grid">
+                      {Array.from({length: 6}).map((_, i) => <SkeletonCard key={i} />)}
+                    </div>
+                  ) : visibleStories.length ? (
+                    <>
+                      {/* Top Featured Hero Story */}
+                      {visibleStories[0] && (
+                        <div className="cat-featured-story">
+                          <a 
+                            href={`/p/${visibleStories[0].slug || visibleStories[0].numId || visibleStories[0].id}`} 
+                            onClick={(e) => { e.preventDefault(); setActiveStory(visibleStories[0]); window.scrollTo({ top: 0, behavior: "instant" }); }}
+                            className="cat-featured-link"
+                          >
+                            <div className="cat-featured-text">
+                              <h2 className="cat-featured-title">{visibleStories[0].title}</h2>
+                              {visibleStories[0].summary && (
+                                <p className="cat-featured-summary">{visibleStories[0].summary}</p>
+                              )}
+                              <div className="cat-time">
+                                <span className="cat-time-bullet">▶</span>
+                                <span>{getStoryTime(visibleStories[0])}</span>
+                              </div>
+                            </div>
+                            <div className="cat-featured-img-wrap">
+                              <img src={visibleStories[0].image} alt={visibleStories[0].title} className="cat-featured-img" loading="lazy" />
+                            </div>
+                          </a>
+                        </div>
+                      )}
+
+                      {/* 3-Column Grid for remaining stories */}
+                      {visibleStories.length > 1 && (
+                        <div className="cat-grid">
+                          {visibleStories.slice(1).map((story, index) => (
+                            <a 
+                              key={`${story.id}-${index}`}
+                              href={`/p/${story.slug || story.numId || story.id}`}
+                              onClick={(e) => { e.preventDefault(); setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }}
+                              className="cat-card"
+                            >
+                              <div className="cat-card-img-wrap">
+                                <img src={story.image} alt={story.title} className="cat-card-img" loading="lazy" />
+                                {story.videoUrl && (
+                                  <div className="cat-video-badge">▶</div>
+                                )}
+                              </div>
+                              <div className="cat-card-time">{getStoryTime(story)}</div>
+                              <h3 className="cat-card-title">{story.title}</h3>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="empty-state">{T("Bu bo'limda hozircha maqola yo'q.")}</div>
+                  )}
+                </div>
+              </div>
+            </main>
           ) : (
-            <main className={`section ${page === "home" ? "home-section" : "category-section"}`}>
+            <main className="section home-section">
               <div className="section-inner">
-                {page !== "home" && page !== "barcha-yangiliklar" && (
-                  <div className="category-masthead">
-                    <span>{t.portal}</span>
-                    <h1>{page}</h1>
-                    <p>{t.pageNotes[page]}</p>
-                  </div>
-                )}
-                <div className="section-head" style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: "12px" }}>
+                <div className="section-head" style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: "12px", marginBottom: "16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "24px", width: "100%", overflow: "hidden" }}>
                     <h2 className="section-title" style={{ display: "inline-flex", alignItems: "center", gap: "10px", margin: 0, flexShrink: 0 }}>
                       <span className="dot"></span>
-                      {query ? T("Qidiruv natijalari") : (page === "home" ? (t.articlesTitle || T("Maqolalar")) : (page === "barcha-yangiliklar" ? T("Barcha yangiliklar") : (pages.find(p => p.slug === page)?.name || page)))}
+                      {query ? T("Qidiruv natijalari") : (t.articlesTitle || T("Maqolalar"))}
                     </h2>
                     <div className="page-tools" style={{ flex: 1, margin: 0 }}>
                       {filterCategories.map((cat) => (
@@ -1656,21 +1777,25 @@ function App() {
                       ))}
                     </div>
                   </div>
-                  <p className="section-note" style={{ margin: 0 }}>{page === "home" || page === "barcha-yangiliklar" ? t.latestNote : t.pageNotes[page]}</p>
+                  <p className="section-note" style={{ margin: 0 }}>{t.latestNote}</p>
                 </div>
                 <div className="layout">
-                  <div>
+                  <div style={{ width: "100%" }}>
                     <AdBanner ads={ads} position="inline" />
                     <div className="stories-grid">
                       {loading
                         ? Array.from({length: 6}).map((_, i) => <SkeletonCard key={i} />)
-                        : visibleStories.length ? (page === "home" ? visibleStories.slice(0, 8) : visibleStories).map((story, index) => (
-                          <StoryCard lang={lang} key={`${story.id}-${index}`} story={story} featured={page !== "home" && index === 0}
-                            savedIds={savedIds} onToggleSave={toggleSave}
-                            onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+                        : visibleStories.length ? visibleStories.slice(0, 8).map((story, index) => (
+                          <StoryCard 
+                            lang={lang} 
+                            key={`${story.id}-${index}`} 
+                            story={story} 
+                            savedIds={savedIds} 
+                            onToggleSave={toggleSave}
+                            onOpen={() => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} 
+                          />
                         )) : <div className="empty-state">{T("Bu bo'limda hozircha maqola yo'q.")}</div>}
                     </div>
-                    
                   </div>
                   <Sidebar t={t} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} ads={ads} />
                 </div>
@@ -1678,10 +1803,10 @@ function App() {
             </main>
           )}
 
-          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <AdBanner ads={ads} position="bottom" />}
-          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <BreakingBanner t={t} lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
-          {page !== "admin" && page !== "Aloqa" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <MediaSection lang={lang} items={[...displayVideos, ...displayPhotos]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
-          {page !== "admin" && page !== "Fotolar" && page !== "Фотолар" && page !== "Photo" && page !== "Videolar" && page !== "Видеолар" && page !== "Video" && page !== "barcha-yangiliklar" && <Special t={t} dial={false} siteConfig={siteConfig} />}
+          {page === "home" && <AdBanner ads={ads} position="bottom" />}
+          {page === "home" && <BreakingBanner t={t} lang={lang} stories={stories} onOpen={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page === "home" && <MediaSection lang={lang} items={[...displayVideos, ...displayPhotos]} onOpen={(story) => { setActiveStory(story); window.scrollTo({ top: 0, behavior: "instant" }); }} setPage={setPage} />}
+          {page === "home" && <Special t={t} dial={false} siteConfig={siteConfig} />}
         </>
       )}
 
@@ -2135,6 +2260,24 @@ function StoryBadge({ story }) {
   return null;
 }
 
+function getStoryTime(story) {
+  if (!story) return "";
+  if (story.createdAt) {
+    try {
+      const d = new Date(story.createdAt);
+      if (!isNaN(d.getTime())) {
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const mon = String(d.getMonth() + 1).padStart(2, '0');
+        const yr = d.getFullYear();
+        return `${hh}:${mm} / ${day}.${mon}.${yr}`;
+      }
+    } catch(e) {}
+  }
+  return story.time || "Bugun";
+}
+
 function calcReadTime(text, lang) {
   if (!text) return null;
   const words = text.replace(/<[^>]+>/g,"").split(/\s+/).filter(Boolean).length;
@@ -2142,21 +2285,58 @@ function calcReadTime(text, lang) {
   return lang === "en" ? `${mins} min` : `${mins} daq`;
 }
 
-function StoryCard({ story, onOpen, featured = false, savedIds = [], onToggleSave }) {
+function StoryCard({ story, onOpen, featured = false, savedIds = [], onToggleSave, isCategory = false }) {
   const isSaved = savedIds.includes(story.id);
+  const storyUrl = `/p/${story.slug || story.numId || story.id}`;
+
+  let formattedTime = story.time || "";
+  if (story.createdAt) {
+    try {
+      const d = new Date(story.createdAt);
+      if (!isNaN(d.getTime())) {
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const mon = String(d.getMonth() + 1).padStart(2, '0');
+        const yr = d.getFullYear();
+        formattedTime = `${hh}:${mm} / ${day}.${mon}.${yr}`;
+      }
+    } catch(e) {}
+  }
+  if (!formattedTime) formattedTime = "Bugun";
+
   return (
-    <article className={`story-card fade-in-up ${featured ? "featured-story" : ""}`} style={{position:"relative"}}>
+    <article className={`story-card fade-in-up ${featured ? "featured-story" : ""}`} style={{ position: "relative" }}>
       <StoryBadge story={story} />
-      <a href={`/?story=${story.id}`} onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + story.id); if (onOpen) onOpen(); }} style={{ textDecoration: 'none', color: 'inherit', display: 'block', border: 'none', background: 'transparent', padding: 0, textAlign: 'left', cursor: 'pointer' }}>
-        <img className="story-image" src={story.image} alt="" loading="lazy" />
+      <a href={storyUrl} onClick={(e) => { e.preventDefault(); if (onOpen) onOpen(story); }} style={{ textDecoration: 'none', color: 'inherit', display: 'block', border: 'none', background: 'transparent', padding: 0, textAlign: 'left', cursor: 'pointer' }}>
+        <div style={{ position: "relative", overflow: "hidden", borderRadius: featured ? "8px" : "6px" }}>
+          <img className="story-image" src={story.image} alt={story.title} loading="lazy" />
+          {story.videoUrl && (
+            <div style={{ position: "absolute", bottom: "10px", left: "10px", width: "28px", height: "28px", borderRadius: "50%", background: "#0033a0", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>
+              ▶
+            </div>
+          )}
+        </div>
         <div className="story-body">
-          <span className="category" data-cat={story.category}>{story.category}</span>
+          {!isCategory && story.category && <span className="category" data-cat={story.category}>{story.category}</span>}
+          {isCategory && !featured && (
+            <div className="category-card-time" style={{ fontSize: "12px", color: "var(--muted, #64748b)", fontWeight: "500", marginTop: "10px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span>{formattedTime}</span>
+            </div>
+          )}
           <h3>{story.title}</h3>
-          <p>{story.summary}</p>
-          <div className="story-footer">
-            
-            {(story.views || 0) > 0 && <span className="story-views">👁 {story.views}</span>}
-          </div>
+          {(featured || !isCategory) && story.summary && <p>{story.summary}</p>}
+          {featured && (
+            <div className="category-card-time" style={{ fontSize: "13px", color: "var(--muted, #64748b)", fontWeight: "600", marginTop: "14px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--brand, #0033a0)" }}></span>
+              <span>{formattedTime}</span>
+            </div>
+          )}
+          {!isCategory && (story.views || 0) > 0 && (
+            <div className="story-footer">
+              <span className="story-views">👁 {story.views}</span>
+            </div>
+          )}
         </div>
       </a>
       {onToggleSave && (
@@ -2164,7 +2344,7 @@ function StoryCard({ story, onOpen, featured = false, savedIds = [], onToggleSav
           className={`bookmark-corner ${isSaved ? "saved" : ""}`}
           onClick={e => { e.stopPropagation(); onToggleSave(story.id); }}
           title={isSaved ? T("Saqlangandan olib tashlash") : T("Saqlash")}
-        >{isSaved ? "в˜…" : "в˜†"}</button>
+        >{isSaved ? "★" : "☆"}</button>
       )}
     </article>
   );
