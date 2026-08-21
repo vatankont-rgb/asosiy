@@ -5301,49 +5301,133 @@ function AdminSecurity({ isUz }) {
         </div>
       </div>
 
-      <div style={{ background: "#fff", padding: "24px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-        <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "8px", color: "var(--ink)" }}>Ma'lumotlar zaxirasi</h3>
-        <p style={{ fontSize: "13px", color: "var(--muted)", margin: "0 0 16px" }}>Barcha maqolalar, sahifalar va sozlamalarni xavfsiz tarzda JSON formatida saqlab oling yoki qayta tiklang.</p>
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          <button type="button" style={{ background: "#1e293b", color: "#fff", padding: "10px 20px", borderRadius: "6px", border: "none", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }} onClick={async () => {
-            const res = await fetch("/api/admin/backup/export", { method: 'POST', headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` } });
-            const data = await res.json();
-            const blob = new Blob([JSON.stringify(data.data.content, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `vatanuz-backup-${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-          }}>
-            <span style={{ fontSize: "16px" }}>📥</span> Export (Yuklab olish)
+      <div style={{ background: "#fff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
+          <div>
+            <h3 style={{ fontSize: "16px", fontWeight: "800", marginBottom: "4px", color: "var(--ink)" }}>💾 Tizimni to‘liq zaxiralash (Backup)</h3>
+            <p style={{ fontSize: "13px", color: "var(--muted)", margin: 0 }}>Barcha maqolalar, parametrlar va yuklangan barcha rasmlarni xavfsiz ZIP formatida saqlang.</p>
+          </div>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(16,185,129,0.1)", color: "#10b981", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: "700", border: "1px solid rgba(16,185,129,0.3)" }}>
+            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981" }}></span>
+            Avto-backup: Har kuni 03:00 da (7 kunlik)
+          </span>
+        </div>
+
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "16px" }}>
+          <button 
+            type="button" 
+            style={{ background: "#0033a0", color: "#fff", padding: "12px 22px", borderRadius: "8px", border: "none", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px", boxShadow: "0 2px 8px rgba(0,51,160,0.3)" }} 
+            onClick={async (e) => {
+              const btn = e.currentTarget;
+              const originalText = btn.innerHTML;
+              btn.innerHTML = "⏳ Zaxira tayyorlanmoqda...";
+              btn.disabled = true;
+              try {
+                const token = document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+                const res = await fetch("/api/admin/backup/download", {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                  alert("Zaxira yuklab olishda xatolik yuz berdi");
+                  btn.innerHTML = originalText;
+                  btn.disabled = false;
+                  return;
+                }
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `vatanuz-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+              } catch(err) {
+                alert("Xatolik: " + (err.message || err));
+              } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+              }
+            }}
+          >
+            <span>📥</span> To‘liq zaxirani yuklab olish (.ZIP)
           </button>
 
-          <label style={{ background: "#fff", color: "#1e293b", padding: "10px 20px", borderRadius: "6px", border: "1px solid #e2e8f0", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
-            <input type="file" accept=".json" style={{ display: "none" }} onChange={async (e) => {
+          <button 
+            type="button" 
+            style={{ background: "#1e293b", color: "#fff", padding: "12px 20px", borderRadius: "8px", border: "none", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }} 
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/admin/backup/create-now", { method: 'POST', headers: { 'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` } });
+                if (res.ok) alert("✅ Yangi zaxira nusxasi serverda muvaffaqiyatli yaratildi!");
+                else alert("Xatolik yuz berdi");
+              } catch(e) { alert("Xatolik: " + e.message); }
+            }}
+          >
+            <span>⚡</span> Hozir serverda zaxira yaratish
+          </button>
+
+          <label style={{ background: "#fff", color: "#1e293b", padding: "12px 20px", borderRadius: "8px", border: "1px solid #cbd5e1", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
+            <input type="file" accept=".zip,.json,application/zip,application/x-zip-compressed,application/x-zip,application/json" style={{ display: "none" }} onChange={async (e) => {
               const file = e.target.files[0];
               if (!file) return;
-              try {
-                const text = await file.text();
-                const parsed = JSON.parse(text);
-                const res = await fetch("/api/admin/backup/import", {
-                  method: "POST",
-                  headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1")}` 
-                  },
-                  body: JSON.stringify(parsed)
-                });
-                const responseData = await res.json();
-                if (res.ok) alert(isUz ? "Zaxira muvaffaqiyatli tiklandi!" : "Backup restored successfully!");
-                else alert(responseData.message || "Xatolik yuz berdi");
-              } catch (err) {
-                alert("Faylni o'qishda xatolik: " + err.message);
+              const token = document.cookie.replace(/(?:(?:^|.*;\s*)yk_session\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+              
+              if (file.name.endsWith('.zip')) {
+                if (!confirm(isUz ? "Ushbu ZIP zaxira faylini tiklashni tasdiqlaysizmi? Barcha maqolalar va rasmlar yangilanadi." : "Are you sure you want to restore from this ZIP backup?")) {
+                  e.target.value = null;
+                  return;
+                }
+                try {
+                  const reader = new FileReader();
+                  reader.onload = async (event) => {
+                    const base64 = event.target.result.split(',')[1];
+                    const res = await fetch("/api/admin/backup/restore-zip", {
+                      method: "POST",
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({ zipBase64: base64 })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert(isUz ? "✅ Zaxira muvaffaqiyatli tiklandi! Sahifa yangilanadi." : "Backup restored successfully!");
+                      window.location.reload();
+                    } else {
+                      alert(data.message || "Xatolik yuz berdi");
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                } catch(err) {
+                  alert("Faylni o'qishda xatolik: " + err.message);
+                }
+              } else {
+                try {
+                  const text = await file.text();
+                  const parsed = JSON.parse(text);
+                  const res = await fetch("/api/admin/backup/import", {
+                    method: "POST",
+                    headers: { 
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(parsed)
+                  });
+                  const responseData = await res.json();
+                  if (res.ok) {
+                    alert(isUz ? "✅ Zaxira muvaffaqiyatli tiklandi! Sahifa yangilanadi." : "Backup restored successfully!");
+                    window.location.reload();
+                  } else {
+                    alert(responseData.message || "Xatolik yuz berdi");
+                  }
+                } catch (err) {
+                  alert("Faylni o'qishda xatolik: " + err.message);
+                }
               }
               e.target.value = null;
             }} />
-            <span style={{ fontSize: "16px", color: "#3b82f6" }}>📤</span> Import (Tiklash)
+            <span style={{ fontSize: "16px", color: "#3b82f6" }}>📤</span> Zaxirani tiklash (.ZIP / .JSON)
           </label>
         </div>
       </div>

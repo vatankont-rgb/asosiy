@@ -24,6 +24,58 @@ class SettingController {
     }
   }
 
+  async downloadZipBackup(req, res, next) {
+    try {
+      const backupService = require('../services/backupService');
+      const zip = backupService.createBackupArchive();
+      const zipBuffer = zip.toBuffer();
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const filename = `vatanuz-backup-${dateStr}.zip`;
+
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', zipBuffer.length);
+      return res.send(zipBuffer);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async listBackups(req, res, next) {
+    try {
+      const backupService = require('../services/backupService');
+      const backups = backupService.listBackups();
+      return res.status(200).json(formatResponse({ data: backups }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async createBackupNow(req, res, next) {
+    try {
+      const backupService = require('../services/backupService');
+      const result = await backupService.performDailyBackup();
+      return res.status(200).json(formatResponse({ message: 'Zaxira nusxasi muvaffaqiyatli yaratildi', data: result }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async restoreZipBackup(req, res, next) {
+    try {
+      const backupService = require('../services/backupService');
+      const { zipBase64 } = req.body;
+      if (!zipBase64) {
+        return res.status(400).json(formatResponse({ success: false, message: 'ZIP fayl taqdim etilmadi.' }));
+      }
+      const buffer = Buffer.from(zipBase64, 'base64');
+      const result = backupService.restoreBackupZip(buffer);
+      return res.status(200).json(formatResponse({ message: 'Zaxira nusxasi muvaffaqiyatli tiklandi!', data: result }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async exportBackup(req, res, next) {
     try {
       const articles = await articleRepository.getAll();
