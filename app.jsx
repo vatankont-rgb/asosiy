@@ -5674,6 +5674,7 @@ function AdminPanel({
   
   const userRole = localStorage.getItem('yk_role');
   
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [dashboardStats, setDashboardStats] = useState(null);
   const [dashboardLogs, setDashboardLogs] = useState([]);
   const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = window.Recharts || {};
@@ -5700,7 +5701,6 @@ function AdminPanel({
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7'];
 
-const [activeTab, setActiveTab] = useState("dashboard");
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [adminTags, setAdminTags] = useState([]);
   useEffect(() => { fetch("/api/tags").then(r=>r.json()).then(d=>{if(d&&d.data) setAdminTags(d.data)}).catch(console.error) }, []);
