@@ -17,6 +17,7 @@ yarn-error.log*
 
 # Database & Storage (Dynamic application state)
 server/storage/
+server/backups/
 uploads/
 
 # OS metadata
