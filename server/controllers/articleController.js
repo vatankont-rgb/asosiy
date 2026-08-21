@@ -51,14 +51,14 @@ class ArticleController {
         body: sanitizeHtml(String(story.body || "")),
         status: story.status === "draft" ? "draft" : "published",
         isFeatured: !!story.isFeatured,
-        isEditorChoice: !!story.isEditorChoice,
+        isEditorChoice: !!(story.isEditorChoice || story.isEditorPick),
         isBreaking: !!story.isBreaking,
-        scheduledAt: story.scheduledAt || null,
+        scheduledAt: story.scheduledAt || story.publishAt || null,
         createdAt: story.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         views: parseInt(story.views) || 0,
         videoUrl: String(story.videoUrl || "").trim(),
-          tags: String(story.tags || "").trim()
+        tags: String(story.tags || "").trim()
       };
 
       await articleRepository.addStory(targetLang, normalized);
@@ -68,19 +68,28 @@ class ArticleController {
       // Notify via Telegram if published and sendToTelegram is requested
       if (normalized.status === 'published' && (!normalized.scheduledAt || new Date(normalized.scheduledAt) <= new Date())) {
         if (story.sendToTelegram) {
-          const { sendTelegramMessage } = require('../utils/telegram');
-          const message = `📰 <b>Yangi maqola qo'shildi!</b>\n\n<b>Sarlavha:</b> ${normalized.title}\n<b>Muallif:</b> ${normalized.author}\n<b>Bo'lim:</b> ${normalized.category}`;
-          sendTelegramMessage(message).catch(console.error);
+          try {
+            const { sendTelegramMessage } = require('../utils/telegram');
+            const siteUrl = 'https://vatanuz.uz';
+            const message = `📰 <b>${normalized.title}</b>\n\n${normalized.summary ? normalized.summary + '\n\n' : ''}📂 <b>Rukn:</b> ${normalized.category}\n👤 <b>Muallif:</b> ${normalized.author}\n\n👉 <a href="${siteUrl}/?story=${normalized.id}">Batafsil o'qish</a>`;
+            sendTelegramMessage(message).catch(console.error);
+          } catch (err) {
+            console.error("Telegram error:", err);
+          }
         }
         if (story.sendPushNotification) {
-          const pushController = require('./pushController');
-          const payload = {
-            title: "Yangi maqola: " + normalized.title,
-            body: normalized.summary || "Batafsil o'qish uchun saytga kiring.",
-            url: `/?page=article&id=${normalized.id}`,
-            icon: "/assets/images/logo.png"
-          };
-          pushController.sendPushNotification(payload).catch(console.error);
+          try {
+            const pushController = require('./pushController');
+            const payload = {
+              title: (normalized.isBreaking ? "🔴 TEZKOR: " : "📰 ") + normalized.title,
+              body: normalized.summary || "Batafsil o'qish uchun saytga kiring.",
+              url: `/?story=${normalized.id}`,
+              icon: normalized.image || "/assets/images/logo.png"
+            };
+            pushController.sendPushNotification(payload).catch(console.error);
+          } catch (err) {
+            console.error("Push error:", err);
+          }
         }
       }
 
@@ -97,31 +106,49 @@ class ArticleController {
       const { story } = req.body;
       const targetLang = ['uz', 'uzk', 'en'].includes(lang) ? lang : 'uz';
 
-      if (story && story.body) {
+      if (!story) {
+        return res.status(400).json({ error: "Story data is required" });
+      }
+
+      if (story.body) {
         story.body = sanitizeHtml(String(story.body));
       }
 
-      const oldStory = (await articleRepository.getAll())[targetLang].find(s => s.id === id);
+      // Explicitly normalize boolean flags
+      story.isFeatured = !!story.isFeatured;
+      story.isEditorChoice = !!(story.isEditorChoice || story.isEditorPick);
+      story.isBreaking = !!story.isBreaking;
+
       const updated = await articleRepository.updateStory(targetLang, id, story);
       if (!updated) {
         return res.status(404).json({ error: "Maqola topilmadi" });
       }
 
-      if (oldStory && oldStory.status !== 'published' && updated.status === 'published' && (!updated.scheduledAt || new Date(updated.scheduledAt) <= new Date())) {
-        if (story.sendToTelegram) {
+      // Trigger Telegram notification if checked
+      if (story.sendToTelegram) {
+        try {
           const { sendTelegramMessage } = require('../utils/telegram');
-          const message = `📰 <b>Yangi maqola qo'shildi!</b>\n\n<b>Sarlavha:</b> ${updated.title}\n<b>Muallif:</b> ${updated.author}\n<b>Bo'lim:</b> ${updated.category}`;
-          sendTelegramMessage(message).catch(console.error);
+          const siteUrl = 'https://vatanuz.uz';
+          const message = `📰 <b>${updated.title}</b>\n\n${updated.summary ? updated.summary + '\n\n' : ''}📂 <b>Rukn:</b> ${updated.category}\n👤 <b>Muallif:</b> ${updated.author || 'Vatanuz.uz'}\n\n👉 <a href="${siteUrl}/?story=${updated.id}">Batafsil o'qish</a>`;
+          sendTelegramMessage(message).catch(err => console.error("Telegram send error:", err));
+        } catch (err) {
+          console.error("Telegram error:", err);
         }
-        if (story.sendPushNotification) {
+      }
+
+      // Trigger Push notification if checked
+      if (story.sendPushNotification) {
+        try {
           const pushController = require('./pushController');
           const payload = {
-            title: "Yangi maqola: " + updated.title,
+            title: (updated.isBreaking ? "🔴 TEZKOR: " : "📰 ") + updated.title,
             body: updated.summary || "Batafsil o'qish uchun saytga kiring.",
-            url: `/?page=article&id=${updated.id}`,
-            icon: "/assets/images/logo.png"
+            url: `/?story=${updated.id}`,
+            icon: updated.image || "/assets/images/logo.png"
           };
-          pushController.sendPushNotification(payload).catch(console.error);
+          pushController.sendPushNotification(payload).catch(err => console.error("Push send error:", err));
+        } catch (err) {
+          console.error("Push error:", err);
         }
       }
 

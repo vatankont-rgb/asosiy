@@ -69,11 +69,20 @@ class ArticleRepository {
 
   async updateStory(lang, id, story) {
     const db = this.read();
-    if (!db[lang]) return null;
-    const index = db[lang].findIndex(s => s.id === id);
+    let currentLang = ['uz', 'uzk', 'en'].includes(lang) ? lang : 'uz';
+    if (!db[currentLang] || !db[currentLang].some(s => s.id === id)) {
+      for (const l of ['uz', 'uzk', 'en']) {
+        if (db[l] && db[l].some(s => s.id === id)) {
+          currentLang = l;
+          break;
+        }
+      }
+    }
+    if (!db[currentLang]) return null;
+    const index = db[currentLang].findIndex(s => s.id === id);
     if (index === -1) return null;
     
-    const oldStory = db[lang][index];
+    const oldStory = db[currentLang][index];
     const newHistory = Array.isArray(oldStory.history) ? [...oldStory.history] : [];
     
     // Save current state into history before updating
@@ -89,9 +98,25 @@ class ArticleRepository {
     // Keep only last 10 versions to save space
     if (newHistory.length > 10) newHistory.shift();
 
-    db[lang][index] = { ...oldStory, ...story, id, history: newHistory, updatedAt: new Date().toISOString() };
+    const updatedStory = {
+      ...oldStory,
+      ...story,
+      id,
+      history: newHistory,
+      updatedAt: new Date().toISOString()
+    };
+
+    const targetLang = (story && story.articleLang && ['uz', 'uzk', 'en'].includes(story.articleLang)) ? story.articleLang : currentLang;
+    if (targetLang !== currentLang) {
+      db[currentLang].splice(index, 1);
+      if (!db[targetLang]) db[targetLang] = [];
+      db[targetLang].unshift(updatedStory);
+    } else {
+      db[currentLang][index] = updatedStory;
+    }
+
     this.write(db);
-    return db[lang][index];
+    return updatedStory;
   }
 
   async deleteStory(lang, id) {

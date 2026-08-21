@@ -5932,7 +5932,10 @@ const [activeTab, setActiveTab] = useState("dashboard");
       }
       if (res.ok) {
         const data = await res.json();
-        setAllStories(data.stories);
+        if (data.stories) {
+          setAllStories(data.stories);
+          window.ALL_STORIES = data.stories;
+        }
         alert(isUz ? "Maqola muvaffaqiyatli saqlandi!" : "Article saved successfully!");
         setActiveTab("articles");
         setEditingStory(null);
@@ -5953,34 +5956,86 @@ const [activeTab, setActiveTab] = useState("dashboard");
           seoKeywords: "",
           focusKeyword: "",
           videoUrl: "",
-          publishAt: ""
+          publishAt: "",
+          sendToTelegram: false,
+          sendPushNotification: false,
+          isFeatured: false,
+          isEditorChoice: false,
+          isBreaking: false
         });
         localStorage.removeItem("yk-cms-draft");
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || errData.message || (isUz ? "Xatolik yuz berdi" : "Error saving story"));
       }
     } catch (err) {
-      alert("Error saving story.");
+      alert("Error saving story: " + (err.message || err));
     }
   };
 
   const handleEdit = (story) => {
     setEditingStory(story);
-    setForm(story);
+    let storyLang = story.articleLang;
+    if (!storyLang) {
+      if (allStories.en && allStories.en.some(s => s.id === story.id)) storyLang = "en";
+      else if (allStories.uzk && allStories.uzk.some(s => s.id === story.id)) storyLang = "uzk";
+      else storyLang = "uz";
+    }
+
+    setForm({
+      id: story.id,
+      articleLang: storyLang,
+      title: story.title || "",
+      category: story.category || (isUz ? "Siyosat" : "Politics"),
+      summary: story.summary || "",
+      body: story.body || "",
+      image: story.image || "",
+      author: story.author || "Tahririyat",
+      status: story.status || "published",
+      time: story.time || "Bugun",
+      read: story.read || "",
+      tags: story.tags || "",
+      seoTitle: story.seoTitle || "",
+      seoDescription: story.seoDescription || "",
+      seoKeywords: story.seoKeywords || "",
+      focusKeyword: story.focusKeyword || "",
+      videoUrl: story.videoUrl || "",
+      views: story.views || 0,
+      publishAt: story.publishAt || story.scheduledAt || "",
+      sendToTelegram: false,
+      sendPushNotification: false,
+      isFeatured: Boolean(story.isFeatured),
+      isEditorChoice: Boolean(story.isEditorChoice || story.isEditorPick),
+      isBreaking: Boolean(story.isBreaking)
+    });
     setActiveTab("editor");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (story) => {
     if (!confirm(isUz ? "Maqolani o'chirishni tasdiqlaysizmi?" : "Confirm deletion?")) return;
     try {
-      const langKey = lang === "en" ? "en" : lang === "uzk" ? "uzk" : "uz";
+      let langKey = story.articleLang;
+      if (!langKey) {
+        if (allStories.en && allStories.en.some(s => s.id === story.id)) langKey = "en";
+        else if (allStories.uzk && allStories.uzk.some(s => s.id === story.id)) langKey = "uzk";
+        else langKey = "uz";
+      }
       const res = await fetch(`/api/admin/stories/${langKey}/${story.id}`, {
         method: "DELETE"
       });
       if (res.ok) {
         const data = await res.json();
-        setAllStories(data.stories);
+        if (data.stories) {
+          setAllStories(data.stories);
+          window.ALL_STORIES = data.stories;
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || errData.message || "Error deleting story.");
       }
     } catch (err) {
-      alert("Error deleting story.");
+      alert("Error deleting story: " + (err.message || err));
     }
   };
 
@@ -6827,65 +6882,172 @@ const [activeTab, setActiveTab] = useState("dashboard");
               <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
                 <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>⚙️ Qo'shimcha Sozlamalar</h3>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
-                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Telegramga yuborish</span>
-                    <label className="adm-toggle">
+                  
+                  {/* Telegram */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Telegramga yuborish</span>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <input 
                         type="checkbox" 
-                        checked={form.sendToTelegram || false}
+                        style={{ display: "none" }}
+                        checked={Boolean(form.sendToTelegram)}
                         onChange={(e) => setForm({ ...form, sendToTelegram: e.target.checked })}
                       />
-                      <span className="adm-toggle-slider"></span>
-                    </label>
-                  </div>
+                      <div style={{
+                        position: "relative",
+                        width: "46px",
+                        height: "24px",
+                        backgroundColor: form.sendToTelegram ? "#2563eb" : "#cbd5e1",
+                        borderRadius: "12px",
+                        transition: "background-color 0.2s ease"
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: form.sendToTelegram ? "24px" : "2px",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                          transition: "left 0.2s ease"
+                        }} />
+                      </div>
+                    </div>
+                  </label>
                   
-                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
-                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Push xabar (Breaking News)</span>
-                    <label className="adm-toggle">
+                  {/* Push Notification */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Push xabar (Breaking News)</span>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <input 
                         type="checkbox" 
-                        checked={form.sendPushNotification || false}
+                        style={{ display: "none" }}
+                        checked={Boolean(form.sendPushNotification)}
                         onChange={(e) => setForm({ ...form, sendPushNotification: e.target.checked })}
                       />
-                      <span className="adm-toggle-slider"></span>
-                    </label>
-                  </div>
+                      <div style={{
+                        position: "relative",
+                        width: "46px",
+                        height: "24px",
+                        backgroundColor: form.sendPushNotification ? "#2563eb" : "#cbd5e1",
+                        borderRadius: "12px",
+                        transition: "background-color 0.2s ease"
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: form.sendPushNotification ? "24px" : "2px",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                          transition: "left 0.2s ease"
+                        }} />
+                      </div>
+                    </div>
+                  </label>
 
-                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
-                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Asosiy maqola (Featured)</span>
-                    <label className="adm-toggle">
+                  {/* Featured */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Asosiy maqola (Featured)</span>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <input 
                         type="checkbox" 
-                        checked={form.isFeatured || false}
+                        style={{ display: "none" }}
+                        checked={Boolean(form.isFeatured)}
                         onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
                       />
-                      <span className="adm-toggle-slider"></span>
-                    </label>
-                  </div>
+                      <div style={{
+                        position: "relative",
+                        width: "46px",
+                        height: "24px",
+                        backgroundColor: form.isFeatured ? "#2563eb" : "#cbd5e1",
+                        borderRadius: "12px",
+                        transition: "background-color 0.2s ease"
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: form.isFeatured ? "24px" : "2px",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                          transition: "left 0.2s ease"
+                        }} />
+                      </div>
+                    </div>
+                  </label>
 
-                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
-                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Tahririyat tanlovi</span>
-                    <label className="adm-toggle">
+                  {/* Editor's Choice */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Tahririyat tanlovi</span>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <input 
                         type="checkbox" 
-                        checked={form.isEditorChoice || false}
+                        style={{ display: "none" }}
+                        checked={Boolean(form.isEditorChoice)}
                         onChange={(e) => setForm({ ...form, isEditorChoice: e.target.checked })}
                       />
-                      <span className="adm-toggle-slider"></span>
-                    </label>
-                  </div>
+                      <div style={{
+                        position: "relative",
+                        width: "46px",
+                        height: "24px",
+                        backgroundColor: form.isEditorChoice ? "#2563eb" : "#cbd5e1",
+                        borderRadius: "12px",
+                        transition: "background-color 0.2s ease"
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: form.isEditorChoice ? "24px" : "2px",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                          transition: "left 0.2s ease"
+                        }} />
+                      </div>
+                    </div>
+                  </label>
 
-                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0" }}>
-                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Dolzarb xabar (Breaking)</span>
-                    <label className="adm-toggle">
+                  {/* Breaking */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", cursor: "pointer", userSelect: "none" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Dolzarb xabar (Breaking)</span>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <input 
                         type="checkbox" 
-                        checked={form.isBreaking || false}
+                        style={{ display: "none" }}
+                        checked={Boolean(form.isBreaking)}
                         onChange={(e) => setForm({ ...form, isBreaking: e.target.checked })}
                       />
-                      <span className="adm-toggle-slider"></span>
-                    </label>
-                  </div>
+                      <div style={{
+                        position: "relative",
+                        width: "46px",
+                        height: "24px",
+                        backgroundColor: form.isBreaking ? "#ef4444" : "#cbd5e1",
+                        borderRadius: "12px",
+                        transition: "background-color 0.2s ease"
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: form.isBreaking ? "24px" : "2px",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                          transition: "left 0.2s ease"
+                        }} />
+                      </div>
+                    </div>
+                  </label>
+
                 </div>
               </div>
               
