@@ -1332,7 +1332,7 @@ function App() {
           </div>
 
           <div className="actions">
-            <div className="desktop-search" style={{ display: "flex", alignItems: "center" }}>
+            <div className="desktop-search">
               {!searchOpen ? (
                 <button 
                   className="dark-toggle" 

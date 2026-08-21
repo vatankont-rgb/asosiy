@@ -297,6 +297,11 @@ button {
   gap: 10px;
 }
 
+.desktop-search {
+  display: flex;
+  align-items: center;
+}
+
 .search {
   width: 210px;
   border: 1px solid var(--line);
@@ -7197,7 +7202,8 @@ textarea.field-error {
     gap: 8px;
     width: auto !important;
   }
-  .header .search {
+  .header .search,
+  .header .desktop-search {
     display: none !important;
   }
   .header .lang-toggle {
