@@ -187,6 +187,8 @@ const DEFAULT_SITE_CONFIG = {
   telegram: "https://t.me/vatanuz",
   bannerText: "",
   bannerActive: false,
+  latestNewsCount: 20,
+  homeStoriesCount: 12,
   specialUz: {
     kicker: "Maxsus loyiha",
     title: "Ma'lumotga tayangan jurnalistika: voqeani shovqindan ajratamiz",
@@ -810,7 +812,7 @@ function App() {
   const [siteConfig, setSiteConfig] = useState(DEFAULT_SITE_CONFIG);
   const [videos, setVideos] = useState({ uz: [], uzk: [], en: [] });
   const [photos, setPhotos] = useState({ uz: [], uzk: [], en: [] });
-  const [latestNewsCount, setLatestNewsCount] = useState(7);
+  const [latestNewsCount, setLatestNewsCount] = useState(8);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const handlePushSubscribe = async () => {
@@ -1221,9 +1223,9 @@ function App() {
     ...remainingStories
   ].filter((s, idx, self) => self.findIndex(x => x.id === s.id) === idx).slice(0, 6);
   
-  // Right side "So'nggi yangiliklar" list (shows recent stories, non-hero if available, or all stories)
+  // Right side "So'nggi yangiliklar" list (shows 8 recent stories to perfectly fill sidebar without empty space)
   const nonHeroStories = stories.filter(s => s && s.id !== hero?.id);
-  const latestStories = (nonHeroStories.length > 0 ? nonHeroStories : stories).slice(0, latestNewsCount || 7);
+  const latestStories = (nonHeroStories.length > 0 ? nonHeroStories : stories).slice(0, 8);
 
   useEffect(() => {
     refreshPublicStories();
@@ -2384,7 +2386,7 @@ function HeroSkeleton() {
             <div className="skeleton-line skeleton-anim" style={{ width: 160, height: 22 }} />
           </div>
           <div className="hero-latest-list">
-            {Array.from({ length: 7 }).map((_, idx) => (
+            {Array.from({ length: 8 }).map((_, idx) => (
               <div className="hero-latest-card skeleton-card" key={idx} style={{ display: "flex", gap: 12, cursor: "default" }}>
                 <span className="latest-copy" style={{ flex: 1 }}>
                   <div className="skeleton-line skeleton-anim" style={{ width: 50, height: 12, marginBottom: 6 }} />

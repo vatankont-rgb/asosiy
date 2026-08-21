@@ -1174,6 +1174,7 @@ body {
 .hero-latest-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .hero-latest-card {
@@ -1186,7 +1187,7 @@ body {
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--line);
-  padding: 16px 0;
+  padding: 13px 0;
   cursor: pointer;
   transition: opacity 0.2s;
 }
