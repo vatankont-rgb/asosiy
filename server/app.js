@@ -120,7 +120,7 @@ app.use(async (req, res, next) => {
       if (m) storyId = m[1];
     }
 
-    // If there is a storyId, inject dynamic OpenGraph SEO tags
+    // If there is a storyId, inject dynamic OpenGraph & Google SEO Schema.org tags
     if (storyId) {
       const db = await articleRepository.getAll(true);
       const allStories = Object.values(db).flat().filter(Boolean);
@@ -135,37 +135,90 @@ app.use(async (req, res, next) => {
           imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
 
-        const pageTitle = `${escText(story.title)} - Vatanuz.uz`;
+        const pageTitle = `${escText(story.title)} — Vatanuz.uz`;
         const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
         const pageDesc = escText(rawSummary);
         const pageUrl = `${baseUrl}/news/${encodeURIComponent(story.id)}`;
         const cleanImageUrl = escUrl(imageUrl);
         const cleanPageUrl = escUrl(pageUrl);
+        const publishedDate = new Date(story.createdAt || Date.now()).toISOString();
+        const modifiedDate = new Date(story.updatedAt || story.createdAt || Date.now()).toISOString();
+        const authorName = escText(story.author || 'Vatanuz Tahririyati');
+        const categoryName = escText(story.category || 'Yangiliklar');
+        const tags = escText(Array.isArray(story.tags) ? story.tags.join(', ') : (story.tags || categoryName));
 
-        const ogTags = `
-    <!-- Dynamic Open Graph / Telegram / Social Preview -->
+        const structuredData = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": cleanPageUrl
+          },
+          "headline": story.title,
+          "description": rawSummary,
+          "image": cleanImageUrl ? [cleanImageUrl] : [`${baseUrl}/icon-512.png`],
+          "datePublished": publishedDate,
+          "dateModified": modifiedDate,
+          "author": {
+            "@type": "Person",
+            "name": story.author || "Vatanuz.uz"
+          },
+          "publisher": {
+            "@type": "NewsMediaOrganization",
+            "name": "Vatanuz.uz",
+            "url": baseUrl,
+            "logo": {
+              "@type": "ImageObject",
+              "url": `${baseUrl}/icon-512.png`
+            }
+          },
+          "articleSection": story.category || "Yangiliklar",
+          "keywords": tags
+        });
+
+        const seoTags = `
+    <!-- Google & Search Engine SEO Meta -->
+    <link rel="canonical" href="${cleanPageUrl}" />
+    <meta name="description" content="${pageDesc}" />
+    <meta name="keywords" content="${tags}" />
+    <meta name="news_keywords" content="${tags}" />
+    <meta name="author" content="${authorName}" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Open Graph / Facebook / Telegram -->
     <meta property="og:site_name" content="Vatanuz.uz" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${cleanPageUrl}" />
     <meta property="og:title" content="${escText(story.title)}" />
     <meta property="og:description" content="${pageDesc}" />
+    <meta property="article:published_time" content="${publishedDate}" />
+    <meta property="article:modified_time" content="${modifiedDate}" />
+    <meta property="article:section" content="${categoryName}" />
     ${cleanImageUrl ? `
     <meta property="og:image" content="${cleanImageUrl}" />
     <meta property="og:image:secure_url" content="${cleanImageUrl}" />
     <meta property="og:image:alt" content="${escText(story.title)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />` : ''}
+
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="${cleanPageUrl}" />
     <meta name="twitter:title" content="${escText(story.title)}" />
     <meta name="twitter:description" content="${pageDesc}" />
     ${cleanImageUrl ? `<meta name="twitter:image" content="${cleanImageUrl}" />` : ''}
+
+    <!-- Google News & Rich Results JSON-LD Structured Data -->
+    <script type="application/ld+json">
+${structuredData}
+    </script>
 `;
-        html = html.replace(/<head>/i, '<head>\n' + ogTags);
+        html = html.replace(/<head>/i, '<head>\n' + seoTags);
         html = html.replace(/<title>.*?<\/title>/i, `<title>${pageTitle}</title>`);
       }
     } else {
-      // Default website OpenGraph preview tags
+      // Default website SEO & OpenGraph tags for Homepage
       try {
         const settings = await settingRepository.getSettings();
         const siteName = settings?.siteName || 'Vatanuz.uz';
@@ -175,11 +228,34 @@ app.use(async (req, res, next) => {
         }
         const escText = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const escUrl = (str) => String(str || '').trim().replace(/"/g,'%22').replace(/'/g,'%27').replace(/</g,'%3C').replace(/>/g,'%3E');
-        const defaultDesc = "Vatanuz.uz — O'zbekiston yangiliklari portali. Tezkor, ishonchli, mustaqil.";
+        const defaultDesc = "Vatanuz.uz — O'zbekiston va jahon yangiliklari, eng muhim voqealar va tahliliy materiallar portali.";
         const cleanOgImage = escUrl(ogImage);
         const cleanBaseUrl = escUrl(baseUrl);
+        const googleVerif = settings?.googleVerification ? `<meta name="google-site-verification" content="${escText(settings.googleVerification)}" />` : '';
+
+        const homeStructuredData = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "NewsMediaOrganization",
+          "name": siteName,
+          "url": baseUrl,
+          "logo": cleanOgImage || `${baseUrl}/icon-512.png`,
+          "description": defaultDesc,
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${baseUrl}/?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          }
+        });
+
         const ogTags = `
-    <!-- Default Open Graph / Telegram Preview -->
+    <!-- Homepage SEO & Verification -->
+    <link rel="canonical" href="${cleanBaseUrl}/" />
+    <meta name="description" content="${escText(defaultDesc)}" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    ${googleVerif}
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:site_name" content="${escText(siteName)}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${cleanBaseUrl}/" />
@@ -190,10 +266,17 @@ app.use(async (req, res, next) => {
     <meta property="og:image:secure_url" content="${cleanOgImage}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />` : ''}
+
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escText(siteName)} — Milliy axborot portali" />
     <meta name="twitter:description" content="${escText(defaultDesc)}" />
     ${cleanOgImage ? `<meta name="twitter:image" content="${cleanOgImage}" />` : ''}
+
+    <!-- Structured Data JSON-LD -->
+    <script type="application/ld+json">
+${homeStructuredData}
+    </script>
 `;
         html = html.replace(/<head>/i, '<head>\n' + ogTags);
       } catch (_) {}
