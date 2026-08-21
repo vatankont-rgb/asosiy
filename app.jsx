@@ -810,7 +810,7 @@ function App() {
   const [siteConfig, setSiteConfig] = useState(DEFAULT_SITE_CONFIG);
   const [videos, setVideos] = useState({ uz: [], uzk: [], en: [] });
   const [photos, setPhotos] = useState({ uz: [], uzk: [], en: [] });
-  const [latestNewsCount, setLatestNewsCount] = useState(9);
+  const [latestNewsCount, setLatestNewsCount] = useState(5);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const handlePushSubscribe = async () => {
@@ -1149,13 +1149,13 @@ function App() {
   const otherFeatured = featuredStories.filter(s => s && s.id !== hero?.id && !s.isEditorChoice && !s.isEditorPick);
   const remainingStories = stories.filter(s => s && s.id !== hero?.id && !pinnedSideIds.includes(s.id) && !s.isFeatured && !s.isEditorChoice && !s.isEditorPick);
   
-  // Left side sub-grid cards under hero: Tahririyat tanlovi maqolalarini birinchi o'ringa chiqarish (6 tagacha)
+  // Left side sub-grid cards under hero: Tahririyat tanlovi maqolalarini birinchi o'ringa chiqarish (3 ta)
   const gridStories = [
     ...editorChoiceStories,
     ...otherFeatured,
     ...pinnedSideStories.filter(s => !editorChoiceStories.some(e => e.id === s.id)),
     ...remainingStories
-  ].filter((s, idx, self) => self.findIndex(x => x.id === s.id) === idx).slice(0, 6);
+  ].filter((s, idx, self) => self.findIndex(x => x.id === s.id) === idx).slice(0, 3);
   
   // Right side "So'nggi yangiliklar" list (shows recent stories, non-hero if available, or all stories)
   const nonHeroStories = stories.filter(s => s && s.id !== hero?.id);

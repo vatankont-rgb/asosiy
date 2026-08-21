@@ -1003,7 +1003,7 @@ body {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.9fr 1fr;
-  align-items: start;
+  align-items: stretch;
   gap: 32px;
 }
 
