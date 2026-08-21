@@ -1174,7 +1174,7 @@ function App() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [activeStory, setActiveStory] = useState(null);
-  const [allStories, setAllStories] = useState(withIds(storyData));
+  const [allStories, setAllStories] = useState({ uz: [], uzk: [], en: [] });
   const [serverMessage, setServerMessage] = useState("");
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("yk-dark") === "1");
   const [savedIds, setSavedIds] = useState(() => JSON.parse(localStorage.getItem("yk-saved") || "[]"));
@@ -1504,6 +1504,7 @@ function App() {
       setServerMessage("");
     } catch (error) {
       setServerMessage("Server API bilan aloqa bo'lmadi, demo maqolalar ko'rsatilmoqda.");
+      setAllStories(withIds(storyData));
     } finally {
       setLoading(false);
     }
