@@ -1692,7 +1692,7 @@ function App() {
             <main className="section category-section" style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px 16px 60px 16px" }}>
               <div className="section-inner" style={{ padding: 0 }}>
                 <h1 className="cat-page-title" style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink, #0f172a)", margin: "0 0 28px 0", letterSpacing: "-0.3px" }}>
-                  {getDisplayCat(page)} {lang === "en" ? "news" : (lang === "uz" ? "yangiliklari" : "янгиликлари")}
+                  {getDisplayCat(page)}
                 </h1>
 
                 <div className="category-news-feed">
