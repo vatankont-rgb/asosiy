@@ -1187,7 +1187,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   flex: 1;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .hero-latest-card {
@@ -1200,7 +1200,7 @@ body {
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--line);
-  padding: 8px 0;
+  padding: 10px 0;
   flex: 1;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -1216,7 +1216,6 @@ body {
 
 .hero-latest-card:last-child {
   border-bottom: none;
-  padding-bottom: 0;
 }
 
 .latest-copy {
@@ -1254,15 +1253,15 @@ body {
 
 .more-news-btn {
   width: 100%;
-  padding: 16px;
+  padding: 14px 20px;
   background: var(--brand);
   color: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
-  margin-top: 0;
+  margin-top: auto;
   transition: background 0.2s;
 }
 

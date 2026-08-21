@@ -980,15 +980,19 @@ function App() {
 
   useEffect(() => {
     if (!initialCheckedRef.current) return;
-    const url = new URL(window.location);
-    if (activeStory) {
-      url.searchParams.set("story", activeStory.id);
-      window.history.replaceState(null, "", url.toString());
-    } else if (url.searchParams.has("story") || url.searchParams.has("id")) {
-      url.searchParams.delete("story");
-      url.searchParams.delete("id");
-      window.history.replaceState(null, "", url.toString().replace(/\?$/, ""));
-    }
+    try {
+      const url = new URL(window.location);
+      if (activeStory && activeStory.id) {
+        if (url.searchParams.get("story") !== activeStory.id) {
+          url.searchParams.set("story", activeStory.id);
+          window.history.pushState({ storyId: activeStory.id }, "", url.toString());
+        }
+      } else if (url.searchParams.has("story") || url.searchParams.has("id")) {
+        url.searchParams.delete("story");
+        url.searchParams.delete("id");
+        window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+      }
+    } catch(e) {}
   }, [activeStory]);
 
   function toggleSave(id) {
@@ -1130,10 +1134,24 @@ function App() {
       } else if (!loading) {
         initialCheckedRef.current = true;
         initialStoryIdRef.current = null;
+        setActiveStory(null);
+        try {
+          const url = new URL(window.location);
+          url.searchParams.delete("story");
+          url.searchParams.delete("id");
+          window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+        } catch(e) {}
       }
     } else if (!loading) {
       initialCheckedRef.current = true;
       initialStoryIdRef.current = null;
+      setActiveStory(null);
+      try {
+        const url = new URL(window.location);
+        url.searchParams.delete("story");
+        url.searchParams.delete("id");
+        window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+      } catch(e) {}
     }
   }, [stories, allStories, loading]);
 
@@ -1150,27 +1168,41 @@ function App() {
   // Brauzer tarixi (orqaga / oldinga) tugmalari bosilganda
   useEffect(() => {
     function onPopState() {
-      const url = new URL(window.location);
-      let sId = url.searchParams.get("story") || url.searchParams.get("id");
-      if (!sId) {
-        const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
-        if (m) sId = m[1];
-      }
-      if (sId && stories && stories.length > 0) {
-        const found = stories.find(s => s && (s.id === sId || s.slug === sId));
-        if (found) {
-          setActiveStory(found);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          return;
+      try {
+        const url = new URL(window.location);
+        let sId = url.searchParams.get("story") || url.searchParams.get("id");
+        if (!sId) {
+          const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+          if (m) sId = m[1];
         }
-      }
-      if (!sId) {
+        if (sId) {
+          const list = Array.isArray(stories) ? stories : [];
+          const found = list.find(s => s && (s.id === sId || s.slug === sId))
+            || (allStories.uz || []).find(s => s && (s.id === sId || s.slug === sId))
+            || (allStories.uzk || []).find(s => s && (s.id === sId || s.slug === sId))
+            || (allStories.en || []).find(s => s && (s.id === sId || s.slug === sId));
+          if (found) {
+            setActiveStory(found);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          } else {
+            setActiveStory(null);
+            url.searchParams.delete("story");
+            url.searchParams.delete("id");
+            window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          }
+        }
+        setActiveStory(null);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch(err) {
         setActiveStory(null);
       }
     }
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [stories]);
+  }, [stories, allStories]);
 
   const pages = categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }));
   const selectedCategory = page === 'home' || page === 'admin' || page === 'barcha-yangiliklar' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
@@ -2492,12 +2524,26 @@ function TagPage({ tag, stories, lang, onOpen, onBack, savedIds, onToggleSave })
   );
 }
 
-function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, onToggleSave, copiedShare, setCopiedShare, onClose, onOpen, onView, reactions, addReaction, onAuthorClick, onTagClick }) {
-  const initials = (story.author || "YK").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-  const isHtml = story.body && /<[a-z]/.test(story.body);
+function ArticlePage({ lang, t, story, stories = [], ads, getDisplayCat, savedIds, onToggleSave, copiedShare, setCopiedShare, onClose, onOpen, onView, reactions, addReaction, onAuthorClick, onTagClick }) {
+  if (!story || typeof story !== 'object' || !story.id) {
+    return (
+      <main className="article-page" style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px", textAlign: "center" }}>
+        <h2 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "16px", color: "var(--ink)" }}>
+          {lang === "uz" ? "Kechirasiz, maqola topilmadi" : (lang === "uzk" ? "Кечирасиз, мақола топилмади" : "Article not found")}
+        </h2>
+        <button className="article-back-btn" onClick={onClose} style={{ marginTop: "12px", padding: "10px 24px", fontSize: "15px" }}>
+          <span>&#8592;</span> {lang === "uz" ? "Bosh sahifaga qaytish" : (lang === "uzk" ? "Бош саҳифага қайтиш" : "Back to Home")}
+        </button>
+      </main>
+    );
+  }
+  const authorName = String(story.author || "YK").trim();
+  const initials = authorName.split(/\s+/).filter(Boolean).map(w => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase() || "YK";
+  const isHtml = Boolean(story.body && /<[a-z]/i.test(story.body));
   const paragraphs = isHtml ? [] : (story.body || story.summary || "").split("\n\n").filter(Boolean);
-  const related = stories.filter(s => s.id !== story.id && s.category === story.category).slice(0, 3);
-  const more = stories.filter(s => s.id !== story.id && s.category !== story.category).slice(0, 3);
+  const storyList = Array.isArray(stories) ? stories : [];
+  const related = storyList.filter(s => s && s.id !== story.id && s.category === story.category).slice(0, 3);
+  const more = storyList.filter(s => s && s.id !== story.id && s.category !== story.category).slice(0, 3);
   const readMore = related.length ? related : more;
   const parseTags = (str) => {
     if (!str) return [];
