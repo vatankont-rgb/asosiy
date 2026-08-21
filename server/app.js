@@ -102,6 +102,24 @@ const fs = require('fs');
 const articleRepository = require('./repositories/articleRepository');
 const settingRepository = require('./repositories/settingRepository');
 
+// Asset safeguard: serve app.jsx, styles.css, sw.js, manifest.json for any subpath (e.g. /p/app.jsx)
+app.get([/.*\/app\.jsx$/, /.*\/styles\.css$/, /.*\/sw\.js$/, /.*\/manifest\.json$/], (req, res) => {
+  const fileName = req.path.split('/').pop().split('?')[0];
+  const filePath = path.join(rootDir, fileName);
+  if (fs.existsSync(filePath)) {
+    if (fileName.endsWith('.jsx') || fileName.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.type('application/javascript').sendFile(filePath);
+    }
+    if (fileName.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.type('text/css').sendFile(filePath);
+    }
+    return res.sendFile(filePath);
+  }
+  res.status(404).send('Not Found');
+});
+
 // Google Site Verification file handler (serves only real uploaded verification files, 404 otherwise)
 app.get('/google:code.html', (req, res) => {
   const code = req.params.code;
