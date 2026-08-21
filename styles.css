@@ -7203,7 +7203,8 @@ textarea.field-error {
     width: auto !important;
   }
   .header .search,
-  .header .desktop-search {
+  .header .desktop-search,
+  .desktop-search {
     display: none !important;
   }
   .header .lang-toggle {
