@@ -2252,23 +2252,38 @@ function AuthorPage({ author, stories, lang, onOpen, onBack, savedIds, onToggleS
 }
 
 function TagPage({ tag, stories, lang, onOpen, onBack, savedIds, onToggleSave }) {
-  const tagStories = stories.filter(s => s.tags && s.tags.split(",").map(t => t.trim()).includes(tag));
-  const isUz = lang !== "en";
+  const cleanStr = (str) => (str || "").replace(/^[#\s]+|[#\s]+$/g, "").toLowerCase().trim();
+  const targetTag = cleanStr(tag);
+  
+  const tagStories = (stories || []).filter(s => {
+    if (!s || !s.tags) return false;
+    const sTags = (Array.isArray(s.tags) ? s.tags : s.tags.split(/[,;\n]+/))
+      .map(cleanStr)
+      .filter(Boolean);
+    return sTags.some(t => t === targetTag || t.includes(targetTag) || targetTag.includes(t));
+  });
+  
+  const isUz = lang === "uz";
+  const isUzk = lang === "uzk";
+  const backText = isUz ? "Orqaga" : (isUzk ? "Орқага" : "Back");
+  const countText = isUz ? "ta maqola" : (isUzk ? "та мақола" : "articles");
+  const emptyText = isUz ? "Ushbu teg bo'yicha maqolalar topilmadi" : (isUzk ? "Ушбу тег бўйича мақолалар топилмади" : "No articles found for this tag");
+
   return (
     <main className="section">
       <div className="section-inner">
         <button className="article-back-btn" onClick={onBack} style={{marginBottom:24}}>
-          <span>&#8592;</span> {isUz ? "Orqaga" : "Back"}
+          <span>&#8592;</span> {backText}
         </button>
         <div className="section-head">
           <div>
-            <h2 className="section-title">🏷️ #{tag}</h2>
-            <p className="section-note">{tagStories.length} {isUz ? "ta maqola" : "articles"}</p>
+            <h2 className="section-title">🏷️ #{tag ? tag.replace(/^[#\s]+/, '') : ''}</h2>
+            <p className="section-note">{tagStories.length} {countText}</p>
           </div>
         </div>
         <div className="stories-grid" style={{marginTop:24}}>
           {tagStories.length === 0 ? (
-            <p style={{color:"var(--muted)"}}>{isUz ? "Bu teg bo'yicha maqolalar topilmadi" : "No articles found for this tag"}</p>
+            <p style={{color:"var(--muted)", padding:"24px 0"}}>{emptyText}</p>
           ) : tagStories.map(story => (
             <StoryCard lang={lang} key={story.id} story={story} savedIds={savedIds} onToggleSave={onToggleSave}
               onOpen={() => onOpen(story)} />
@@ -2286,7 +2301,15 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
   const related = stories.filter(s => s.id !== story.id && s.category === story.category).slice(0, 3);
   const more = stories.filter(s => s.id !== story.id && s.category !== story.category).slice(0, 3);
   const readMore = related.length ? related : more;
-  const tags = story.tags ? story.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+  const parseTags = (str) => {
+    if (!str) return [];
+    if (Array.isArray(str)) return str.map(t => String(t).replace(/^[#\s]+|[#\s]+$/g, '').trim()).filter(Boolean);
+    return String(str)
+      .split(/[,;\n]+/)
+      .map(t => t.replace(/^[#\s]+|[#\s]+$/g, '').trim())
+      .filter(Boolean);
+  };
+  const tags = parseTags(story.tags);
   const [readProgress, setReadProgress] = useState(0);
   const [comments, setComments] = useState([]);
   const [localViews, setLocalViews] = useState(story.views || 0);
@@ -2504,12 +2527,6 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
           )}
 
           <div>
-            {tags.length > 0 && (
-              <div className="article-tags" style={{ marginBottom: "20px" }}>
-                {tags.map(tag => <button key={tag} className="article-tag tag-btn" onClick={() => onTagClick && onTagClick(tag)}>#{tag}</button>)}
-              </div>
-            )}
-
             {headings.length > 1 && (
               <nav className="toc-box">
                 <strong className="toc-title">{isUz ? "📋 Mundarija" : "📋 Table of Contents"}</strong>
@@ -2617,7 +2634,29 @@ function ArticlePage({ lang, t, story, stories, ads, getDisplayCat, savedIds, on
               );
             })()}
 
-            {tags && tags.length > 0 && (<div className="article-tags" style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}><span style={{ fontSize: "14px", fontWeight: "600", color: "var(--muted)", marginRight: "8px", alignSelf: "center" }}>{lang === "uz" ? "Teglar:" : (lang === "uzk" ? "Теглар:" : "Tags:")}</span>{tags.map((tag, i) => (<a key={i} href={`/${lang}?q=${encodeURIComponent(tag)}`} className="article-tag-item">#{tag}</a>))}</div>)}<div className="article-share">
+            {tags && tags.length > 0 && (
+              <div className="article-tags-bottom" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px", marginTop: "24px", marginBottom: "24px" }}>
+                <span style={{ fontSize: "14px", fontWeight: "700", color: "var(--muted)", marginRight: "4px" }}>
+                  {lang === "uz" ? "Teglar:" : (lang === "uzk" ? "Теглар:" : "Tags:")}
+                </span>
+                {tags.map((tag, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className="article-tag-item"
+                    onClick={() => {
+                      if (onTagClick) {
+                        onTagClick(tag);
+                      }
+                    }}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="article-share">
               <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Share:")}</span>
               {(() => {
                 const shareUrl = `${window.location.origin}/news/${story.id}`;
