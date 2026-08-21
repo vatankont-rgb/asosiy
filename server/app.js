@@ -86,8 +86,16 @@ app.use('/uploads', express.static(config.uploadsDir));
 const rootDir = path.join(__dirname, '..');
 app.use(express.static(rootDir, {
   dotfiles: 'deny',
-  maxAge: '7d',
-  index: false // Disable serving index.html automatically so dynamic SSR / OG tag handler processes all HTML routes
+  index: false, // Disable serving index.html automatically so dynamic SSR / OG tag handler processes all HTML routes
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('app.jsx') || filePath.endsWith('styles.css') || filePath.endsWith('sw.js')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+  }
 }));
 
 const fs = require('fs');
