@@ -102,7 +102,7 @@ const fs = require('fs');
 const articleRepository = require('./repositories/articleRepository');
 const settingRepository = require('./repositories/settingRepository');
 
-// Google Site Verification file auto-handler (e.g. /google[code].html)
+// Google Site Verification file handler (serves only real uploaded verification files, 404 otherwise)
 app.get('/google:code.html', (req, res) => {
   const code = req.params.code;
   const fileName = `google${code}.html`;
@@ -110,7 +110,7 @@ app.get('/google:code.html', (req, res) => {
   if (fs.existsSync(filePath)) {
     return res.sendFile(filePath);
   }
-  res.type('text/html').send(`google-site-verification: google${code}.html`);
+  return res.status(404).send('Not Found');
 });
 
 // Fallback wild-card handler for Single Page Application routing (with SSR SEO meta injection)
