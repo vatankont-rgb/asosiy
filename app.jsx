@@ -232,6 +232,7 @@ function RichEditor({ value, onChange }) {
   const pdfInputRef = useRef(null);
   const isComposing = useRef(false);
   const [uploading, setUploading] = useState(false);
+  const [showMediaModal, setShowMediaModal] = useState(false);
 
   useEffect(() => {
     const el = editorRef.current;
@@ -404,6 +405,12 @@ function RichEditor({ value, onChange }) {
               className={`rich-tool-btn rich-tool-img ${uploading ? "uploading" : ""}`}
               onMouseDown={e=>{ e.preventDefault(); (fileInputRef.current && fileInputRef.current.click()); }}
             >{uploading ? "⏳" : "🖼"}</button>
+            <button
+              type="button"
+              title="Kutubxonadan tanlash"
+              className="rich-tool-btn"
+              onMouseDown={e=>{ e.preventDefault(); setShowMediaModal(true); }}
+            >📂</button>
             <input
               ref={fileInputRef}
               type="file"
@@ -463,6 +470,25 @@ function RichEditor({ value, onChange }) {
         onCompositionEnd={() => { isComposing.current = false; syncContent(); }}
         data-placeholder="To'liq maqola matni. Paragraflarni Enter bilan ajrating..."
       />
+      {showMediaModal && (
+        <MediaSelectModal
+          isUz={true}
+          onClose={() => setShowMediaModal(false)}
+          onSelect={(url) => {
+            let html = '';
+            const lowerUrl = url.toLowerCase();
+            if (lowerUrl.endsWith('.pdf')) {
+              html = `<a href="${url}" target="_blank">📄 Hujjatni yuklab olish</a>`;
+            } else if (lowerUrl.match(/\.(mp4|webm|ogg)$/)) {
+              html = `<video src="${url}" controls style="max-width:100%"></video>`;
+            } else {
+              html = `<img src="${url}" alt="media" />`;
+            }
+            exec('insertHTML', html);
+            setShowMediaModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -3530,6 +3556,8 @@ function AdminSettings({ setSiteConfig, isUz }) {
   });
   const [loading, setLoading] = React.useState(true);
   const importFileRef = React.useRef(null);
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
+  const [activeMediaField, setActiveMediaField] = React.useState(null);
 
   React.useEffect(() => {
     fetchSettings();
@@ -3725,10 +3753,15 @@ function AdminSettings({ setSiteConfig, isUz }) {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                      <label style={{ padding: "10px 20px", background: "var(--ink)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}>
-                        Юклаш
-                        <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: "none" }} />
-                      </label>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <label style={{ flex: 1, padding: "10px 10px", background: "var(--ink)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}>
+                          Юклаш
+                          <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: "none" }} />
+                        </label>
+                        <button type="button" onClick={() => { setActiveMediaField('logoUrl'); setShowMediaModal(true); }} style={{ flex: 1, padding: "10px 10px", background: "rgba(59,130,246,0.1)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#3b82f6", cursor: "pointer", textAlign: "center", border: "none", transition: "all 0.2s" }}>
+                          Кутубхона
+                        </button>
+                      </div>
                       <button type="button" onClick={() => setSettings({...settings, logoUrl: ""})} style={{ padding: "10px 20px", background: "transparent", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#ef4444", cursor: "pointer", transition: "all 0.2s" }}>
                         Ўчириш
                       </button>
@@ -3963,9 +3996,10 @@ function AdminSettings({ setSiteConfig, isUz }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <p style={{ margin: 0, fontSize: "13px", color: "var(--muted)" }}>Сайт ҳаволаси Telegram ёки Facebook да улашилганда чиқадиган асосий расм.</p>
-                  <label style={{ padding: "10px 20px", background: "var(--ink)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s", width: "max-content" }}>
-                    Расм юклаш
-                    <input type="file" accept="image/*" onChange={(e) => {
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <label style={{ padding: "10px 20px", background: "var(--ink)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s", width: "max-content" }}>
+                      Расм юклаш
+                      <input type="file" accept="image/*" onChange={(e) => {
                       const file = e.target.files[0];
                       if (!file) return;
                       const reader = new FileReader();
@@ -3989,6 +4023,10 @@ function AdminSettings({ setSiteConfig, isUz }) {
                       reader.readAsDataURL(file);
                     }} style={{ display: "none" }} />
                   </label>
+                  <button type="button" onClick={() => { setActiveMediaField('defaultOgImage'); setShowMediaModal(true); }} style={{ padding: "10px 20px", background: "rgba(59,130,246,0.1)", borderRadius: "8px", fontSize: "13px", fontWeight: "600", color: "#3b82f6", cursor: "pointer", textAlign: "center", border: "none", transition: "all 0.2s" }}>
+                    Кутубхона
+                  </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -4075,6 +4113,20 @@ function AdminSettings({ setSiteConfig, isUz }) {
           </div>
         )}
       </div>
+      {showMediaModal && (
+        <MediaSelectModal
+          isUz={isUz}
+          onClose={() => setShowMediaModal(false)}
+          onSelect={(url) => {
+            if (activeMediaField === 'logoUrl') {
+              setSettings({ ...settings, logoUrl: url });
+            } else if (activeMediaField === 'defaultOgImage') {
+              setSettings({ ...settings, seo: { ...(settings.seo || {}), defaultOgImage: url } });
+            }
+            setShowMediaModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -4495,7 +4547,20 @@ function AdminUsers({ isUz }) {
   );
 }
 
-function AdminMedia({ isUz }) {
+function MediaSelectModal({ isUz, onClose, onSelect }) {
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 100000, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div style={{ background: "var(--bg)", width: "90%", maxWidth: "1200px", height: "90%", borderRadius: "16px", overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: "16px", right: "24px", background: "rgba(0,0,0,0.1)", border: "none", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}>✕</button>
+        <div style={{ padding: "24px", flex: 1, overflowY: "auto" }}>
+          <AdminMedia isUz={isUz} onSelect={onSelect} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminMedia({ isUz, onSelect }) {
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -4583,7 +4648,7 @@ function AdminMedia({ isUz }) {
       
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "24px" }}>
         {media.map((item, idx) => (
-          <div key={idx} style={{ background: "var(--surface)", borderRadius: "12px", border: "1px solid var(--line)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <div key={idx} onClick={() => onSelect && onSelect(item.url)} style={{ background: "var(--surface)", borderRadius: "12px", border: onSelect ? "2px solid transparent" : "1px solid var(--line)", overflow: "hidden", display: "flex", flexDirection: "column", cursor: onSelect ? "pointer" : "default" }}>
             <div style={{ height: "160px", background: "var(--fill)", position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
               {item.type === 'image' ? (
                 <img src={item.url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -4600,8 +4665,8 @@ function AdminMedia({ isUz }) {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: "11px", color: "var(--muted)" }}>{(item.size / 1024).toFixed(1)} KB</span>
                 <div style={{ display: "flex", gap: "8px" }}>
-                  <button onClick={() => copyToClipboard(item.url)} style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "14px" }} title="Nusxalash">🔗</button>
-                  <button onClick={() => handleDelete(item.name)} style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "14px", color: "#ef4444" }} title="O'chirish">🗑️</button>
+                  <button onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url); }} style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "14px" }} title="Nusxalash">🔗</button>
+                  <button onClick={(e) => { e.stopPropagation(); handleDelete(item.name); }} style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "14px", color: "#ef4444" }} title="O'chirish">🗑️</button>
                 </div>
               </div>
             </div>
@@ -5128,6 +5193,7 @@ function AdminKPI({ isUz }) {
 function AdminAds({ ads, setAds }) {
   const [isUploading, setIsUploading] = React.useState(false);
   const [formData, setFormData] = React.useState({ title: "", link: "", position: "inline", image: "" });
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
 
   async function handleCreate(e) {
     e.preventDefault();
@@ -5252,6 +5318,7 @@ function AdminAds({ ads, setAds }) {
             <label style={{display:"block", marginBottom:6, fontSize:13, fontWeight:"600", color: "var(--muted)"}}>Rasm yuklash</label>
             <div style={{ display: "flex", gap: 12, alignItems: "center", padding: "16px", border: "1.5px dashed var(--line)", borderRadius: "8px", background: "var(--fill)" }}>
               <input type="file" accept="image/*" onChange={handleUpload} disabled={isUploading} style={{ cursor: "pointer" }} />
+              <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "8px 16px", borderRadius: "6px", fontSize: "14px", fontWeight: "700", cursor: "pointer" }}>Yoki Kutubxonadan Tanlash</button>
               {isUploading && <span style={{ color: "var(--brand)", fontSize: 14, fontWeight: "600" }}>Yuklanmoqda...</span>}
             </div>
             {formData.image && (
@@ -5288,6 +5355,12 @@ function AdminAds({ ads, setAds }) {
         ))}
         {ads.length === 0 && <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px", background: "var(--surface)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--muted)" }}><p style={{ margin: 0, fontSize: 16 }}>Hozircha reklamalar yo'q. Yangi reklama qo'shishingiz mumkin.</p></div>}
       </div>
+      {showMediaModal && (
+        <MediaSelectModal isUz={true} onClose={() => setShowMediaModal(false)} onSelect={(url) => {
+          setFormData(prev => ({ ...prev, image: url }));
+          setShowMediaModal(false);
+        }} />
+      )}
     </div>
   );
 }
@@ -5297,6 +5370,7 @@ function AdminSpecial({ setSiteConfig }) {
   const [settings, setSettings] = React.useState({});
   const [saving, setSaving] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
 
   React.useEffect(() => {
     fetch('/api/admin/settings', {
@@ -5468,7 +5542,10 @@ function AdminSpecial({ setSiteConfig }) {
         <div>
           <label style={labelStyle}>Asosiy rasm</label>
           <p style={{fontSize: '12px', color: 'var(--muted)', marginTop: '-4px', marginBottom: '6px'}}>O'ng tomonda chiqadigan katta asosiy rasm (Gorizontal rasm tavsiya etiladi)</p>
-          <input type="file" onChange={uploadImage} accept="image/*" style={{marginBottom: 8}} />
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
+            <input type="file" onChange={uploadImage} accept="image/*" />
+            <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxonadan Tanlash</button>
+          </div>
           {special.image && <img src={special.image} alt="Preview" style={{marginTop: 8, maxWidth: 320, borderRadius: 10, display: 'block', border: '1px solid var(--border, #e2e8f0)'}} />}
         </div>
 
@@ -5495,6 +5572,12 @@ function AdminSpecial({ setSiteConfig }) {
           {saving ? "Saqlanmoqda..." : "💾 Saqlash"}
         </button>
       </div>
+      {showMediaModal && (
+        <MediaSelectModal isUz={true} onClose={() => setShowMediaModal(false)} onSelect={(url) => {
+          handleUpdate("image", url);
+          setShowMediaModal(false);
+        }} />
+      )}
     </div>
   );
 }
@@ -5556,6 +5639,7 @@ function AdminPanel({
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7'];
 
 const [activeTab, setActiveTab] = useState("dashboard");
+  const [showMediaModal, setShowMediaModal] = useState(false);
   const [adminTags, setAdminTags] = useState([]);
   useEffect(() => { fetch("/api/tags").then(r=>r.json()).then(d=>{if(d&&d.data) setAdminTags(d.data)}).catch(console.error) }, []);
   const [translations, setTranslations] = useState({ uz: {}, en: {} });
@@ -6527,7 +6611,10 @@ const [activeTab, setActiveTab] = useState("dashboard");
 
               {/* Cover Image Block */}
               <div className="adm-card">
-                <h3 className="adm-card-header">Rasm Muqovasi (Cover Image)</h3>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <h3 className="adm-card-header" style={{margin:0, borderBottom:"none", paddingBottom:0}}>Rasm Muqovasi (Cover Image)</h3>
+                  <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxonadan Tanlash</button>
+                </div>
                 <div 
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
@@ -6825,6 +6912,12 @@ const [activeTab, setActiveTab] = useState("dashboard");
         {activeTab === "trash" && <AdminTrash isUz={isUz} />}
         {activeTab === "kpi" && <AdminKPI isUz={isUz} />}
       </main>
+      {showMediaModal && (
+        <MediaSelectModal isUz={isUz} onClose={() => setShowMediaModal(false)} onSelect={(url) => {
+          setForm(prev => ({ ...prev, image: url }));
+          setShowMediaModal(false);
+        }} />
+      )}
     </div>
   );
 };
@@ -6917,6 +7010,7 @@ function AdminPhotos({ photos, setPhotos, lang, isUz }) {
   const [editingId, setEditingId] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
   const ps = photos[lang] || [];
 
   const handleUpload = async (e) => {
@@ -7039,7 +7133,10 @@ function AdminPhotos({ photos, setPhotos, lang, isUz }) {
             </div>
             
             <div className="adm-card">
-              <h3 className="adm-card-header">Rasmlar yuklash</h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h3 className="adm-card-header" style={{margin:0, borderBottom:"none", paddingBottom:0}}>Rasmlar yuklash</h3>
+                <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxonadan Tanlash</button>
+              </div>
               <div style={{ display: "flex", gap: 12, alignItems: "center", padding: "32px 20px", border: "2px dashed #cbd5e1", borderRadius: "8px", background: "#f8fafc", justifyContent: "center" }}>
                 <input type="file" accept="image/*" multiple onChange={handleUpload} disabled={uploading} style={{ cursor: "pointer", maxWidth: "250px" }} />
                 {uploading && <span style={{ color: "#3b82f6", fontSize: 14, fontWeight: "600" }}>Yuklanmoqda...</span>}
@@ -7105,6 +7202,12 @@ function AdminPhotos({ photos, setPhotos, lang, isUz }) {
           </div>
         )}
       </div>
+      {showMediaModal && (
+        <MediaSelectModal isUz={isUz} onClose={() => setShowMediaModal(false)} onSelect={(url) => {
+          setForm(prev => ({ ...prev, images: [...(prev.images || []), url] }));
+          setShowMediaModal(false);
+        }} />
+      )}
     </div>
   );
 }
@@ -7113,6 +7216,7 @@ function AdminVideos({ videos, setVideos, lang, isUz, categories }) {
   const [form, setForm] = React.useState({ title: '', meta: '', url: '', images: [], body: '' });
   const [editingId, setEditingId] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
   const vids = videos[lang] || [];
 
   const handleSave = async (e) => {
@@ -7200,7 +7304,10 @@ function AdminVideos({ videos, setVideos, lang, isUz, categories }) {
           
           <div className="adm-col-side" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
              <div className="adm-card">
-               <h3 className="adm-card-header">Video manba</h3>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                 <h3 className="adm-card-header" style={{margin:0, borderBottom:"none", paddingBottom:0}}>Video manba</h3>
+                 <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxonadan Tanlash</button>
+               </div>
                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                  <div>
                    <label className="adm-form-label">Video URL (YouTube yoki mp4)</label>
@@ -7252,6 +7359,12 @@ function AdminVideos({ videos, setVideos, lang, isUz, categories }) {
           </div>
         )}
       </div>
+      {showMediaModal && (
+        <MediaSelectModal isUz={isUz} onClose={() => setShowMediaModal(false)} onSelect={(url) => {
+          setForm(prev => ({ ...prev, url: url }));
+          setShowMediaModal(false);
+        }} />
+      )}
     </div>
   );
 }
