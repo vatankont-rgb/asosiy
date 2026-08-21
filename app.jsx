@@ -2911,11 +2911,6 @@ function ArticlePage({ lang, t, story, stories = [], ads, getDisplayCat, savedId
         </div>
 
         <article className="article-full"><div className="article-page-content">
-          {/* Breadcrumbs */}
-          <div className="article-breadcrumbs" style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "16px" }}>
-            {lang === "uz" ? "Bosh sahifa" : (lang === "uzk" ? "Бош саҳифа" : "Home")} &gt; {getDisplayCat(story.category)}
-          </div>
-
           {/* Title */}
           <h1 className="article-main-title" style={{ fontSize: "28px", fontWeight: "800", color: "var(--ink)", lineHeight: "1.3", marginBottom: "12px", fontFamily: "inherit" }}>
             {story.title}
