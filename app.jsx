@@ -1772,8 +1772,8 @@ function MediaSection({ lang, items, onOpen, setPage }) {
 
   const videoLabel = T(isUz ? "Video" : "Video");
   const photoLabel = T(isUz ? "Foto" : "Photo");
-  const videoNote = T(isUz ? "Kunning eng muhim videolari" : "Main videos of the day");
-  const photoNote = T(isUz ? "Fotoreportajlar va vizual materiallar" : "Photo reports and visual materials");
+  const videoNote = lang === "uz" ? "Kunning eng muhim videolari" : (lang === "uzk" ? "Куннинг энг муҳим видеолари" : "Main videos of the day");
+  const photoNote = lang === "uz" ? "Fotoreportajlar va vizual materiallar" : (lang === "uzk" ? "Фоторепортажлар ва визуал материаллар" : "Photo reports and visual materials");
   const watchLabel = T(isUz ? "Tomosha qilish →" : "Watch →");
   const viewLabel = T(isUz ? "Ko'rish →" : "View →");
 
