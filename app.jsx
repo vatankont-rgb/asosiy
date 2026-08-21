@@ -1431,7 +1431,13 @@ function App() {
         />
       ) : (
         <>
-          {page === "home" && !query && <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} getDisplayCat={getDisplayCat} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page === "home" && !query && (
+            loading ? (
+              <HeroSkeleton />
+            ) : (
+              <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} getDisplayCat={getDisplayCat} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+            )
+          )}
           {page !== "admin" && page !== "__saved__" && <AdBanner ads={ads} position="top" />}
 
           {page === "admin" ? (
@@ -2227,6 +2233,67 @@ function ContactPage({ t, page, siteConfig }) {
         </div>
       </div>
     </main>
+  );
+}
+
+function HeroSkeleton() {
+  return (
+    <section className="hero">
+      <div className="hero-grid">
+        <div className="hero-left-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <div className="skeleton-line skeleton-anim" style={{ width: 140, height: 22 }} />
+          </div>
+          <div className="hero-main skeleton-card" style={{ cursor: "default" }}>
+            <div className="hero-main-content">
+              <div className="skeleton-line skeleton-anim" style={{ width: 90, height: 14, marginBottom: 12 }} />
+              <div className="skeleton-line skeleton-anim" style={{ width: "95%", height: 30, marginBottom: 10 }} />
+              <div className="skeleton-line skeleton-anim" style={{ width: "80%", height: 30, marginBottom: 14 }} />
+              <div className="skeleton-line skeleton-anim" style={{ width: "90%", height: 16, marginBottom: 8 }} />
+              <div className="skeleton-line skeleton-anim" style={{ width: "65%", height: 16 }} />
+            </div>
+            <div className="hero-main-thumb">
+              <div className="skeleton-img skeleton-anim" style={{ width: "100%", height: "100%", minHeight: 240, borderRadius: 12 }} />
+            </div>
+          </div>
+          <div className="hero-sub-grid">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div className="hero-sub-card skeleton-card" key={idx} style={{ display: "flex", gap: 12, cursor: "default" }}>
+                <div className="side-thumb">
+                  <div className="skeleton-img skeleton-anim" style={{ width: 100, height: 75, borderRadius: 8 }} />
+                </div>
+                <span className="side-copy" style={{ flex: 1 }}>
+                  <div className="skeleton-line skeleton-anim" style={{ width: 60, height: 12, marginBottom: 8 }} />
+                  <div className="skeleton-line skeleton-anim" style={{ width: "92%", height: 15, marginBottom: 6 }} />
+                  <div className="skeleton-line skeleton-anim" style={{ width: "70%", height: 15 }} />
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hero-right-block">
+          <div className="hero-block-header">
+            <span className="dot"></span>
+            <div className="skeleton-line skeleton-anim" style={{ width: 160, height: 22 }} />
+          </div>
+          <div className="hero-latest-list">
+            {Array.from({ length: 7 }).map((_, idx) => (
+              <div className="hero-latest-card skeleton-card" key={idx} style={{ display: "flex", gap: 12, cursor: "default" }}>
+                <span className="latest-copy" style={{ flex: 1 }}>
+                  <div className="skeleton-line skeleton-anim" style={{ width: 50, height: 12, marginBottom: 6 }} />
+                  <div className="skeleton-line skeleton-anim" style={{ width: "92%", height: 14, marginBottom: 4 }} />
+                  <div className="skeleton-line skeleton-anim" style={{ width: "75%", height: 14 }} />
+                </span>
+                <div className="latest-thumb">
+                  <div className="skeleton-img skeleton-anim" style={{ width: 70, height: 55, borderRadius: 6 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
