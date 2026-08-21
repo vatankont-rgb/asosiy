@@ -889,6 +889,21 @@ function App() {
   const [reactions, setReactions] = useState(() => JSON.parse(localStorage.getItem("yk-reactions") || "{}"));
   const [ads, setAds] = useState([]);
 
+  const initialStoryIdRef = useRef((() => {
+    try {
+      const url = new URL(window.location);
+      let sId = url.searchParams.get("story") || url.searchParams.get("id");
+      if (!sId) {
+        const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+        if (m) sId = m[1];
+      }
+      return sId || null;
+    } catch(e) {
+      return null;
+    }
+  })());
+  const initialCheckedRef = useRef(!initialStoryIdRef.current);
+
   useEffect(() => {
     localStorage.setItem("yk-reactions", JSON.stringify(reactions));
   }, [reactions]);
@@ -962,12 +977,14 @@ function App() {
   }, [activeStory]);
 
   useEffect(() => {
+    if (!initialCheckedRef.current) return;
     const url = new URL(window.location);
     if (activeStory) {
       url.searchParams.set("story", activeStory.id);
       window.history.replaceState(null, "", url.toString());
-    } else if (url.searchParams.has("story")) {
+    } else if (url.searchParams.has("story") || url.searchParams.has("id")) {
       url.searchParams.delete("story");
+      url.searchParams.delete("id");
       window.history.replaceState(null, "", url.toString().replace(/\?$/, ""));
     }
   }, [activeStory]);
@@ -1088,23 +1105,70 @@ function App() {
   const adminStories = allStories[dataLang] || [];
   const displayVideos = lang === "uz" ? (videos["uz"]?.length ? videos["uz"] : (videos["uzk"] || []).map(v => ({...v, title: convertText(v.title, false), meta: convertText(v.meta, false), body: convertText(v.body, false)}))) : (videos[lang] || []);
   const displayPhotos = lang === "uz" ? (photos["uz"]?.length ? photos["uz"] : (photos["uzk"] || []).map(p => ({...p, title: convertText(p.title, false), meta: convertText(p.meta, false), body: convertText(p.body, false)}))) : (photos[lang] || []);
-  // URL дан мақола юклаш ёки тил ўзгарганда activeStory ни янгилаш
-  if (window.__pendingStoryId && stories.length > 0) {
-    const pid = window.__pendingStoryId;
-    const found = stories.find(s => s.id === pid || s.slug === pid);
-    if (found) {
-      window.__pendingStoryId = null;
-      setTimeout(() => setActiveStory(found), 0);
+  // URL orqali to'g'ridan-to'g'ri ochilgan maqolani topish va ko'rsatish
+  useEffect(() => {
+    if (initialCheckedRef.current) return;
+    const targetId = initialStoryIdRef.current;
+    if (!targetId) {
+      initialCheckedRef.current = true;
+      return;
     }
-  }
+    if (stories && stories.length > 0) {
+      const found = stories.find(s => s && (s.id === targetId || s.slug === targetId))
+        || (allStories.uz || []).find(s => s && (s.id === targetId || s.slug === targetId))
+        || (allStories.uzk || []).find(s => s && (s.id === targetId || s.slug === targetId))
+        || (allStories.en || []).find(s => s && (s.id === targetId || s.slug === targetId));
 
-  // Тил ўзгарганда очиқ мақолани транслитерация қилиш
-  if (activeStory && stories.length > 0) {
-    const updated = stories.find(s => s.id === activeStory.id);
-    if (updated && updated !== activeStory && (updated.title !== activeStory.title || updated.body !== activeStory.body)) {
-      setTimeout(() => setActiveStory(updated), 0);
+      if (found) {
+        const activeItem = stories.find(s => s.id === found.id) || found;
+        setActiveStory(activeItem);
+        window.scrollTo({ top: 0, behavior: "instant" });
+        initialCheckedRef.current = true;
+        initialStoryIdRef.current = null;
+      } else if (!loading) {
+        initialCheckedRef.current = true;
+        initialStoryIdRef.current = null;
+      }
+    } else if (!loading) {
+      initialCheckedRef.current = true;
+      initialStoryIdRef.current = null;
     }
-  }
+  }, [stories, allStories, loading]);
+
+  // Til o'zgarganda ochiq maqolani yangilash
+  useEffect(() => {
+    if (activeStory && stories && stories.length > 0) {
+      const updated = stories.find(s => s.id === activeStory.id);
+      if (updated && (updated.title !== activeStory.title || updated.body !== activeStory.body || updated.category !== activeStory.category)) {
+        setActiveStory(updated);
+      }
+    }
+  }, [lang, stories]);
+
+  // Brauzer tarixi (orqaga / oldinga) tugmalari bosilganda
+  useEffect(() => {
+    function onPopState() {
+      const url = new URL(window.location);
+      let sId = url.searchParams.get("story") || url.searchParams.get("id");
+      if (!sId) {
+        const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+        if (m) sId = m[1];
+      }
+      if (sId && stories && stories.length > 0) {
+        const found = stories.find(s => s && (s.id === sId || s.slug === sId));
+        if (found) {
+          setActiveStory(found);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+      }
+      if (!sId) {
+        setActiveStory(null);
+      }
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [stories]);
 
   const pages = categories.map(c => ({ slug: c.slug, name: c.names[lang] || c.names["en"] || c.slug }));
   const selectedCategory = page === 'home' || page === 'admin' || page === 'barcha-yangiliklar' ? null : (categories.find(c => c.slug === page)?.names[lang] || categories.find(c => c.slug === page)?.names["en"] || page);
