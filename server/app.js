@@ -28,6 +28,7 @@ const videoRoutes = require('./routes/videoRoutes');
 const photoRoutes = require('./routes/photoRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Global Middlewares
 app.use(helmetConfig);

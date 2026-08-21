@@ -1139,22 +1139,20 @@ function App() {
     return matchesPage && matchesFilter && isEditor;
   });
 
-  const pinnedStory = pinnedHeroId ? stories.find(s => s.id === pinnedHeroId) : null;
-  const featuredStories = stories.filter(s => s.isFeatured);
+  const pinnedStory = pinnedHeroId ? stories.find(s => s && s.id === pinnedHeroId) : null;
+  const featuredStories = stories.filter(s => s && s.isFeatured);
   const hero = featuredStories[0] || pinnedStory || stories[0] || adminStories[0] || fallbackStory;
-  const pinnedSideStories = pinnedSideIds.map(id => stories.find(s => s.id === id)).filter(Boolean);
+  const pinnedSideStories = pinnedSideIds.map(id => stories.find(s => s && s.id === id)).filter(Boolean);
   
-  const remainingStories = stories.filter(s => s.id !== hero.id && !pinnedSideIds.includes(s.id) && !s.isFeatured);
-  const allAvailable = [...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories, ...remainingStories];
+  const remainingStories = stories.filter(s => s && s.id !== hero?.id && !pinnedSideIds.includes(s.id) && !s.isFeatured);
+  const otherFeatured = featuredStories.filter(s => s && s.id !== hero?.id);
   
-  const otherFeatured = featuredStories.filter(s => s.id !== hero.id);
+  // Left side sub-grid cards under hero (up to 3 items)
+  const gridStories = [...otherFeatured, ...pinnedSideStories, ...remainingStories].slice(0, 3);
   
-  // gridStories takes pinned ones first, then fills up to 9
-  const gridStories = [...otherFeatured, ...pinnedSideStories, ...allAvailable].slice(0, 9);
-  
-  // latestStories takes the next 9 items
-  const usedForGrid = Math.max(0, gridStories.length - otherFeatured.length - pinnedSideStories.length);
-  const latestStories = allAvailable.slice(usedForGrid, usedForGrid + latestNewsCount);
+  // Right side "So'nggi yangiliklar" list (shows recent stories, non-hero if available, or all stories)
+  const nonHeroStories = stories.filter(s => s && s.id !== hero?.id);
+  const latestStories = (nonHeroStories.length > 0 ? nonHeroStories : stories).slice(0, latestNewsCount || 6);
 
   useEffect(() => {
     refreshPublicStories();
@@ -1426,7 +1424,7 @@ function App() {
         />
       ) : (
         <>
-          {page === "home" && !query && <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
+          {page === "home" && !query && <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} getDisplayCat={getDisplayCat} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />}
           {page !== "admin" && page !== "__saved__" && <AdBanner ads={ads} position="top" />}
 
           {page === "admin" ? (
@@ -1881,7 +1879,7 @@ function WeatherBar({ lang }) {
   );
 }
 
-function Hero({ t, hero, gridStories, latestStories, openStory, onLoadMore }) {
+function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, onLoadMore }) {
   return (
     <section className="hero">
       <div className="hero-grid">
@@ -1891,36 +1889,44 @@ function Hero({ t, hero, gridStories, latestStories, openStory, onLoadMore }) {
             <h2>{t.home || "Bosh sahifa"}</h2>
           </div>
           
-          <a className="hero-main" href={`/?story=${hero.id}`} onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + hero.id); openStory(hero); }} style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
-            <div className="hero-main-content">
-              <span className="kicker">{hero.category}</span>
-              <h1>{hero.title}</h1>
-              <p>{hero.summary}</p>
-            </div>
-            <div className="hero-main-thumb">
-              <img src={hero.image} alt={hero.title} />
-            </div>
-          </a>
-
-          <div className="hero-sub-grid">
-            {gridStories.map((story, idx) => (
-              <a
-                className="hero-sub-card"
-                href={`/?story=${story.id}`}
-                key={`${story.id || story.title}-${idx}`}
-                onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + story.id); openStory(story); }}
-                style={{ textDecoration: "none", color: "inherit", display: "flex", border: "none", background: "transparent", textAlign: "left", cursor: "pointer" }}
-              >
-                <div className="side-thumb">
-                  <img src={story.image} alt={story.title} />
+          {hero && (
+            <a className="hero-main" href={`/?story=${hero.id}`} onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + hero.id); openStory(hero); }} style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
+              <div className="hero-main-content">
+                <span className="kicker">{getDisplayCat ? getDisplayCat(hero.category) : hero.category}</span>
+                <h1>{hero.title}</h1>
+                <p>{hero.summary}</p>
+              </div>
+              {hero.image && (
+                <div className="hero-main-thumb">
+                  <img src={hero.image} alt={hero.title} />
                 </div>
-                <span className="side-copy">
-                  <span className="kicker-small">{story.category}</span>
-                  <h3>{story.title}</h3>
-                </span>
-              </a>
-            ))}
-          </div>
+              )}
+            </a>
+          )}
+
+          {gridStories && gridStories.length > 0 && (
+            <div className="hero-sub-grid">
+              {gridStories.map((story, idx) => (
+                <a
+                  className="hero-sub-card"
+                  href={`/?story=${story.id}`}
+                  key={`${story.id || story.title}-${idx}`}
+                  onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + story.id); openStory(story); }}
+                  style={{ textDecoration: "none", color: "inherit", display: "flex", border: "none", background: "transparent", textAlign: "left", cursor: "pointer" }}
+                >
+                  {story.image && (
+                    <div className="side-thumb">
+                      <img src={story.image} alt={story.title} />
+                    </div>
+                  )}
+                  <span className="side-copy">
+                    <span className="kicker-small">{getDisplayCat ? getDisplayCat(story.category) : story.category}</span>
+                    <h3>{story.title}</h3>
+                  </span>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="hero-right-block">
@@ -1930,25 +1936,33 @@ function Hero({ t, hero, gridStories, latestStories, openStory, onLoadMore }) {
           </div>
           
           <div className="hero-latest-list">
-            {latestStories.map((story, idx) => (
-              <a
-                className="hero-latest-card"
-                href={`/?story=${story.id}`}
-                key={`${story.id || story.title}-${idx}`}
-                onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + story.id); openStory(story); }}
-                style={{ textDecoration: "none", color: "inherit", display: "flex", border: "none", background: "transparent", textAlign: "left", cursor: "pointer" }}
-              >
-                <span className="latest-copy">
-                  <span className="kicker-small">{story.category}</span>
-                  <h3>{story.title}</h3>
-                </span>
-                <div className="latest-thumb">
-                  <img src={story.image} alt={story.title} />
-                </div>
-              </a>
-            ))}
+            {latestStories && latestStories.length > 0 ? (
+              latestStories.map((story, idx) => (
+                <a
+                  className="hero-latest-card"
+                  href={`/?story=${story.id}`}
+                  key={`${story.id || story.title}-${idx}`}
+                  onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + story.id); openStory(story); }}
+                  style={{ textDecoration: "none", color: "inherit", display: "flex", border: "none", background: "transparent", textAlign: "left", cursor: "pointer" }}
+                >
+                  <span className="latest-copy">
+                    <span className="kicker-small">{getDisplayCat ? getDisplayCat(story.category) : story.category}</span>
+                    <h3>{story.title}</h3>
+                  </span>
+                  {story.image && (
+                    <div className="latest-thumb">
+                      <img src={story.image} alt={story.title} />
+                    </div>
+                  )}
+                </a>
+              ))
+            ) : (
+              <p style={{ padding: "20px 0", color: "var(--muted)", fontSize: "14px", margin: 0 }}>
+                {t.empty || "Hozircha yangiliklar yo'q"}
+              </p>
+            )}
           </div>
-          <button className="more-news-btn" onClick={onLoadMore}>{T("Ko'proq yangiliklar")}</button>
+          <button className="more-news-btn" onClick={onLoadMore}>{t.moreNews || T("Ko'proq yangiliklar")}</button>
         </div>
       </div>
     </section>
@@ -5930,7 +5944,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
           body: "",
           image: "",
           author: "Tahririyat",
-          status: "draft",
+          status: "published",
           time: "Bugun",
           read: "",
           tags: "",
@@ -6396,7 +6410,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h2 style={{ fontSize: "24px", fontWeight: "800", color: "var(--ink)" }}>📝 Maqolalar Ro'yxati</h2>
               <button 
-                onClick={() => { setEditingStory(null); setForm({ title: "", category: isUz ? "Siyosat" : "Politics", summary: "", body: "", image: "", author: "Tahririyat", status: "draft", time: "Bugun", read: "", isFeatured: false, isEditorChoice: false, isBreaking: false, tags: "", seoTitle: "", seoDescription: "", seoKeywords: "", focusKeyword: "", videoUrl: "", publishAt: "" }); setActiveTab("editor"); }} 
+                onClick={() => { setEditingStory(null); setForm({ title: "", category: isUz ? "Siyosat" : "Politics", summary: "", body: "", image: "", author: "Tahririyat", status: "published", time: "Bugun", read: "", isFeatured: false, isEditorChoice: false, isBreaking: false, tags: "", seoTitle: "", seoDescription: "", seoKeywords: "", focusKeyword: "", videoUrl: "", publishAt: "" }); setActiveTab("editor"); }} 
                 className="more-news-btn" 
                 style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700" }}
               >+ Yangi Maqola</button>

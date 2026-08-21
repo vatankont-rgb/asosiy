@@ -5,8 +5,8 @@ const articleController = require('../controllers/articleController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { articleRules, validate } = require('../validators/rules');
 
-// Rate limit for view counter (max 30 views per IP per 15 min)
-const viewLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: false, legacyHeaders: false });
+// Rate limit for view counter (max 500 views per IP per 15 min)
+const viewLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: false, legacyHeaders: false, skipFailedRequests: true });
 
 // Public routes
 router.get('/stories', articleController.getPublicStories);

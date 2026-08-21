@@ -23,9 +23,22 @@ const corsOptions = {
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // limit each IP to 500 requests per 15 min
+  max: 3000, // 3000 requests per 15 min per IP
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Never rate limit static files, assets, uploads or non-API routes
+    const p = req.path.toLowerCase();
+    if (!p.startsWith('/api/')) return true;
+    if (p.startsWith('/uploads/') || p.startsWith('/assets/')) return true;
+    // Don't rate limit common public GET requests
+    if (req.method === 'GET') {
+      if (p === '/api/stories' || p.startsWith('/api/translations') || p.startsWith('/api/categories') || p.startsWith('/api/settings') || p.startsWith('/api/ads') || p.startsWith('/api/photos') || p.startsWith('/api/videos')) {
+        return true;
+      }
+    }
+    return false;
+  },
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
@@ -37,7 +50,7 @@ const limiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // max 50 login requests per IP per window
+  max: 100, // max 100 login requests per IP per window
   standardHeaders: true,
   legacyHeaders: false,
   message: {
