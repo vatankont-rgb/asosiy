@@ -1,4 +1,4 @@
-const CACHE = "yk-v16";
+const CACHE = "yk-v17";
 const STATIC = ["/", "/styles.css", "/app.jsx"];
 
 self.addEventListener("install", e => {

@@ -1499,7 +1499,7 @@ function App() {
             loading ? (
               <HeroSkeleton />
             ) : (
-              <Hero t={t} hero={hero} gridStories={gridStories} latestStories={latestStories} getDisplayCat={getDisplayCat} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+              <Hero t={t} lang={lang} hero={hero} gridStories={gridStories} latestStories={latestStories} getDisplayCat={getDisplayCat} openStory={(s) => { setActiveStory(s); window.scrollTo({ top: 0, behavior: "instant" }); }} pinnedHeroId={pinnedHeroId} onLoadMore={() => { setPage("barcha-yangiliklar"); window.scrollTo({ top: 0, behavior: "instant" }); }} />
             )
           )}
           {page !== "admin" && page !== "__saved__" && <AdBanner ads={ads} position="top" />}
@@ -1956,7 +1956,12 @@ function WeatherBar({ lang }) {
   );
 }
 
-function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, onLoadMore }) {
+function Hero({ t, lang, hero, gridStories, latestStories, getDisplayCat, openStory, onLoadMore }) {
+  const getStoryTime = (s) => {
+    if (!s) return "";
+    return s.time || s.date || "";
+  };
+
   return (
     <section className="hero">
       <div className="hero-grid">
@@ -1969,9 +1974,32 @@ function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, o
           {hero && (
             <a className="hero-main" href={`/?story=${hero.id}`} onClick={(e) => { e.preventDefault(); window.history.pushState(null, "", "/?story=" + hero.id); openStory(hero); }} style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
               <div className="hero-main-content">
-                <span className="kicker">{getDisplayCat ? getDisplayCat(hero.category) : hero.category}</span>
+                <div className="hero-main-meta-top" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "8px" }}>
+                  <span className="kicker">{getDisplayCat ? getDisplayCat(hero.category) : hero.category}</span>
+                  {hero.isBreaking && <span className="story-badge breaking" style={{ background: "var(--accent-red)", color: "#fff", padding: "2px 7px", borderRadius: "4px", fontSize: "11px", fontWeight: "700" }}>🔴 TEZKOR</span>}
+                  {calcReadTime(hero.body || hero.summary, lang) && (
+                    <span className="hero-read-time" style={{ fontSize: "12px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      {calcReadTime(hero.body || hero.summary, lang)}
+                    </span>
+                  )}
+                </div>
                 <h1>{hero.title}</h1>
                 <p>{hero.summary}</p>
+                <div className="hero-meta-bottom" style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", fontSize: "12px", color: "var(--muted)" }}>
+                  {getStoryTime(hero) && (
+                    <span className="hero-time" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      {getStoryTime(hero)}
+                    </span>
+                  )}
+                  {(hero.views || 0) > 0 && (
+                    <span className="hero-views" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      {hero.views}
+                    </span>
+                  )}
+                </div>
               </div>
               {hero.image && (
                 <div className="hero-main-thumb">
@@ -1999,6 +2027,12 @@ function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, o
                   <span className="side-copy">
                     <span className="kicker-small">{getDisplayCat ? getDisplayCat(story.category) : story.category}</span>
                     <h3>{story.title}</h3>
+                    {getStoryTime(story) && (
+                      <span className="sub-card-time" style={{ fontSize: "11px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "3px", marginTop: "4px" }}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        {getStoryTime(story)}
+                      </span>
+                    )}
                   </span>
                 </a>
               ))}
@@ -2023,7 +2057,15 @@ function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, o
                   style={{ textDecoration: "none", color: "inherit", display: "flex", border: "none", background: "transparent", textAlign: "left", cursor: "pointer" }}
                 >
                   <span className="latest-copy">
-                    <span className="kicker-small">{getDisplayCat ? getDisplayCat(story.category) : story.category}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
+                      <span className="kicker-small">{getDisplayCat ? getDisplayCat(story.category) : story.category}</span>
+                      {getStoryTime(story) && (
+                        <span style={{ fontSize: "11px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                          {getStoryTime(story)}
+                        </span>
+                      )}
+                    </div>
                     <h3>{story.title}</h3>
                   </span>
                   {story.image && (
