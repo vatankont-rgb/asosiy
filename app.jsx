@@ -1144,11 +1144,18 @@ function App() {
   const hero = featuredStories[0] || pinnedStory || stories[0] || adminStories[0] || fallbackStory;
   const pinnedSideStories = pinnedSideIds.map(id => stories.find(s => s && s.id === id)).filter(Boolean);
   
-  const remainingStories = stories.filter(s => s && s.id !== hero?.id && !pinnedSideIds.includes(s.id) && !s.isFeatured);
-  const otherFeatured = featuredStories.filter(s => s && s.id !== hero?.id);
+  // Tahririyat tanlovi (Editor's choice)
+  const editorChoiceStories = stories.filter(s => s && (s.isEditorChoice || s.isEditorPick) && s.id !== hero?.id);
+  const otherFeatured = featuredStories.filter(s => s && s.id !== hero?.id && !s.isEditorChoice && !s.isEditorPick);
+  const remainingStories = stories.filter(s => s && s.id !== hero?.id && !pinnedSideIds.includes(s.id) && !s.isFeatured && !s.isEditorChoice && !s.isEditorPick);
   
-  // Left side sub-grid cards under hero (up to 3 items)
-  const gridStories = [...otherFeatured, ...pinnedSideStories, ...remainingStories].slice(0, 3);
+  // Left side sub-grid cards under hero: Tahririyat tanlovi maqolalarini birinchi o'ringa chiqarish
+  const gridStories = [
+    ...editorChoiceStories,
+    ...otherFeatured,
+    ...pinnedSideStories.filter(s => !editorChoiceStories.some(e => e.id === s.id)),
+    ...remainingStories
+  ].filter((s, idx, self) => self.findIndex(x => x.id === s.id) === idx).slice(0, 3);
   
   // Right side "So'nggi yangiliklar" list (shows recent stories, non-hero if available, or all stories)
   const nonHeroStories = stories.filter(s => s && s.id !== hero?.id);
