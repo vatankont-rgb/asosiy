@@ -981,8 +981,8 @@ function App() {
   useEffect(() => {
     if (!initialCheckedRef.current) return;
     try {
-      if (activeStory && (activeStory.numId || activeStory.id)) {
-        const targetPath = `/p/${activeStory.numId || activeStory.id}`;
+      if (activeStory && (activeStory.slug || activeStory.numId || activeStory.id)) {
+        const targetPath = `/p/${activeStory.slug || activeStory.numId || activeStory.id}`;
         if (window.location.pathname !== targetPath) {
           window.history.pushState({ storyId: activeStory.id }, "", targetPath);
         }
@@ -2907,7 +2907,7 @@ function ArticlePage({ lang, t, story, stories = [], ads, getDisplayCat, savedId
             <div className="article-share">
               <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Share:")}</span>
               {(() => {
-                const shareUrl = `${window.location.origin}/p/${story.numId || story.id}`;
+                const shareUrl = `${window.location.origin}/p/${story.slug || story.numId || story.id}`;
                 return (
                   <>
                     <a
@@ -6180,6 +6180,7 @@ function AdminPanel({
           summary: "",
           body: "",
           image: "",
+          slug: "",
           author: "Tahririyat",
           status: "published",
           time: "Bugun",
@@ -6218,6 +6219,8 @@ function AdminPanel({
 
     setForm({
       id: story.id,
+      numId: story.numId,
+      slug: story.slug || "",
       articleLang: storyLang,
       title: story.title || "",
       category: story.category || (isUz ? "Siyosat" : "Politics"),
@@ -7043,6 +7046,34 @@ function AdminPanel({
               <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
                 <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>📂 Rukn va Parametrlar</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  {/* URL Slug */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>URL Slug (havola)</label>
+                    <div style={{ display: "flex", alignItems: "center", background: "#f8fafc", border: "1px solid var(--line, #cbd5e1)", borderRadius: "8px", overflow: "hidden" }}>
+                      <span style={{ padding: "10px 14px", background: "#f1f5f9", color: "var(--muted)", fontWeight: "700", fontSize: "14px", borderRight: "1px solid var(--line)" }}>/p/</span>
+                      <input 
+                        type="text" 
+                        value={form.slug || ""} 
+                        onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
+                        placeholder="avtomatik-hosil-bo‘ladi"
+                        style={{ flex: 1, padding: "10px 12px", border: "none", background: "transparent", outline: "none", fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}
+                      />
+                    </div>
+                    <span style={{ fontSize: "11px", color: "var(--muted)" }}>Bo‘sh qoldirilsa, avtomatik raqam (/p/16) beriladi</span>
+                  </div>
+
+                  {/* Author */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Muallif ismi</label>
+                    <input 
+                      type="text" 
+                      value={form.author || ""} 
+                      onChange={(e) => setForm({ ...form, author: e.target.value })}
+                      placeholder="Masalan: Eldor Asanov yoki Tahririyat"
+                      className="adm-form-input"
+                    />
+                  </div>
+
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Kategoriya</label>
                     <select 
