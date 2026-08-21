@@ -896,7 +896,7 @@ function App() {
       const url = new URL(window.location);
       let sId = url.searchParams.get("story") || url.searchParams.get("id");
       if (!sId) {
-        const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+        const m = window.location.pathname.match(/^\/(?:p|news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
         if (m) sId = m[1];
       }
       return sId || null;
@@ -981,16 +981,13 @@ function App() {
   useEffect(() => {
     if (!initialCheckedRef.current) return;
     try {
-      const url = new URL(window.location);
-      if (activeStory && activeStory.id) {
-        if (url.searchParams.get("story") !== activeStory.id) {
-          url.searchParams.set("story", activeStory.id);
-          window.history.pushState({ storyId: activeStory.id }, "", url.toString());
+      if (activeStory && (activeStory.numId || activeStory.id)) {
+        const targetPath = `/p/${activeStory.numId || activeStory.id}`;
+        if (window.location.pathname !== targetPath) {
+          window.history.pushState({ storyId: activeStory.id }, "", targetPath);
         }
-      } else if (url.searchParams.has("story") || url.searchParams.has("id")) {
-        url.searchParams.delete("story");
-        url.searchParams.delete("id");
-        window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+      } else if (window.location.pathname.startsWith('/p/') || window.location.pathname.startsWith('/news/') || window.location.search.includes('story=') || window.location.search.includes('id=')) {
+        window.history.replaceState(null, "", '/');
       }
     } catch(e) {}
   }, [activeStory]);
@@ -1120,10 +1117,15 @@ function App() {
       return;
     }
     if (stories && stories.length > 0) {
-      const found = stories.find(s => s && (s.id === targetId || s.slug === targetId))
-        || (allStories.uz || []).find(s => s && (s.id === targetId || s.slug === targetId))
-        || (allStories.uzk || []).find(s => s && (s.id === targetId || s.slug === targetId))
-        || (allStories.en || []).find(s => s && (s.id === targetId || s.slug === targetId));
+      const isMatch = s => s && (
+        String(s.id) === String(targetId) ||
+        String(s.numId) === String(targetId) ||
+        String(s.slug) === String(targetId)
+      );
+      const found = stories.find(isMatch)
+        || (allStories.uz || []).find(isMatch)
+        || (allStories.uzk || []).find(isMatch)
+        || (allStories.en || []).find(isMatch);
 
       if (found) {
         const activeItem = stories.find(s => s.id === found.id) || found;
@@ -1136,10 +1138,9 @@ function App() {
         initialStoryIdRef.current = null;
         setActiveStory(null);
         try {
-          const url = new URL(window.location);
-          url.searchParams.delete("story");
-          url.searchParams.delete("id");
-          window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+          if (window.location.pathname.startsWith('/p/') || window.location.pathname.startsWith('/news/') || window.location.search.includes('story=')) {
+            window.history.replaceState(null, "", '/');
+          }
         } catch(e) {}
       }
     } else if (!loading) {
@@ -1147,10 +1148,9 @@ function App() {
       initialStoryIdRef.current = null;
       setActiveStory(null);
       try {
-        const url = new URL(window.location);
-        url.searchParams.delete("story");
-        url.searchParams.delete("id");
-        window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+        if (window.location.pathname.startsWith('/p/') || window.location.pathname.startsWith('/news/') || window.location.search.includes('story=')) {
+          window.history.replaceState(null, "", '/');
+        }
       } catch(e) {}
     }
   }, [stories, allStories, loading]);
@@ -1169,27 +1169,31 @@ function App() {
   useEffect(() => {
     function onPopState() {
       try {
-        const url = new URL(window.location);
-        let sId = url.searchParams.get("story") || url.searchParams.get("id");
+        let sId = null;
+        const m = window.location.pathname.match(/^\/(?:p|news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+        if (m) sId = m[1];
         if (!sId) {
-          const m = window.location.pathname.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
-          if (m) sId = m[1];
+          const url = new URL(window.location);
+          sId = url.searchParams.get("story") || url.searchParams.get("id");
         }
         if (sId) {
+          const isMatch = s => s && (
+            String(s.id) === String(sId) ||
+            String(s.numId) === String(sId) ||
+            String(s.slug) === String(sId)
+          );
           const list = Array.isArray(stories) ? stories : [];
-          const found = list.find(s => s && (s.id === sId || s.slug === sId))
-            || (allStories.uz || []).find(s => s && (s.id === sId || s.slug === sId))
-            || (allStories.uzk || []).find(s => s && (s.id === sId || s.slug === sId))
-            || (allStories.en || []).find(s => s && (s.id === sId || s.slug === sId));
+          const found = list.find(isMatch)
+            || (allStories.uz || []).find(isMatch)
+            || (allStories.uzk || []).find(isMatch)
+            || (allStories.en || []).find(isMatch);
           if (found) {
             setActiveStory(found);
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
           } else {
             setActiveStory(null);
-            url.searchParams.delete("story");
-            url.searchParams.delete("id");
-            window.history.replaceState(null, "", url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : ""));
+            window.history.replaceState(null, "", '/');
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
           }
@@ -2903,7 +2907,7 @@ function ArticlePage({ lang, t, story, stories = [], ads, getDisplayCat, savedId
             <div className="article-share">
               <span className="article-share-label">{lang === "uz" ? "Ulashish:" : (lang === "uzk" ? "Улашиш:" : "Share:")}</span>
               {(() => {
-                const shareUrl = `${window.location.origin}/news/${story.id}`;
+                const shareUrl = `${window.location.origin}/p/${story.numId || story.id}`;
                 return (
                   <>
                     <a

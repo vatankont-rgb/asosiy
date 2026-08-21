@@ -127,7 +127,7 @@ app.use(async (req, res, next) => {
 
     let storyId = req.query.story || req.query.id;
     if (!storyId) {
-      const m = req.path.match(/^\/(?:news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
+      const m = req.path.match(/^\/(?:p|news|story|article|yangilik)\/([a-zA-Z0-9_-]+)/i);
       if (m) storyId = m[1];
     }
 
@@ -135,7 +135,11 @@ app.use(async (req, res, next) => {
     if (storyId) {
       const db = await articleRepository.getAll(true);
       const allStories = Object.values(db).flat().filter(Boolean);
-      const story = allStories.find(s => String(s.id) === String(storyId) || String(s.slug) === String(storyId));
+      const story = allStories.find(s => 
+        String(s.id) === String(storyId) || 
+        String(s.numId) === String(storyId) || 
+        String(s.slug) === String(storyId)
+      );
       
       if (story) {
         const escText = (str) => String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -149,7 +153,7 @@ app.use(async (req, res, next) => {
         const pageTitle = `${escText(story.title)} — Vatanuz.uz`;
         const rawSummary = story.summary || (story.body ? story.body.replace(/<[^>]*>?/gm, '').slice(0, 250) : '') || 'Vatanuz.uz yangiliklari';
         const pageDesc = escText(rawSummary);
-        const pageUrl = `${baseUrl}/news/${encodeURIComponent(story.id)}`;
+        const pageUrl = `${baseUrl}/p/${encodeURIComponent(story.numId || story.id)}`;
         const cleanImageUrl = escUrl(imageUrl);
         const cleanPageUrl = escUrl(pageUrl);
         const publishedDate = new Date(story.createdAt || Date.now()).toISOString();

@@ -41,7 +41,7 @@ class SeoController {
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}${req.path}" rel="self" type="application/rss+xml"/>
     ${items.map(s => {
-      const link = `${baseUrl}/news/${encodeURIComponent(s.id)}`;
+      const link = `${baseUrl}/p/${encodeURIComponent(s.numId || s.id)}`;
       const pubDate = new Date(s.createdAt || Date.now()).toUTCString();
       const rawSummary = s.summary || (s.body ? String(s.body).replace(/<[^>]*>?/gm, '').slice(0, 250) : '');
       const imageUrl = s.image ? (s.image.startsWith('http') ? s.image : `${baseUrl}${s.image.startsWith('/') ? '' : '/'}${s.image}`) : '';
@@ -103,7 +103,7 @@ class SeoController {
     <priority>0.8</priority>
   </url>`).join('\n')}
   ${allStories.map(s => {
-    const link = `${baseUrl}/news/${encodeURIComponent(s.id)}`;
+    const link = `${baseUrl}/p/${encodeURIComponent(s.numId || s.id)}`;
     const lastMod = new Date(s.updatedAt || s.createdAt || Date.now()).toISOString();
     const imageUrl = s.image ? (s.image.startsWith('http') ? s.image : `${baseUrl}${s.image.startsWith('/') ? '' : '/'}${s.image}`) : '';
     const safeTitle = String(s.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

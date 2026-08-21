@@ -62,6 +62,17 @@ class ArticleRepository {
   async addStory(lang, story) {
     const db = this.read();
     if (!db[lang]) db[lang] = [];
+    if (!story.numId) {
+      let maxNum = 0;
+      ['uz', 'uzk', 'en'].forEach(l => {
+        (db[l] || []).forEach(item => {
+          if (typeof item.numId === 'number' && item.numId > maxNum) {
+            maxNum = item.numId;
+          }
+        });
+      });
+      story.numId = maxNum + 1;
+    }
     db[lang].unshift(story);
     this.write(db);
     return story;
