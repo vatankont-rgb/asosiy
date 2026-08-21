@@ -1970,8 +1970,10 @@ function Hero({ t, hero, gridStories, latestStories, getDisplayCat, openStory, o
 }
 
 function StoryBadge({ story }) {
+  if (!story) return null;
   if (story.isBreaking) return <span className="story-badge breaking">🔴 TEZKOR</span>;
-  if (story.isEditorPick) return <span className="story-badge editor">⭐ MUHARRIR</span>;
+  if (story.isFeatured) return <span className="story-badge featured" style={{ background: "#2563eb", color: "#fff", padding: "2px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: "700" }}>⭐ ASOSIY</span>;
+  if (story.isEditorChoice || story.isEditorPick) return <span className="story-badge editor">⭐ MUHARRIR</span>;
   if ((story.views || 0) > 50) return <span className="story-badge trend">🔥 TREND</span>;
   return null;
 }
@@ -6884,169 +6886,144 @@ const [activeTab, setActiveTab] = useState("dashboard");
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   
                   {/* Telegram */}
-                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                  <div 
+                    onClick={() => setForm(prev => ({ ...prev, sendToTelegram: !prev.sendToTelegram }))}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}
+                  >
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Telegramga yuborish</span>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ display: "none" }}
-                        checked={Boolean(form.sendToTelegram)}
-                        onChange={(e) => setForm({ ...form, sendToTelegram: e.target.checked })}
-                      />
+                    <div style={{
+                      position: "relative",
+                      width: "46px",
+                      height: "24px",
+                      backgroundColor: form.sendToTelegram ? "#2563eb" : "#cbd5e1",
+                      borderRadius: "12px",
+                      transition: "background-color 0.2s ease"
+                    }}>
                       <div style={{
-                        position: "relative",
-                        width: "46px",
-                        height: "24px",
-                        backgroundColor: form.sendToTelegram ? "#2563eb" : "#cbd5e1",
-                        borderRadius: "12px",
-                        transition: "background-color 0.2s ease"
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          top: "2px",
-                          left: form.sendToTelegram ? "24px" : "2px",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#ffffff",
-                          borderRadius: "50%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                          transition: "left 0.2s ease"
-                        }} />
-                      </div>
+                        position: "absolute",
+                        top: "2px",
+                        left: form.sendToTelegram ? "24px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        transition: "left 0.2s ease"
+                      }} />
                     </div>
-                  </label>
+                  </div>
                   
                   {/* Push Notification */}
-                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                  <div 
+                    onClick={() => setForm(prev => ({ ...prev, sendPushNotification: !prev.sendPushNotification }))}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}
+                  >
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Push xabar (Breaking News)</span>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ display: "none" }}
-                        checked={Boolean(form.sendPushNotification)}
-                        onChange={(e) => setForm({ ...form, sendPushNotification: e.target.checked })}
-                      />
+                    <div style={{
+                      position: "relative",
+                      width: "46px",
+                      height: "24px",
+                      backgroundColor: form.sendPushNotification ? "#2563eb" : "#cbd5e1",
+                      borderRadius: "12px",
+                      transition: "background-color 0.2s ease"
+                    }}>
                       <div style={{
-                        position: "relative",
-                        width: "46px",
-                        height: "24px",
-                        backgroundColor: form.sendPushNotification ? "#2563eb" : "#cbd5e1",
-                        borderRadius: "12px",
-                        transition: "background-color 0.2s ease"
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          top: "2px",
-                          left: form.sendPushNotification ? "24px" : "2px",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#ffffff",
-                          borderRadius: "50%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                          transition: "left 0.2s ease"
-                        }} />
-                      </div>
+                        position: "absolute",
+                        top: "2px",
+                        left: form.sendPushNotification ? "24px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        transition: "left 0.2s ease"
+                      }} />
                     </div>
-                  </label>
+                  </div>
 
                   {/* Featured */}
-                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                  <div 
+                    onClick={() => setForm(prev => ({ ...prev, isFeatured: !prev.isFeatured }))}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}
+                  >
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Asosiy maqola (Featured)</span>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ display: "none" }}
-                        checked={Boolean(form.isFeatured)}
-                        onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
-                      />
+                    <div style={{
+                      position: "relative",
+                      width: "46px",
+                      height: "24px",
+                      backgroundColor: form.isFeatured ? "#2563eb" : "#cbd5e1",
+                      borderRadius: "12px",
+                      transition: "background-color 0.2s ease"
+                    }}>
                       <div style={{
-                        position: "relative",
-                        width: "46px",
-                        height: "24px",
-                        backgroundColor: form.isFeatured ? "#2563eb" : "#cbd5e1",
-                        borderRadius: "12px",
-                        transition: "background-color 0.2s ease"
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          top: "2px",
-                          left: form.isFeatured ? "24px" : "2px",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#ffffff",
-                          borderRadius: "50%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                          transition: "left 0.2s ease"
-                        }} />
-                      </div>
+                        position: "absolute",
+                        top: "2px",
+                        left: form.isFeatured ? "24px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        transition: "left 0.2s ease"
+                      }} />
                     </div>
-                  </label>
+                  </div>
 
                   {/* Editor's Choice */}
-                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}>
+                  <div 
+                    onClick={() => setForm(prev => ({ ...prev, isEditorChoice: !prev.isEditorChoice }))}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--line, #e2e8f0)", cursor: "pointer", userSelect: "none" }}
+                  >
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Tahririyat tanlovi</span>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ display: "none" }}
-                        checked={Boolean(form.isEditorChoice)}
-                        onChange={(e) => setForm({ ...form, isEditorChoice: e.target.checked })}
-                      />
+                    <div style={{
+                      position: "relative",
+                      width: "46px",
+                      height: "24px",
+                      backgroundColor: form.isEditorChoice ? "#2563eb" : "#cbd5e1",
+                      borderRadius: "12px",
+                      transition: "background-color 0.2s ease"
+                    }}>
                       <div style={{
-                        position: "relative",
-                        width: "46px",
-                        height: "24px",
-                        backgroundColor: form.isEditorChoice ? "#2563eb" : "#cbd5e1",
-                        borderRadius: "12px",
-                        transition: "background-color 0.2s ease"
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          top: "2px",
-                          left: form.isEditorChoice ? "24px" : "2px",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#ffffff",
-                          borderRadius: "50%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                          transition: "left 0.2s ease"
-                        }} />
-                      </div>
+                        position: "absolute",
+                        top: "2px",
+                        left: form.isEditorChoice ? "24px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        transition: "left 0.2s ease"
+                      }} />
                     </div>
-                  </label>
+                  </div>
 
                   {/* Breaking */}
-                  <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", cursor: "pointer", userSelect: "none" }}>
+                  <div 
+                    onClick={() => setForm(prev => ({ ...prev, isBreaking: !prev.isBreaking }))}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", cursor: "pointer", userSelect: "none" }}
+                  >
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Dolzarb xabar (Breaking)</span>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ display: "none" }}
-                        checked={Boolean(form.isBreaking)}
-                        onChange={(e) => setForm({ ...form, isBreaking: e.target.checked })}
-                      />
+                    <div style={{
+                      position: "relative",
+                      width: "46px",
+                      height: "24px",
+                      backgroundColor: form.isBreaking ? "#ef4444" : "#cbd5e1",
+                      borderRadius: "12px",
+                      transition: "background-color 0.2s ease"
+                    }}>
                       <div style={{
-                        position: "relative",
-                        width: "46px",
-                        height: "24px",
-                        backgroundColor: form.isBreaking ? "#ef4444" : "#cbd5e1",
-                        borderRadius: "12px",
-                        transition: "background-color 0.2s ease"
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          top: "2px",
-                          left: form.isBreaking ? "24px" : "2px",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#ffffff",
-                          borderRadius: "50%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                          transition: "left 0.2s ease"
-                        }} />
-                      </div>
+                        position: "absolute",
+                        top: "2px",
+                        left: form.isBreaking ? "24px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        transition: "left 0.2s ease"
+                      }} />
                     </div>
-                  </label>
+                  </div>
 
                 </div>
               </div>
