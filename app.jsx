@@ -6487,23 +6487,23 @@ const [activeTab, setActiveTab] = useState("dashboard");
 
         {/* Tab 3: Text Editor and Live SEO Optimizer */}
         {activeTab === "editor" && (
-          <form onSubmit={handleSave} className="adm-2col-layout">
+          <form onSubmit={handleSave} className="adm-2col-layout" style={{ display: "grid", gridTemplateColumns: "minmax(0, 2.2fr) minmax(320px, 1fr)", gap: "24px", alignItems: "start" }}>
             
             {/* Main Column (Left) */}
             <div className="adm-col-main" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className="adm-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
                   <h2 style={{ fontSize: "20px", fontWeight: "800", color: "var(--ink)", margin: 0 }}>
                     ✍️ {editingStory ? "Maqolani Tahrirlash" : "Yangi Maqola Qo'shish"}
                   </h2>
-                  <button type="button" onClick={loadDraft} style={{ padding: "6px 12px", background: "var(--fill)", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}>
+                  <button type="button" onClick={loadDraft} style={{ padding: "6px 12px", background: "var(--fill)", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
                     💾 Qoralamani tiklash
                   </button>
                 </div>
 
                 {/* Language selection */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-                  <label className="adm-form-label">Maqola tili</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Maqola tili</label>
                   <select 
                     value={form.articleLang || "uzk"} 
                     onChange={(e) => {
@@ -6548,7 +6548,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
 
                 {/* Title input */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-                  <label className="adm-form-label">Sarlavha *</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Sarlavha *</label>
                   <input 
                     type="text" 
                     value={form.title} 
@@ -6561,7 +6561,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
 
                 {/* Summary / Lead */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-                  <label className="adm-form-label">Qisqacha mazmun (Подзаголовок)</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Qisqacha mazmun (Подзаголовок)</label>
                   <textarea 
                     rows="3" 
                     value={form.summary}
@@ -6574,7 +6574,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
 
                 {/* Main Body Editor */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <label className="adm-form-label">Matn</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Matn</label>
                   <RichEditor 
                     key={form.articleLang || "uzk"}
                     value={form.body}
@@ -6589,11 +6589,11 @@ const [activeTab, setActiveTab] = useState("dashboard");
               </div>
 
               {/* SEO Block */}
-              <div className="adm-card">
-                <h3 className="adm-card-header">SEO teglar va so'zlar</h3>
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>🎯 SEO teglar va tahlil</h3>
                 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-                  <label className="adm-form-label">Focus Keyword (Asosiy so'z)</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Focus Keyword (Asosiy so'z)</label>
                   <input 
                     type="text" 
                     value={form.focusKeyword}
@@ -6604,7 +6604,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <label className="adm-form-label">Kalit so'zlar (Tags)</label>
+                  <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Kalit so'zlar (Tags)</label>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
                     {(form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : []).map((tag, i) => (
                       <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", background: "#f1f5f9", color: "var(--ink)", borderRadius: "16px", fontSize: "12px", fontWeight: "600", border: "1px solid var(--line)" }}>
@@ -6661,12 +6661,54 @@ const [activeTab, setActiveTab] = useState("dashboard");
                   </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Sidebar Column (Right) */}
+            <div className="adm-col-side" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              
+              {/* Action & Publishing Card */}
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>🚀 Nashr qilish</h3>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Holati (Status)</label>
+                    <select 
+                      value={form.status || "published"} 
+                      onChange={(e) => setForm({ ...form, status: e.target.value })}
+                      className="adm-form-input"
+                    >
+                      <option value="published">🟢 Darhol nashr qilish</option>
+                      <option value="draft">🟡 Qoralama</option>
+                    </select>
+                  </div>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Rejalashtirish (Vaqti)</label>
+                    <input 
+                      type="datetime-local" 
+                      value={form.publishAt || ""}
+                      onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
+                      className="adm-form-input"
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+                    <button type="button" onClick={() => setActiveTab("articles")} style={{ padding: "12px 16px", background: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", fontWeight: "700", cursor: "pointer", flex: 1 }}>
+                      Bekor qilish
+                    </button>
+                    <button type="button" onClick={(e) => { if(!form.title) { alert("Sarlavha kiritilishi shart!"); return; } handleSave(e); }} style={{ padding: "12px 16px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "700", cursor: "pointer", flex: 1, boxShadow: "0 2px 8px rgba(59, 130, 246, 0.4)" }}>
+                      Saqlash
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {/* Cover Image Block */}
-              <div className="adm-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                  <h3 className="adm-card-header" style={{margin:0, borderBottom:"none", paddingBottom:0}}>Rasm Muqovasi (Cover Image)</h3>
-                  <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxonadan Tanlash</button>
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
+                  <h3 className="adm-card-header" style={{ margin: 0, borderBottom: "none", paddingBottom: 0, fontSize: "16px", fontWeight: "700", color: "var(--ink)" }}>🖼️ Rasm Muqovasi</h3>
+                  <button type="button" onClick={() => setShowMediaModal(true)} style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>Kutubxona</button>
                 </div>
                 <div 
                   onDragOver={(e) => e.preventDefault()}
@@ -6676,7 +6718,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                       handleImageUpload(e.dataTransfer.files[0]);
                     }
                   }}
-                  style={{ border: "2px dashed #cbd5e1", padding: "32px 20px", borderRadius: "8px", textAlign: "center", background: "#f8fafc", cursor: "pointer", transition: "0.2s" }}
+                  style={{ border: "2px dashed #cbd5e1", padding: "24px 16px", borderRadius: "8px", textAlign: "center", background: "#f8fafc", cursor: "pointer", transition: "0.2s" }}
                   onClick={() => {
                     const input = document.createElement("input");
                     input.type = "file";
@@ -6695,26 +6737,25 @@ const [activeTab, setActiveTab] = useState("dashboard");
                     <div style={{ color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>Yuklanmoqda...</div>
                   ) : form.image ? (
                     <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", display: "inline-block" }}>
-                      <img src={form.image} alt="Cover preview" style={{ maxHeight: "120px", borderRadius: "6px", display: "block", margin: "0 auto", border: "1px solid var(--line)" }} />
+                      <img src={form.image} alt="Cover preview" style={{ maxHeight: "140px", maxWidth: "100%", borderRadius: "6px", display: "block", margin: "0 auto", border: "1px solid var(--line)" }} />
                       <button type="button" onClick={() => setForm({...form, image: ""})} style={{ position: "absolute", top: -8, right: -8, background: "#ef4444", color: "#fff", border: "none", borderRadius: "50%", width: 24, height: 24, cursor: "pointer", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>&times;</button>
                     </div>
                   ) : (
-                    <div style={{ color: "var(--muted)", fontSize: "14px" }}>
-                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📁</div>
-                      <strong>Drop files here to upload</strong><br/>
+                    <div style={{ color: "var(--muted)", fontSize: "13px" }}>
+                      <div style={{ fontSize: "28px", marginBottom: "6px" }}>📁</div>
+                      <strong style={{ color: "var(--ink)" }}>Faylni bu yerga tashlang</strong><br/>
                       <span style={{ fontSize: "12px" }}>Yoki yuklash uchun bosing</span>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-            
-            {/* Sidebar Column (Right) */}
-            <div className="adm-col-side" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className="adm-card">
+
+              {/* Category & Details Card */}
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>📂 Rukn va Parametrlar</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">Kategoriya</label>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Kategoriya</label>
                     <select 
                       value={form.category} 
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -6749,7 +6790,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">Video URL (ixtiyoriy)</label>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Video URL (ixtiyoriy)</label>
                     <input 
                       type="text" 
                       value={form.videoUrl || ""} 
@@ -6760,7 +6801,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">Ko'rishlar (Prosmotr)</label>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>Ko'rishlar (Prosmotr)</label>
                     <input 
                       type="number" 
                       value={form.views || 0} 
@@ -6770,7 +6811,7 @@ const [activeTab, setActiveTab] = useState("dashboard");
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">O'qish vaqti (daqiqa)</label>
+                    <label className="adm-form-label" style={{ fontWeight: "700", fontSize: "14px", color: "var(--ink)" }}>O'qish vaqti (daqiqa)</label>
                     <input 
                       type="number" 
                       value={form.read || ""} 
@@ -6779,36 +6820,15 @@ const [activeTab, setActiveTab] = useState("dashboard");
                       className="adm-form-input"
                     />
                   </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">Holati (Status)</label>
-                    <select 
-                      value={form.status || "published"} 
-                      onChange={(e) => setForm({ ...form, status: e.target.value })}
-                      className="adm-form-input"
-                    >
-                      <option value="published">🟢 Darhol nashr qilish</option>
-                      <option value="draft">🟡 Qoralama</option>
-                    </select>
-                  </div>
-                  
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <label className="adm-form-label">Rejalashtirish (Vaqti)</label>
-                    <input 
-                      type="datetime-local" 
-                      value={form.publishAt || ""}
-                      onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
-                      className="adm-form-input"
-                    />
-                  </div>
                 </div>
               </div>
 
-              <div className="adm-card">
-                <h3 className="adm-card-header">Sozlamalar</h3>
+              {/* Toggles Card */}
+              <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>⚙️ Qo'shimcha Sozlamalar</h3>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="adm-toggle-wrapper">
-                    <span className="adm-toggle-label-text">Telegramga yuborish</span>
+                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
+                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Telegramga yuborish</span>
                     <label className="adm-toggle">
                       <input 
                         type="checkbox" 
@@ -6819,8 +6839,8 @@ const [activeTab, setActiveTab] = useState("dashboard");
                     </label>
                   </div>
                   
-                  <div className="adm-toggle-wrapper">
-                    <span className="adm-toggle-label-text">Push xabar (Breaking News)</span>
+                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
+                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Push xabar (Breaking News)</span>
                     <label className="adm-toggle">
                       <input 
                         type="checkbox" 
@@ -6831,8 +6851,8 @@ const [activeTab, setActiveTab] = useState("dashboard");
                     </label>
                   </div>
 
-                  <div className="adm-toggle-wrapper">
-                    <span className="adm-toggle-label-text">Asosiy maqola (Featured)</span>
+                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
+                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Asosiy maqola (Featured)</span>
                     <label className="adm-toggle">
                       <input 
                         type="checkbox" 
@@ -6843,8 +6863,8 @@ const [activeTab, setActiveTab] = useState("dashboard");
                     </label>
                   </div>
 
-                  <div className="adm-toggle-wrapper">
-                    <span className="adm-toggle-label-text">Tahririyat tanlovi</span>
+                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line, #e2e8f0)" }}>
+                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Tahririyat tanlovi</span>
                     <label className="adm-toggle">
                       <input 
                         type="checkbox" 
@@ -6855,8 +6875,8 @@ const [activeTab, setActiveTab] = useState("dashboard");
                     </label>
                   </div>
 
-                  <div className="adm-toggle-wrapper">
-                    <span className="adm-toggle-label-text">Dolzarb xabar (Breaking)</span>
+                  <div className="adm-toggle-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0" }}>
+                    <span className="adm-toggle-label-text" style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)" }}>Dolzarb xabar (Breaking)</span>
                     <label className="adm-toggle">
                       <input 
                         type="checkbox" 
@@ -6868,20 +6888,10 @@ const [activeTab, setActiveTab] = useState("dashboard");
                   </div>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-                <button type="button" onClick={() => setActiveTab("articles")} style={{ padding: "12px 16px", background: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "6px", fontWeight: "700", cursor: "pointer", flex: 1 }}>
-                  Bekor qilish
-                </button>
-                <button type="button" onClick={(e) => { if(!form.title) { alert("Sarlavha kiritilishi shart!"); return; } handleSave(e); }} style={{ padding: "12px 16px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "6px", fontWeight: "700", cursor: "pointer", flex: 1, boxShadow: "0 2px 8px rgba(59, 130, 246, 0.4)" }}>
-                  Сохранить (Saqlash)
-                </button>
-              </div>
               
               {editingStory && editingStory.history && editingStory.history.length > 0 && (
-                  <div className="adm-card">
-                    <h3 className="adm-card-header">⏳ Tarix</h3>
+                  <div className="adm-card" style={{ background: "var(--surface, #fff)", border: "1px solid var(--line, #e2e8f0)", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                    <h3 className="adm-card-header" style={{ fontSize: "16px", fontWeight: "700", color: "var(--ink)", margin: "0 0 16px 0", paddingBottom: "12px", borderBottom: "1px solid var(--line, #e2e8f0)" }}>⏳ Tarix</h3>
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {editingStory.history.map((hist, idx) => (
                         <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px", background: "var(--fill)", borderRadius: "6px" }}>
